@@ -22,7 +22,7 @@ CREATE TABLE reports (
     filepath TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 );
 CREATE TABLE extracted_images (
     id SERIAL PRIMARY KEY,
@@ -30,7 +30,7 @@ CREATE TABLE extracted_images (
     filepath TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    FOREIGN KEY (report_id) REFERENCES reports(id)
+    FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
 );
 CREATE TABLE supplemental_materials (
     id SERIAL PRIMARY KEY,
@@ -38,7 +38,7 @@ CREATE TABLE supplemental_materials (
     filepath TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 );
 CREATE TABLE seizures (
     id SERIAL PRIMARY KEY,
@@ -48,7 +48,7 @@ CREATE TABLE seizures (
     duration INTERVAL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 );
 CREATE TABLE electrodes (
     id SERIAL PRIMARY KEY,
@@ -62,8 +62,8 @@ CREATE TABLE seizures_electrodes (
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
     PRIMARY KEY (seizure_id, electrode_id),
-    FOREIGN KEY (seizure_id) REFERENCES seizures(id),
-    FOREIGN KEY (electrode_id) REFERENCES electrodes(id)
+    FOREIGN KEY (seizure_id) REFERENCES seizures(id) ON DELETE CASCADE,
+    FOREIGN KEY (electrode_id) REFERENCES electrodes(id) ON DELETE CASCADE
 );
 CREATE TABLE drugs (
     id SERIAL PRIMARY KEY,
@@ -79,6 +79,6 @@ CREATE TABLE drug_administration (
     dosage INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES patients(id),
-    FOREIGN KEY (drug_id) REFERENCES drugs(id)
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (drug_id) REFERENCES drugs(id) ON DELETE CASCADE
 );
