@@ -24,14 +24,6 @@ CREATE TABLE reports (
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES patients(id)
 );
-CREATE TABLE supplemental_materials (
-    id SERIAL PRIMARY KEY,
-    patient_id INT NOT NULL,
-    filepath TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES patients(id)
-);
 CREATE TABLE extracted_images (
     id SERIAL PRIMARY KEY,
     report_id INT NOT NULL,
@@ -40,3 +32,9 @@ CREATE TABLE extracted_images (
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
     FOREIGN KEY (report_id) REFERENCES reports(id)
 );
+CREATE TABLE supplemental_materials (
+    id SERIAL PRIMARY KEY,
+    patient_id INT NOT NULL,
+    filepath TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
