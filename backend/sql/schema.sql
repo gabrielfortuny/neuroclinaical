@@ -83,6 +83,23 @@ CREATE TABLE drug_administration (
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
     FOREIGN KEY (drug_id) REFERENCES drugs(id) ON DELETE CASCADE
 );
+CREATE TABLE conversations (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
+);
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    conversation_id INT NOT NULL,
+    query TEXT NOT NULL,
+    response TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+);
+
 CREATE INDEX idx_seizures_patient_id ON seizures(patient_id);
 CREATE INDEX idx_drug_administration_patient_id ON drug_administration(patient_id);
 CREATE INDEX idx_drug_administration_drug_id ON drug_administration(drug_id);
