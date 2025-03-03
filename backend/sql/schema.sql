@@ -103,5 +103,76 @@ CREATE TABLE messages (
 CREATE INDEX idx_seizures_patient_id ON seizures(patient_id);
 CREATE INDEX idx_drug_administration_patient_id ON drug_administration(patient_id);
 CREATE INDEX idx_drug_administration_drug_id ON drug_administration(drug_id);
-CREATE INDEX idx_seizure_electrodes_seizure_id ON seizure_electrodes(seizure_id);
-CREATE INDEX idx_seizure_electrodes_electrode_id ON seizure_electrodes(electrode_id);
+CREATE INDEX idx_seizure_electrodes_seizure_id ON seizures_electrodes(seizure_id);
+CREATE INDEX idx_seizure_electrodes_electrode_id ON seizures_electrodes(electrode_id);
+CREATE INDEX idx_seizures_created_at ON seizures(created_at);
+CREATE INDEX idx_conversations_created_at ON conversations(created_at);
+CREATE INDEX idx_messages_created_at ON messages(created_at);
+
+CREATE OR REPLACE FUNCTION update_modified_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.modified_at = NOW();  -- Set the modified_at column to the current timestamp
+    RETURN NEW;               -- Return the new row after modification
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_users_modified_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_patients_modified_at
+BEFORE UPDATE ON patients
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_reports_modified_at
+BEFORE UPDATE ON reports
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_extracted_images_modified_at
+BEFORE UPDATE ON extracted_images
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_supplemental_materials_modified_at
+BEFORE UPDATE ON supplemental_materials
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_seizures_modified_at
+BEFORE UPDATE ON seizures
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_electrodes_modified_at
+BEFORE UPDATE ON electrodes
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_seizures_electrodes_modified_at
+BEFORE UPDATE ON seizures_electrodes
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_drugs_modified_at
+BEFORE UPDATE ON drugs
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_drug_administration_modified_at
+BEFORE UPDATE ON drug_administration
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_conversations_modified_at
+BEFORE UPDATE ON conversations
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
+
+CREATE TRIGGER trg_update_messages_modified_at
+BEFORE UPDATE ON messages
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_at_column();
