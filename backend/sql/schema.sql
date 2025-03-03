@@ -1,3 +1,11 @@
+CREATE TABLE users (
+    username TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash VARCHAR(64) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    modified_at TIMESTAMP DEFAULT NOW() NOT NULL
+);
 CREATE TABLE patients (
     id SERIAL PRIMARY KEY,
     name TEXT,
