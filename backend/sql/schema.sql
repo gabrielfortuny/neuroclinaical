@@ -1,3 +1,4 @@
+-- https://lucid.app/lucidchart/a8b4be3b-ccad-4e50-8a5e-e9f78e4d78cc/edit?invitationId=inv_4caef618-5598-4fea-ad12-e5acb15c6430
 CREATE TABLE users (
     username TEXT PRIMARY KEY,
     name TEXT NOT NULL,
