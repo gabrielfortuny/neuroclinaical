@@ -82,3 +82,8 @@ CREATE TABLE drug_administration (
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
     FOREIGN KEY (drug_id) REFERENCES drugs(id) ON DELETE CASCADE
 );
+CREATE INDEX idx_seizures_patient_id ON seizures(patient_id);
+CREATE INDEX idx_drug_administration_patient_id ON drug_administration(patient_id);
+CREATE INDEX idx_drug_administration_drug_id ON drug_administration(drug_id);
+CREATE INDEX idx_seizure_electrodes_seizure_id ON seizure_electrodes(seizure_id);
+CREATE INDEX idx_seizure_electrodes_electrode_id ON seizure_electrodes(electrode_id);
