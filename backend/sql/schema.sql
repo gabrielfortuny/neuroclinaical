@@ -10,7 +10,7 @@ CREATE TABLE users (
 );
 CREATE TABLE patients (
     id SERIAL PRIMARY KEY,
-    name TEXT,
+    name TEXT NOT NULL,
     dob DATE,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL
@@ -68,6 +68,7 @@ CREATE TABLE seizures_electrodes (
 CREATE TABLE drugs (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
+    class TEXT,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     modified_at TIMESTAMP DEFAULT NOW() NOT NULL
 );
