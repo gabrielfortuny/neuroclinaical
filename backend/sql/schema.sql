@@ -65,3 +65,20 @@ CREATE TABLE seizures_electrodes (
     FOREIGN KEY (seizure_id) REFERENCES seizures(id),
     FOREIGN KEY (electrode_id) REFERENCES electrodes(id)
 );
+CREATE TABLE drugs (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    modified_at TIMESTAMP DEFAULT NOW() NOT NULL
+);
+CREATE TABLE drug_administration (
+    id SERIAL PRIMARY KEY,
+    patient_id INT NOT NULL,
+    drug_id INT NOT NULL,
+    day INT NOT NULL,
+    dosage INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    modified_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    FOREIGN KEY (patient_id) REFERENCES patients(id),
+    FOREIGN KEY (drug_id) REFERENCES drugs(id)
+);
