@@ -1,0 +1,33 @@
+services:
+  api:
+    build: ./api
+    container_name: flask_app
+    ports:
+      -
+    environment:
+      - FLASK_ENV=development
+    #   - DATABASE_URL=TODO
+    depends_on:
+      - db
+      - llm
+
+  db:
+    build: ./database
+    containername: postgres_db
+    environment:
+    #   - POSTGRES_USER=TODO
+    #   - POSTGRES_PASSWORD=TODO
+    #   - POSTGRES_DB=TODO
+    ports:
+    #   -
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  llm:
+    build: ./llm
+    container_name: llm_service
+    ports:
+    # -TODO
+
+volumes:
+  postgres_data:
