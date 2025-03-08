@@ -12,8 +12,7 @@ services:
       - llm
 
   db:
-    build: ./database
-    container_name: postgres_db
+    image: postgres:17.4
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U
