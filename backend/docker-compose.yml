@@ -13,7 +13,7 @@ services:
 
   db:
     build: ./database
-    containername: postgres_db
+    container_name: postgres_db
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U
