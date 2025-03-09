@@ -3,6 +3,9 @@
   "dockerComposeFile": "../backend/docker-compose.yml",
   "service": "api",
   "workspaceFolder": "/workspaces/neuroclinaical",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspaces/neuroclinaical,type=bind"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
