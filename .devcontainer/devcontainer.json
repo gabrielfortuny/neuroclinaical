@@ -1,0 +1,22 @@
+{
+  "name": "Flask Dev Container",
+  "dockerComposeFile": "../backend/docker-compose.yml",
+  "service": "api",
+  "workspaceFolder": "/workspaces/neuroclinaical",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspaces/neuroclinaical,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-azuretools.vscode-docker"]
+    },
+    "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash",
+      "python.defaultInterpreterPath": "/usr/local/bin/python"
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "remoteUser": "root"
+}
