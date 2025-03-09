@@ -8,11 +8,21 @@
   ],
   "customizations": {
     "vscode": {
-      "extensions": ["ms-python.python", "ms-azuretools.vscode-docker"]
-    },
-    "settings": {
-      "terminal.integrated.shell.linux": "/bin/bash",
-      "python.defaultInterpreterPath": "/usr/local/bin/python"
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        }
+      }
     }
   },
   "features": {
