@@ -10,7 +10,13 @@ def setup():
 
 
 @routes.route('/upload', methods=['POST'])
-def upload() -> str:  # put application's code here
+def upload() -> str:  
+    if request.content_type in supported_file_types:
+        return "OK"
+    return 'Hello World!'
+
+@routes.route('/testing')
+def test() -> str: 
     if request.content_type in supported_file_types:
         return "OK"
     return 'Hello World!'
