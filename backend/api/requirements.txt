@@ -3,3 +3,9 @@ Flask-SQLAlchemy
 Flask-Login
 Flask-RESTful
 psycopg2-binary
+black
+pylint
+pytest
+isort
+pydocstyle
+mypy
