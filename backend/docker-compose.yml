@@ -3,31 +3,35 @@ services:
     build: ./api
     container_name: flask_app
     ports:
-      - "5000"
+      - "8000:5000" # go to http://localhost:8000 on host machine
     environment:
       - FLASK_ENV=development
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
     depends_on:
       - db
-      - llm
+      - ollama
 
   db:
     image: postgres:17.4
+    restart: always
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U
       - POSTGRES_DB=database
       # credentials could be stored elsewhere if better security is needed
     ports:
-      - "5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  llm:
-    build: ./llm
-    container_name: llm_service
+  ollama:
+    image: ollama/ollama
+    restart: always
     ports:
-      - "6000"
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
 
 volumes:
   postgres_data:
+  ollama_data:
