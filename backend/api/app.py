@@ -1,4 +1,5 @@
 from . import app, db
+from sqlalchemy import text
 
 
 @app.route("/")
@@ -8,8 +9,13 @@ def index():
 
 @app.route("/test_db")
 def test_db():
-    db_version = db.session.execute("SELECT version()").fetchone()
-    return f"DB Version: {db_version[0]}"
+    try:
+        with db.engine.connect() as connection:
+            result = connection.execute(text("SELECT version();"))
+            db_version = result.fetchone()[0]
+        return f"DB Version: {db_version}"
+    except Exception as e:
+        return f"Error: {e}", 500
 
 
 @app.route("/test_db_tables")
