@@ -1,0 +1,557 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		66281DAC2D779CD60023826D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66281D932D779CD50023826D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 66281D9A2D779CD50023826D;
+			remoteInfo = "Neuro ClinAIcal";
+		};
+		66281DB62D779CD60023826D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66281D932D779CD50023826D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 66281D9A2D779CD50023826D;
+			remoteInfo = "Neuro ClinAIcal";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		66281D9B2D779CD50023826D /* Neuro ClinAIcal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Neuro ClinAIcal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		66281DAB2D779CD60023826D /* Neuro ClinAIcalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Neuro ClinAIcalTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		66281DB52D779CD60023826D /* Neuro ClinAIcalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Neuro ClinAIcalUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		66281D9D2D779CD50023826D /* Neuro ClinAIcal */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Neuro ClinAIcal";
+			sourceTree = "<group>";
+		};
+		66281DAE2D779CD60023826D /* Neuro ClinAIcalTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Neuro ClinAIcalTests";
+			sourceTree = "<group>";
+		};
+		66281DB82D779CD60023826D /* Neuro ClinAIcalUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Neuro ClinAIcalUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		66281D982D779CD50023826D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66281DA82D779CD60023826D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66281DB22D779CD60023826D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		66281D922D779CD50023826D = {
+			isa = PBXGroup;
+			children = (
+				66281D9D2D779CD50023826D /* Neuro ClinAIcal */,
+				66281DAE2D779CD60023826D /* Neuro ClinAIcalTests */,
+				66281DB82D779CD60023826D /* Neuro ClinAIcalUITests */,
+				66281D9C2D779CD50023826D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		66281D9C2D779CD50023826D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				66281D9B2D779CD50023826D /* Neuro ClinAIcal.app */,
+				66281DAB2D779CD60023826D /* Neuro ClinAIcalTests.xctest */,
+				66281DB52D779CD60023826D /* Neuro ClinAIcalUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		66281D9A2D779CD50023826D /* Neuro ClinAIcal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66281DBF2D779CD60023826D /* Build configuration list for PBXNativeTarget "Neuro ClinAIcal" */;
+			buildPhases = (
+				66281D972D779CD50023826D /* Sources */,
+				66281D982D779CD50023826D /* Frameworks */,
+				66281D992D779CD50023826D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				66281D9D2D779CD50023826D /* Neuro ClinAIcal */,
+			);
+			name = "Neuro ClinAIcal";
+			packageProductDependencies = (
+			);
+			productName = "Neuro ClinAIcal";
+			productReference = 66281D9B2D779CD50023826D /* Neuro ClinAIcal.app */;
+			productType = "com.apple.product-type.application";
+		};
+		66281DAA2D779CD60023826D /* Neuro ClinAIcalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66281DC22D779CD60023826D /* Build configuration list for PBXNativeTarget "Neuro ClinAIcalTests" */;
+			buildPhases = (
+				66281DA72D779CD60023826D /* Sources */,
+				66281DA82D779CD60023826D /* Frameworks */,
+				66281DA92D779CD60023826D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66281DAD2D779CD60023826D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				66281DAE2D779CD60023826D /* Neuro ClinAIcalTests */,
+			);
+			name = "Neuro ClinAIcalTests";
+			packageProductDependencies = (
+			);
+			productName = "Neuro ClinAIcalTests";
+			productReference = 66281DAB2D779CD60023826D /* Neuro ClinAIcalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		66281DB42D779CD60023826D /* Neuro ClinAIcalUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66281DC52D779CD60023826D /* Build configuration list for PBXNativeTarget "Neuro ClinAIcalUITests" */;
+			buildPhases = (
+				66281DB12D779CD60023826D /* Sources */,
+				66281DB22D779CD60023826D /* Frameworks */,
+				66281DB32D779CD60023826D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				66281DB72D779CD60023826D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				66281DB82D779CD60023826D /* Neuro ClinAIcalUITests */,
+			);
+			name = "Neuro ClinAIcalUITests";
+			packageProductDependencies = (
+			);
+			productName = "Neuro ClinAIcalUITests";
+			productReference = 66281DB52D779CD60023826D /* Neuro ClinAIcalUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		66281D932D779CD50023826D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					66281D9A2D779CD50023826D = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					66281DAA2D779CD60023826D = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 66281D9A2D779CD50023826D;
+					};
+					66281DB42D779CD60023826D = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 66281D9A2D779CD50023826D;
+					};
+				};
+			};
+			buildConfigurationList = 66281D962D779CD50023826D /* Build configuration list for PBXProject "Neuro ClinAIcal" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 66281D922D779CD50023826D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 66281D9C2D779CD50023826D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				66281D9A2D779CD50023826D /* Neuro ClinAIcal */,
+				66281DAA2D779CD60023826D /* Neuro ClinAIcalTests */,
+				66281DB42D779CD60023826D /* Neuro ClinAIcalUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		66281D992D779CD50023826D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66281DA92D779CD60023826D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66281DB32D779CD60023826D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		66281D972D779CD50023826D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66281DA72D779CD60023826D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66281DB12D779CD60023826D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		66281DAD2D779CD60023826D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 66281D9A2D779CD50023826D /* Neuro ClinAIcal */;
+			targetProxy = 66281DAC2D779CD60023826D /* PBXContainerItemProxy */;
+		};
+		66281DB72D779CD60023826D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 66281D9A2D779CD50023826D /* Neuro ClinAIcal */;
+			targetProxy = 66281DB62D779CD60023826D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		66281DBD2D779CD60023826D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		66281DBE2D779CD60023826D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		66281DC02D779CD60023826D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Neuro ClinAIcal/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.umich.nehmea.Neuro-ClinAIcal";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		66281DC12D779CD60023826D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Neuro ClinAIcal/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.umich.nehmea.Neuro-ClinAIcal";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		66281DC32D779CD60023826D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.umich.nehmea.Neuro-ClinAIcalTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Neuro ClinAIcal.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Neuro ClinAIcal";
+			};
+			name = Debug;
+		};
+		66281DC42D779CD60023826D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.umich.nehmea.Neuro-ClinAIcalTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Neuro ClinAIcal.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Neuro ClinAIcal";
+			};
+			name = Release;
+		};
+		66281DC62D779CD60023826D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.umich.nehmea.Neuro-ClinAIcalUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Neuro ClinAIcal";
+			};
+			name = Debug;
+		};
+		66281DC72D779CD60023826D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.umich.nehmea.Neuro-ClinAIcalUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Neuro ClinAIcal";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		66281D962D779CD50023826D /* Build configuration list for PBXProject "Neuro ClinAIcal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66281DBD2D779CD60023826D /* Debug */,
+				66281DBE2D779CD60023826D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66281DBF2D779CD60023826D /* Build configuration list for PBXNativeTarget "Neuro ClinAIcal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66281DC02D779CD60023826D /* Debug */,
+				66281DC12D779CD60023826D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66281DC22D779CD60023826D /* Build configuration list for PBXNativeTarget "Neuro ClinAIcalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66281DC32D779CD60023826D /* Debug */,
+				66281DC42D779CD60023826D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66281DC52D779CD60023826D /* Build configuration list for PBXNativeTarget "Neuro ClinAIcalUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66281DC62D779CD60023826D /* Debug */,
+				66281DC72D779CD60023826D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 66281D932D779CD50023826D /* Project object */;
+}
