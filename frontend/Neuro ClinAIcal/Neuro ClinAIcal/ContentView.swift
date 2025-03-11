@@ -13,8 +13,41 @@ struct ContentView: View {
         Patient(name: "Bob", age: 52)
     ]
     
+    let optionButtonWidth: CGFloat = 175
+    
+    @State private var expandedPatientID: UUID? = nil
+    
     func patientTapped(_ patient: Patient) {
         print("\(patient.name) button tapped")
+        
+        if expandedPatientID == patient.id {
+            expandedPatientID = nil // Collapse if already open
+        } else {
+            expandedPatientID = patient.id // Expand this patient and collapse others
+        }
+    }
+    
+    
+    func optionButton(icon: String, text: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .font(.system(size: 20))
+                
+                Text(text)
+                    .fontWeight(.medium)
+                    .foregroundColor(color)
+                
+                Spacer()
+            }
+            .padding()
+            .frame(maxWidth: optionButtonWidth, alignment: .leading)
+        }
+    }
+    
+    func handleOptionSelection(_ option: String) {
+        print("\(option) option tapped")
     }
     
     var body: some View {
@@ -25,25 +58,56 @@ struct ContentView: View {
                     .font(.largeTitle)
                     .foregroundStyle(.white)
                 
-                ForEach(patients) { patient in Button(action: { patientTapped(patient) }) {
-                        HStack {
-                            Spacer() // Pushes text to center
+                ForEach(patients) {
+                    patient in Button(action: { patientTapped(patient) } ) {
+                        VStack{
+                            HStack {
+                                Text(patient.name)
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                    .padding(.leading, 10)
+                                
+                                Spacer()
+                                
+                                Image(systemName: expandedPatientID == patient.id ? "chevron.up" : "chevron.down") // Drop-down icon
+                                    .foregroundColor(.gray)
+                                    .padding(.trailing, 10)
+                            }
                             
-                            Text(patient.name)
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            
-                            Spacer() // Pushes icon to the right
-                            
-                            Image(systemName: "chevron.down") // Drop-down icon
-                                .foregroundColor(.gray)
-                                .padding(.trailing, 15)
+                            if expandedPatientID == patient.id {
+                                VStack(spacing: 15) {
+                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
+                                        handleOptionSelection("Manage Raw Files")
+                                    }
+                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
+                                        handleOptionSelection("Upload New Files")
+                                    }
+                                    optionButton(icon: "play.fill", text: "Export Data", color: .black) {
+                                        handleOptionSelection("Export Data")
+                                    }
+                                    optionButton(icon: "trash", text: "Delete Patient", color: .red) {
+                                        handleOptionSelection("Delete Patient")
+                                    }
+                                    
+                                    Button(action: { handleOptionSelection("View Patient") }) {
+                                        Text("VIEW PATIENT")
+                                            .font(.headline)
+                                            .foregroundColor(.black)
+                                            .padding()
+                                            .frame(maxWidth: optionButtonWidth)
+                                            .background(Color.white)
+                                            .cornerRadius(8)
+                                            .shadow(radius: 3)
+                                    }
+                                    .padding(.top, 10)
+                                }
+                            }
                         }
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
                     }
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .padding(.horizontal, 20)
                 }
                 
                 Spacer()

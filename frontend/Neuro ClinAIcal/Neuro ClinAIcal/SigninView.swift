@@ -12,11 +12,11 @@ struct SignInView: View {
     @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
     @State private var showError: Bool = false
-    @State private var isAuthenticated: Bool = false // ✅ Tracks authentication
+    @State private var isAuthenticated: Bool = false
 
     var body: some View {
         if isAuthenticated {
-            ContentView() // ✅ Show ContentView after sign-in
+            ContentView()
         } else {
             ZStack {
                 Color(red: 80/255, green: 134/255, blue: 98/255)
