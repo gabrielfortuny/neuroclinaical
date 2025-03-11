@@ -6,7 +6,10 @@ services:
       - "8000:5000" # go to http://localhost:8000 on host machine
     environment:
       - FLASK_ENV=development
+      - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
+    volumes:
+      - ./api:/app
     depends_on:
       - db
       - ollama
