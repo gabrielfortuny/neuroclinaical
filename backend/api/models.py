@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
     Column,
     Integer,
@@ -11,162 +11,165 @@ from sqlalchemy import (
     Interval,
     Table,
 )
-from sqlalchemy.orm import relationship, declarative_base
-
-Base = declarative_base()
+from sqlalchemy.orm import relationship
+from . import db
 
 
 def current_timestamp():
-    return datetime.now(datetime.timezone.utc)
+    return datetime.now(timezone.utc)
 
 
 class TimestampMixin:
-    created_at = Column(DateTime, default=current_timestamp, nullable=False)
-    modified_at = Column(
+    created_at = db.Column(DateTime, default=current_timestamp, nullable=False)
+    modified_at = db.Column(
         DateTime, default=current_timestamp, onupdate=current_timestamp, nullable=False
     )
 
 
-class User(Base, TimestampMixin):
+class User(db.Model, TimestampMixin):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    username = Column(String(100), unique=True, nullable=False)
-    name = Column(String(100), nullable=False)
-    email = Column(String(100), unique=True, nullable=False)
-    password_hash = Column(String(64), nullable=False)
-    conversations = relationship("Conversation", back_populates="user")
+    id = db.Column(Integer, primary_key=True)
+    username = db.Column(String(100), unique=True, nullable=False)
+    name = db.Column(String(100), nullable=False)
+    email = db.Column(String(100), unique=True, nullable=False)
+    password_hash = db.Column(String(64), nullable=False)
+    conversations = db.relationship("Conversation", back_populates="user")
 
 
-class Patient(Base, TimestampMixin):
+class Patient(db.Model, TimestampMixin):
     __tablename__ = "patients"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
-    dob = Column(Date)
-    reports = relationship("Report", back_populates="patient", cascade="all, delete")
-    supplemental_materials = relationship(
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String(100), nullable=False)
+    dob = db.Column(Date)
+    reports = db.relationship("Report", back_populates="patient", cascade="all, delete")
+    supplemental_materials = db.relationship(
         "SupplementalMaterial", back_populates="patient", cascade="all, delete"
     )
-    seizures = relationship("Seizure", back_populates="patient", cascade="all, delete")
-    drug_administrations = relationship(
+    seizures = db.relationship(
+        "Seizure", back_populates="patient", cascade="all, delete"
+    )
+    drug_administrations = db.relationship(
         "DrugAdministration", back_populates="patient", cascade="all, delete"
     )
-    conversations = relationship("Conversation", back_populates="patient")
+    conversations = db.relationship("Conversation", back_populates="patient")
 
 
-class Report(Base, TimestampMixin):
+class Report(db.Model, TimestampMixin):
     __tablename__ = "reports"
-    id = Column(Integer, primary_key=True)
-    patient_id = Column(
-        Integer, ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    patient_id = db.Column(
+        Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
-    summary = Column(Text)
-    filepath = Column(Text, nullable=False)
-    patient = relationship("Patient", back_populates="reports")
-    extracted_images = relationship(
+    summary = db.Column(Text)
+    filepath = db.Column(Text, nullable=False)
+    patient = db.relationship("Patient", back_populates="reports")
+    extracted_images = db.relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
 
 
-class ExtractedImage(Base, TimestampMixin):
+class ExtractedImage(db.Model, TimestampMixin):
     __tablename__ = "extracted_images"
-    id = Column(Integer, primary_key=True)
-    report_id = Column(
-        Integer, ForeignKey("reports.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    report_id = db.Column(
+        Integer, db.ForeignKey("reports.id", ondelete="CASCADE"), nullable=False
     )
-    filepath = Column(Text, nullable=False)
-    report = relationship("Report", back_populates="extracted_images")
+    filepath = db.Column(Text, nullable=False)
+    report = db.relationship("Report", back_populates="extracted_images")
 
 
-class SupplementalMaterial(Base, TimestampMixin):
+class SupplementalMaterial(db.Model, TimestampMixin):
     __tablename__ = "supplemental_materials"
-    id = Column(Integer, primary_key=True)
-    patient_id = Column(
-        Integer, ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    patient_id = db.Column(
+        Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
-    filepath = Column(Text, nullable=False)
-    patient = relationship("Patient", back_populates="supplemental_materials")
+    filepath = db.Column(Text, nullable=False)
+    patient = db.relationship("Patient", back_populates="supplemental_materials")
 
 
-class Seizure(Base, TimestampMixin):
+class Seizure(db.Model, TimestampMixin):
     __tablename__ = "seizures"
-    id = Column(Integer, primary_key=True)
-    patient_id = Column(
-        Integer, ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    patient_id = db.Column(
+        Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
-    day = Column(Integer, nullable=False)
-    start_time = Column(Time)
-    duration = Column(Interval)
-    patient = relationship("Patient", back_populates="seizures")
-    electrodes = relationship(
+    day = db.Column(Integer, nullable=False)
+    start_time = db.Column(Time)
+    duration = db.Column(Interval)
+    patient = db.relationship("Patient", back_populates="seizures")
+    electrodes = db.relationship(
         "Electrode",
         secondary="seizure_electrode_association",
         back_populates="seizures",
     )
 
 
-class Electrode(Base, TimestampMixin):
+class Electrode(db.Model, TimestampMixin):
     __tablename__ = "electrodes"
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False)
-    seizures = relationship(
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(Text, nullable=False)
+    seizures = db.relationship(
         "Seizure",
         secondary="seizure_electrode_association",
         back_populates="electrodes",
     )
 
 
-seizure_electrode_association = Table(
+# Association table for many-to-many relationship
+seizure_electrode_association = db.Table(
     "seizure_electrode_association",
-    Base.metadata,
-    Column("seizure_id", Integer, ForeignKey("seizures.id", ondelete="CASCADE")),
-    Column("electrode_id", Integer, ForeignKey("electrodes.id", ondelete="CASCADE")),
+    db.Column("seizure_id", Integer, db.ForeignKey("seizures.id", ondelete="CASCADE")),
+    db.Column(
+        "electrode_id", Integer, db.ForeignKey("electrodes.id", ondelete="CASCADE")
+    ),
 )
 
 
-class Drug(Base, TimestampMixin):
+class Drug(db.Model, TimestampMixin):
     __tablename__ = "drugs"
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False)
-    drug_class = Column(Text)
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(Text, nullable=False)
+    drug_class = db.Column(Text)
 
 
-class DrugAdministration(Base, TimestampMixin):
+class DrugAdministration(db.Model, TimestampMixin):
     __tablename__ = "drug_administration"
-    id = Column(Integer, primary_key=True)
-    patient_id = Column(
-        Integer, ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    patient_id = db.Column(
+        Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
-    drug_id = Column(
-        Integer, ForeignKey("drugs.id", ondelete="CASCADE"), nullable=False
+    drug_id = db.Column(
+        Integer, db.ForeignKey("drugs.id", ondelete="CASCADE"), nullable=False
     )
-    day = Column(Integer, nullable=False)
-    dosage = Column(Integer, nullable=False)
-    patient = relationship("Patient", back_populates="drug_administrations")
-    drug = relationship("Drug")
+    day = db.Column(Integer, nullable=False)
+    dosage = db.Column(Integer, nullable=False)
+    patient = db.relationship("Patient", back_populates="drug_administrations")
+    drug = db.relationship("Drug")
 
 
-class Conversation(Base, TimestampMixin):
+class Conversation(db.Model, TimestampMixin):
     __tablename__ = "conversations"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    user_id = db.Column(
+        Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    patient_id = Column(
-        Integer, ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
+    patient_id = db.Column(
+        Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
-    user = relationship("User", back_populates="conversations")
-    patient = relationship("Patient", back_populates="conversations")
-    messages = relationship(
+    user = db.relationship("User", back_populates="conversations")
+    patient = db.relationship("Patient", back_populates="conversations")
+    messages = db.relationship(
         "Message", back_populates="conversation", cascade="all, delete"
     )
 
 
-class Message(Base, TimestampMixin):
+class Message(db.Model, TimestampMixin):
     __tablename__ = "messages"
-    id = Column(Integer, primary_key=True)
-    conversation_id = Column(
-        Integer, ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False
+    id = db.Column(Integer, primary_key=True)
+    conversation_id = db.Column(
+        Integer, db.ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False
     )
-    query = Column(Text, nullable=False)
-    response = Column(Text, nullable=False)
-    conversation = relationship("Conversation", back_populates="messages")
+    query = db.Column(Text, nullable=False)
+    response = db.Column(Text, nullable=False)
+    conversation = db.relationship("Conversation", back_populates="messages")
