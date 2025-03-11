@@ -20,7 +20,7 @@ def test_db():
 
 @app.route("/test_db_tables")
 def test_db_tables():
-    db_tables = db.engine.table_names()
+    db_tables = db.inspect(db.engine).get_table_names()
     return f"DB Tables: {db_tables}"
 
 
