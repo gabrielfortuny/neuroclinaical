@@ -13,8 +13,6 @@ struct ContentView: View {
         Patient(name: "Bob", age: 52)
     ]
     
-    let optionButtonWidth: CGFloat = 175
-    
     @State private var expandedPatientID: UUID? = nil
     
     func patientTapped(_ patient: Patient) {
@@ -42,7 +40,7 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
-            .frame(maxWidth: optionButtonWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     
@@ -75,32 +73,30 @@ struct ContentView: View {
                             }
                             
                             if expandedPatientID == patient.id {
-                                VStack(spacing: 15) {
-                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
-                                        handleOptionSelection("Manage Raw Files")
-                                    }
-                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
-                                        handleOptionSelection("Upload New Files")
-                                    }
-                                    optionButton(icon: "play.fill", text: "Export Data", color: .black) {
-                                        handleOptionSelection("Export Data")
-                                    }
-                                    optionButton(icon: "trash", text: "Delete Patient", color: .red) {
-                                        handleOptionSelection("Delete Patient")
-                                    }
-                                    
-                                    Button(action: { handleOptionSelection("View Patient") }) {
-                                        Text("VIEW PATIENT")
-                                            .font(.headline)
-                                            .foregroundColor(.black)
-                                            .padding()
-                                            .frame(maxWidth: optionButtonWidth)
-                                            .background(Color.white)
-                                            .cornerRadius(8)
-                                            .shadow(radius: 3)
-                                    }
-                                    .padding(.top, 10)
+                                optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
+                                    handleOptionSelection("Manage Raw Files")
                                 }
+                                optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
+                                    handleOptionSelection("Upload New Files")
+                                }
+                                optionButton(icon: "play.fill", text: "Export Data", color: .black) {
+                                    handleOptionSelection("Export Data")
+                                }
+                                optionButton(icon: "trash", text: "Delete Patient", color: .red) {
+                                    handleOptionSelection("Delete Patient")
+                                }
+                                
+                                Button(action: { handleOptionSelection("View Patient") }) {
+                                    Text("VIEW PATIENT")
+                                        .font(.headline)
+                                        .foregroundColor(.black)
+                                        .padding()
+                                        .frame(maxWidth: 175)
+                                        .background(Color.white)
+                                        .cornerRadius(8)
+                                        .shadow(radius: 3)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
                             }
                         }
                     }
