@@ -49,64 +49,66 @@ struct ContentView: View {
     }
     
     var body: some View {
-        ZStack{
-            Color(red: 80/255, green: 134/255, blue: 98/255).edgesIgnoringSafeArea(.all)
-            VStack {
-                Text("Neuro ClinAIcal")
-                    .font(.largeTitle)
-                    .foregroundStyle(.white)
-                
-                ForEach(patients) {
-                    patient in Button(action: { patientTapped(patient) } ) {
-                        VStack{
-                            HStack {
-                                Text(patient.name)
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                    .padding(.leading, 10)
-                                
-                                Spacer()
-                                
-                                Image(systemName: expandedPatientID == patient.id ? "chevron.up" : "chevron.down") // Drop-down icon
-                                    .foregroundColor(.gray)
-                                    .padding(.trailing, 10)
-                            }
-                            
-                            if expandedPatientID == patient.id {
-                                optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
-                                    handleOptionSelection("Manage Raw Files")
-                                }
-                                optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
-                                    handleOptionSelection("Upload New Files")
-                                }
-                                optionButton(icon: "play.fill", text: "Export Data", color: .black) {
-                                    handleOptionSelection("Export Data")
-                                }
-                                optionButton(icon: "trash", text: "Delete Patient", color: .red) {
-                                    handleOptionSelection("Delete Patient")
-                                }
-                                
-                                Button(action: { handleOptionSelection("View Patient") }) {
-                                    Text("VIEW PATIENT")
+        NavigationStack {
+            ZStack{
+                Color(red: 80/255, green: 134/255, blue: 98/255).edgesIgnoringSafeArea(.all)
+                VStack {
+                    Text("Neuro ClinAIcal")
+                        .font(.largeTitle)
+                        .foregroundStyle(.white)
+                    
+                    ForEach(patients) {
+                        patient in Button(action: { patientTapped(patient) } ) {
+                            VStack{
+                                HStack {
+                                    Text(patient.name)
                                         .font(.headline)
                                         .foregroundColor(.black)
-                                        .padding()
-                                        .frame(maxWidth: 175)
-                                        .background(Color.white)
-                                        .cornerRadius(8)
-                                        .shadow(radius: 3)
+                                        .padding(.leading, 10)
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: expandedPatientID == patient.id ? "chevron.up" : "chevron.down") // Drop-down icon
+                                        .foregroundColor(.gray)
+                                        .padding(.trailing, 10)
                                 }
-                                .frame(maxWidth: .infinity, alignment: .center)
+                                
+                                if expandedPatientID == patient.id {
+                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
+                                        handleOptionSelection("Manage Raw Files")
+                                    }
+                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
+                                        handleOptionSelection("Upload New Files")
+                                    }
+                                    optionButton(icon: "play.fill", text: "Export Data", color: .black) {
+                                        handleOptionSelection("Export Data")
+                                    }
+                                    optionButton(icon: "trash", text: "Delete Patient", color: .red) {
+                                        handleOptionSelection("Delete Patient")
+                                    }
+                                    
+                                    NavigationLink(destination: PatientView(patient: patient)) {
+                                        Text("VIEW PATIENT")
+                                            .font(.headline)
+                                            .foregroundColor(.black)
+                                            .padding()
+                                            .frame(maxWidth: 175)
+                                            .background(Color.white)
+                                            .cornerRadius(8)
+                                            .shadow(radius: 3)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                }
                             }
                         }
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal, 20)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal, 20)
+                    
+                    Spacer()
                 }
-                
-                Spacer()
             }
         }
     }
