@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Api
+from app.routes import register_routes
 from .config import Config
 
 db = SQLAlchemy()
@@ -12,10 +14,6 @@ def create_app():
 
     db.init_app(app)
 
-    from .routes.user_routes import user_bp
-    from .routes.patient_routes import patient_bp
-
-    app.register_blueprint(user_bp, url_prefix="/api/users")
-    app.register_blueprint(patient_bp, url_prefix="/api/patients")
+    register_routes(app)
 
     return app
