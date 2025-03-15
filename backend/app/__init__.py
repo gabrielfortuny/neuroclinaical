@@ -15,6 +15,7 @@ def create_app():
     jwt.init_app(app)
 
     with app.app_context():
+        # pylint: disable-next=import-outside-toplevel, unused-import
         from app import routes, models
 
         db.create_all()
