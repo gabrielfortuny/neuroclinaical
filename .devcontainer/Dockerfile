@@ -1,13 +1,11 @@
 FROM python:3.13.2-slim
 
 WORKDIR /app
-
-COPY requirements.txt .
-
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY . /app
 
 EXPOSE 5000
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--debug"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

@@ -1,11 +1,9 @@
 {
-  "name": "Flask Dev Container",
-  "dockerComposeFile": "../backend/docker-compose.yml",
-  "service": "api",
-  "workspaceFolder": "/workspaces/neuroclinaical",
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspaces/neuroclinaical,type=bind"
-  ],
+  "name": "NeuroClinical Backend",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/app",
+  "forwardPorts": [5000],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -24,9 +22,5 @@
         }
       }
     }
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
-  },
-  "remoteUser": "root"
+  }
 }
