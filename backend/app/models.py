@@ -12,7 +12,7 @@ from sqlalchemy import (
     Table,
 )
 from sqlalchemy.orm import relationship
-from . import db
+from app import db
 
 
 def current_timestamp():

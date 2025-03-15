@@ -11,7 +11,8 @@
         "ms-azuretools.vscode-docker",
         "esbenp.prettier-vscode",
         "ms-python.vscode-pylance",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "ms-python.pylint"
       ],
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
