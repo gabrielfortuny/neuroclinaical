@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from app.config import Config
@@ -21,7 +21,7 @@ def create_app():
 
     @app.before_request
     def require_jwt():
-        if app.request.path != "/auth/login":
+        if request.path != "/auth/login":
             verify_jwt_in_request()
 
     return app
