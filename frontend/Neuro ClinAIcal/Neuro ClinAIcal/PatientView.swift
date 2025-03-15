@@ -29,7 +29,7 @@ struct PatientView: View {
                         .foregroundColor(.black)
                         .padding()
                 }
-                .frame(maxWidth: .infinity, maxHeight: 300)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
                 .cornerRadius(12)
                 .padding(.horizontal, 20)
@@ -41,9 +41,7 @@ struct PatientView: View {
                     tabButton(icon: "doc.plaintext", text: "Summary", isSelected: selectedTab == "Summary")
                     tabButton(icon: "brain.head.profile", text: "Ask AI", isSelected: selectedTab == "Ask AI")
                 }
-                .padding()
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -70,13 +68,18 @@ struct PatientView: View {
             VStack {
                 Image(systemName: icon)
                     .font(.system(size: 24))
-                    .foregroundColor(isSelected ? .blue : .gray)
+                    .foregroundColor(.white)
 
                 Text(text)
                     .font(.footnote)
-                    .foregroundColor(isSelected ? .blue : .gray)
+                    .foregroundColor(.white)
             }
             .padding()
+            .background(Color.clear)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.white, lineWidth: 2)
+            )
         }
         .frame(maxWidth: .infinity)
     }

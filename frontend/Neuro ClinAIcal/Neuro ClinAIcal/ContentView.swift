@@ -101,7 +101,7 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .frame(maxWidth: .infinity, minHeight: expandedPatientID == patient.id ? 362 : 50)
                         .background(Color.white)
                         .cornerRadius(10)
                         .padding(.horizontal, 20)
