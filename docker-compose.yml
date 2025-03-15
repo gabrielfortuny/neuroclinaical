@@ -1,7 +1,9 @@
 services:
-  api:
-    build: ./api
-    container_name: flask_app
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
     ports:
       - "8000:5000" # go to http://localhost:8000 on host machine
     environment:
@@ -9,7 +11,7 @@ services:
       - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
     volumes:
-      - ./api:/app
+      - .:/workspaces/project
     depends_on:
       - db
       - ollama

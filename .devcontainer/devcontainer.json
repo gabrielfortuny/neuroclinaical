@@ -1,11 +1,9 @@
 {
-  "name": "Flask Dev Container",
-  "dockerComposeFile": "../backend/docker-compose.yml",
-  "service": "api",
-  "workspaceFolder": "/workspaces/neuroclinaical",
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspaces/neuroclinaical,type=bind"
-  ],
+  "name": "NeuroClinical Backend",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/workspaces/project",
+  "forwardPorts": [5000],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -18,15 +16,12 @@
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
         "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "[python]": {
           "editor.defaultFormatter": "ms-python.black-formatter"
         }
       }
     }
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
-  },
-  "remoteUser": "root"
+  }
 }
