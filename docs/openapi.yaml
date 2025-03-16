@@ -287,6 +287,44 @@ paths:
           example: 101
         description: The patient ID
 
+    get:
+      summary: Get a specific patient
+      description: Retrieves detailed information about a specific patient by ID.
+      operationId: get_patient_by_id
+      tags:
+        - Patients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+          description: The ID of the patient to retrieve.
+      responses:
+        "200":
+          description: Patient details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  name:
+                    type: string
+                    example: "Jane Doe"
+                  dob:
+                    type: string
+                    format: date
+                    nullable: true
+                    example: "1990-05-15"
+        "404":
+          description: Patient not found.
+        "500":
+          description: Server error.
+
     patch:
       summary: Update a patient
       description: Updates details of an existing patient.
