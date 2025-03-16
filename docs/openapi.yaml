@@ -24,6 +24,8 @@ tags:
     description: Operations related to patient data
   - name: Reports
     description: Operations related to uploading and managing LTM reports
+  - name: Chat
+    description: Operations related to LLM chat features
 
 paths:
   /auth/login:
