@@ -399,3 +399,121 @@ paths:
           description: Patient not found.
         "500":
           description: File processing error.
+
+  /patients/{id}/reports:
+    get:
+      summary: Get all reports for a patient
+      description: Retrieves a list of metadata for all reports associated with a specific patient.
+      operationId: get_patient_reports
+      tags:
+        - Reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the patient whose reports are being retrieved.
+      responses:
+        "200":
+          description: List of reports retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    report_id:
+                      type: integer
+                      example: 456
+                    uploaded_at:
+                      type: string
+                      format: date-time
+                      example: "2024-01-15T13:45:30Z"
+                    download_url:
+                      type: string
+                      format: uri
+                      example: "/reports/456/download"
+        "404":
+          description: Patient not found.
+        "500":
+          description: Server error.
+
+  /reports/{report_id}:
+    get:
+      summary: Get metadata for a report
+      description: Retrieves metadata for a specific report.
+      operationId: get_report_metadata
+      tags:
+        - Reports
+      parameters:
+        - name: report_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the report to retrieve.
+      responses:
+        "200":
+          description: Report metadata retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: integer
+                    example: 456
+                  patient_id:
+                    type: integer
+                    example: 101
+                  uploaded_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-15T13:45:30Z"
+                  summary:
+                    type: string
+        "404":
+          description: Report not found.
+        "500":
+          description: Server error.
+
+  /reports/{report_id}/download:
+    get:
+      summary: Download a report file
+      description: Returns the binary contents of a report file for download, supporting multiple file types.
+      operationId: download_report
+      tags:
+        - Reports
+      parameters:
+        - name: report_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the report to download.
+      responses:
+        "200":
+          description: File retrieved successfully.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+                format: binary
+            text/plain:
+              schema:
+                type: string
+                format: binary
+            application/vnd.oasis.opendocument.text:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Report not found.
+        "500":
+          description: Server error.
