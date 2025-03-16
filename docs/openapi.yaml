@@ -1,0 +1,361 @@
+openapi: 3.0.3
+info:
+  title: NeuroClinAIcal Backend API
+  version: 1.0.0
+  description: API for managing user accounts, patients, and medical reports for NeuroClinAIcal.
+
+# servers:
+#   - url: TODO
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: Account
+    description: User account registration, authentication, and management
+  - name: Patients
+    description: Operations related to patient data
+  - name: Reports
+    description: Operations related to uploading and managing medical reports
+
+paths:
+  /auth/login:
+    post:
+      summary: Log in a user
+      description: Authenticates a user and returns a JWT token for accessing protected endpoints.
+      operationId: login_user
+      tags:
+        - Account
+      security: [] # Public
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The email address of the user.
+                  example: "johndoe@example.com"
+                password:
+                  type: string
+                  format: password
+                  description: The password of the user.
+                  example: "password123"
+      responses:
+        "200":
+          description: Successful login. Returns a JWT token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The JWT token for authentication.
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "401":
+          description: Invalid credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid email or password."
+
+  /auth/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account in the system.
+      operationId: register_user
+      tags:
+        - Account
+      security: [] # Public
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - name
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "johndoe123"
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "johndoe@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "password123"
+      responses:
+        "201":
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 123
+                  username:
+                    type: string
+                    example: "johndoe123"
+                  name:
+                    type: string
+                    example: "John Doe"
+                  email:
+                    type: string
+                    example: "johndoe@example.com"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Email is already in use."
+
+  /account:
+    put:
+      summary: Update user account
+      description: Updates the details of the currently authenticated user's account.
+      operationId: update_user_account
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - name
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "newusername123"
+                name:
+                  type: string
+                  example: "New Name"
+                email:
+                  type: string
+                  format: email
+                  example: "newemail@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "newpassword123"
+      responses:
+        "200":
+          description: Account updated successfully.
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized: Missing or invalid token."
+
+    delete:
+      summary: Delete user account
+      description: Deletes the currently authenticated user's account.
+      operationId: delete_user_account
+      tags:
+        - Account
+      responses:
+        "204":
+          description: Account deleted successfully.
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized: Missing or invalid token."
+
+  /patients:
+    get:
+      summary: Get all patients
+      description: Retrieves a list of all patients in the system.
+      operationId: get_all_patients
+      tags:
+        - Patients
+      responses:
+        "200":
+          description: List of patients.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "John Doe"
+                    dob:
+                      type: string
+                      format: date
+                      nullable: true
+                      example: "1990-01-01"
+        "500":
+          description: Internal server error.
+
+    post:
+      summary: Create a new patient
+      description: Creates a new patient in the system.
+      operationId: create_patient
+      tags:
+        - Patients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: "Jane Doe"
+                dob:
+                  type: string
+                  format: date
+                  nullable: true
+                  example: "1990-05-15"
+      responses:
+        "201":
+          description: Patient created successfully.
+        "400":
+          description: Invalid input.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid input: 'name' is required."
+
+  /patients/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 101
+        description: The patient ID
+
+    patch:
+      summary: Update a patient
+      description: Updates details of an existing patient.
+      operationId: update_patient
+      tags:
+        - Patients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jane Doe"
+                dob:
+                  type: string
+                  format: date
+                  nullable: true
+                  example: "1990-05-15"
+      responses:
+        "200":
+          description: Patient updated successfully.
+        "400":
+          description: Invalid input.
+        "404":
+          description: Patient not found.
+
+    delete:
+      summary: Delete a patient
+      description: Deletes a patient from the system.
+      operationId: delete_patient
+      tags:
+        - Patients
+      responses:
+        "204":
+          description: Patient deleted successfully.
+        "404":
+          description: Patient not found.
+        "500":
+          description: Server error.
+
+  /reports:
+    post:
+      summary: Upload a report file
+      description: Uploads a report file for a specific patient.
+      operationId: upload_report
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                patient_id:
+                  type: integer
+                  example: 101
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Report uploaded successfully.
+        "400":
+          description: Invalid input.
+        "404":
+          description: Patient not found.
+        "500":
+          description: File processing error.
