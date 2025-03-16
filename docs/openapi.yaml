@@ -23,7 +23,7 @@ tags:
   - name: Patients
     description: Operations related to patient data
   - name: Reports
-    description: Operations related to uploading and managing medical reports
+    description: Operations related to uploading and managing LTM reports
 
 paths:
   /auth/login:
