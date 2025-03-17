@@ -816,3 +816,103 @@ paths:
           description: Patient not found.
         "500":
           description: Server error.
+
+  /chat/{patient_id}/messages:
+    post:
+      summary: Send a message to the AI (conversation auto-created if needed)
+      description: Sends a message from the authenticated user regarding a patient. If a conversation doesn’t already exist for the user–patient pair, one is created automatically.
+      operationId: send_message
+      tags:
+        - Chat
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: patient_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The patient ID the conversation is about.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  example: "What is the medication history for this patient?"
+      responses:
+        "200":
+          description: Message sent and response returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: 87
+                  response:
+                    type: string
+                    example: "The patient is prescribed 200mg Carbamazepine daily for 5 days."
+                  created_at:
+                    type: string
+                    format: date-time
+        "400":
+          description: Invalid input.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Server error.
+
+    get:
+      summary: Get full conversation history with a patient
+      description: Retrieves all messages in the conversation between the authenticated user and a given patient.
+      operationId: get_conversation_messages
+      tags:
+        - Chat
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: patient_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The patient ID the conversation is about.
+      responses:
+        "200":
+          description: Conversation history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 33
+                        query:
+                          type: string
+                          example: "What is the medication plan for this patient?"
+                        response:
+                          type: string
+                          example: "The patient is prescribed Carbamazepine 200mg for 5 days."
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-03-17T08:32:00Z"
+        "404":
+          description: Conversation not found for this user and patient.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Server error.
