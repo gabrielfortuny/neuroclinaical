@@ -24,6 +24,7 @@ tags:
     description: Operations related to patient data
   - name: Reports
     description: Operations related to uploading and managing LTM reports
+  - name: Seizures
   - name: Chat
     description: Operations related to LLM chat features
 
@@ -402,11 +403,11 @@ paths:
 
   /patients/{id}/reports:
     get:
-      summary: Get all reports for a patient
+      summary: Get all reports metadata for a patient
       description: Retrieves a list of metadata for all reports associated with a specific patient.
       operationId: get_patient_reports
       tags:
-        - Reports
+        - Patients
       parameters:
         - name: id
           in: path
@@ -431,10 +432,6 @@ paths:
                       type: string
                       format: date-time
                       example: "2024-01-15T13:45:30Z"
-                    download_url:
-                      type: string
-                      format: uri
-                      example: "/reports/456/download"
         "404":
           description: Patient not found.
         "500":
@@ -517,3 +514,98 @@ paths:
           description: Report not found.
         "500":
           description: Server error.
+  /patients/{id}/seizures:
+    get:
+      summary: Get all seizures for a patient
+      description: Retrieves a list of all seizures associated with a specific patient.
+      operationId: get_seizures_by_patient
+      tags:
+        - Patients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the patient whose seizures are being retrieved.
+      responses:
+        "200":
+          description: List of seizures retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    day:
+                      type: integer
+                      example: 3
+                    start_time:
+                      type: string
+                      format: time
+                      example: "14:30:00"
+                    duration:
+                      type: string
+                      description: ISO 8601 duration format
+                      example: "PT2M30S"
+                    created_at:
+                      type: string
+                      format: date-time
+                    modified_at:
+                      type: string
+                      format: date-time
+        "404":
+          description: Patient not found.
+
+  /seizures/{id}:
+    get:
+      summary: Get details of a seizure
+      description: Retrieves detailed information about a specific seizure by ID.
+      operationId: get_seizure_by_id
+      tags:
+        - Seizures
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the seizure to retrieve.
+      responses:
+        "200":
+          description: Seizure details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 42
+                  patient_id:
+                    type: integer
+                    example: 101
+                  day:
+                    type: integer
+                    example: 3
+                  start_time:
+                    type: string
+                    format: time
+                    example: "15:07:23"
+                    description: Start time in HH:MM:SS format.
+                  duration:
+                    type: integer
+                    example: 90
+                    description: Duration in seconds.
+                  created_at:
+                    type: string
+                    format: date-time
+                  modified_at:
+                    type: string
+                    format: date-time
+        "404":
+          description: Seizure not found.
