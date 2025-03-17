@@ -22,7 +22,7 @@ def create_app():
 
     @app.before_request
     def require_jwt():
-        if request.path != "/auth/login":
+        if request.path not in ["/user/login", "/user/register"]:
             verify_jwt_in_request()
 
     return app
