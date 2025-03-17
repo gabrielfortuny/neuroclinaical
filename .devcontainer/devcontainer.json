@@ -12,7 +12,8 @@
         "esbenp.prettier-vscode",
         "ms-python.vscode-pylance",
         "ms-python.black-formatter",
-        "ms-python.pylint"
+        "ms-python.pylint",
+        "42Crunch.vscode-openapi"
       ],
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
