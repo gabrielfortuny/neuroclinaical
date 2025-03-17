@@ -34,18 +34,17 @@ services:
     image: ollama/ollama
     container_name: ollama
     restart: always
+    entrypoint: ["sh", "-c"]
+    command: >
+      "ollama serve & 
+       sleep 5 &&
+       ollama create example-model -f /models/example_model/Modelfile.txt &&
+       wait"
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
       - ./backend/ollama/models:/models
-    command: >
-      bash -c "
-        ollama serve & 
-        sleep 5 &&
-        ollama create example-model -f /models/example_model/Modelfile.txt &&
-        wait
-      "
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434"]
       interval: 10s
