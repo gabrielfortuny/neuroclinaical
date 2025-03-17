@@ -475,6 +475,34 @@ paths:
           description: Report not found.
         "500":
           description: Server error.
+    delete:
+      summary: Delete a report
+      description: Deletes a specific report by its ID.
+      operationId: delete_report
+      tags:
+        - Reports
+      parameters:
+        - name: report_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the report to delete.
+      responses:
+        "204":
+          description: Report deleted successfully.
+        "404":
+          description: Report not found.
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized: Missing or invalid token."
 
   /reports/{report_id}/download:
     get:
