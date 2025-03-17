@@ -768,3 +768,51 @@ paths:
           description: Patient not found.
         "500":
           description: Server error.
+
+  /patients/{id}/drug_administration:
+    get:
+      summary: Get full drug administration history for a patient
+      description: Retrieves a list of all drug administrations recorded for a specific patient.
+      operationId: get_patient_drug_administration
+      tags:
+        - Patients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the patient whose drug administration history is being retrieved.
+      responses:
+        "200":
+          description: List of drug administrations retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 10
+                    drug_id:
+                      type: integer
+                      example: 3
+                    drug_name:
+                      type: string
+                      example: "Carbamazepine"
+                    drug_class:
+                      type: string
+                      example: "Anticonvulsant"
+                    day:
+                      type: integer
+                      example: 2
+                    dosage:
+                      type: integer
+                      example: 200
+                      description: Dosage in milligrams
+        "404":
+          description: Patient not found.
+        "500":
+          description: Server error.
