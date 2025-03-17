@@ -25,6 +25,8 @@ tags:
   - name: Reports
     description: Operations related to uploading and managing LTM reports
   - name: Seizures
+  - name: Supplemental Materials
+    description: Uploading, listing, downloading, and deleting supplemental files linked to patients
   - name: Chat
     description: Operations related to LLM chat features
 
@@ -637,3 +639,132 @@ paths:
                     format: date-time
         "404":
           description: Seizure not found.
+
+  /supplemental_materials:
+    post:
+      summary: Upload a supplemental material file
+      description: Uploads a supplemental file associated with a patient.
+      operationId: upload_supplemental_material
+      tags:
+        - Supplemental Materials
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - patient_id
+                - file
+              properties:
+                patient_id:
+                  type: integer
+                  example: 101
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Supplemental material uploaded successfully.
+        "400":
+          description: Invalid input.
+        "404":
+          description: Patient not found.
+        "500":
+          description: File processing error.
+
+  /supplemental_materials/{id}/download:
+    get:
+      summary: Download a supplemental material file
+      description: Returns the file contents of a specific supplemental material.
+      operationId: download_supplemental_material
+      tags:
+        - Supplemental Materials
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the supplemental material to download.
+      responses:
+        "200":
+          description: File retrieved successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Supplemental material not found.
+        "500":
+          description: File read error.
+
+  /supplemental_materials/{id}:
+    delete:
+      summary: Delete a supplemental material file
+      description: Deletes a specific supplemental material by its ID.
+      operationId: delete_supplemental_material
+      tags:
+        - Supplemental Materials
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the supplemental material to delete.
+      responses:
+        "204":
+          description: Supplemental material deleted successfully.
+        "404":
+          description: Supplemental material not found.
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized: Missing or invalid token."
+
+  /patients/{id}/supplemental_materials:
+    get:
+      summary: Get all supplemental materials for a patient
+      description: Retrieves metadata of all supplemental materials associated with a specific patient.
+      operationId: get_patient_supplemental_materials
+      tags:
+        - Patients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The patient ID.
+      responses:
+        "200":
+          description: List of supplemental materials.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 25
+                    filepath:
+                      type: string
+                      example: "materials/scan_summary_25.pdf"
+                    created_at:
+                      type: string
+                      format: date-time
+                      example: "2024-11-03T14:22:00Z"
+        "404":
+          description: Patient not found.
+        "500":
+          description: Server error.
