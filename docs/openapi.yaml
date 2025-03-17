@@ -18,7 +18,7 @@ components:
       bearerFormat: JWT
 
 tags:
-  - name: Account
+  - name: User
     description: User account registration, authentication, and management
   - name: Patients
     description: Operations related to patient data
@@ -31,13 +31,13 @@ tags:
     description: Operations related to LLM chat features
 
 paths:
-  /auth/login:
+  /user/login:
     post:
       summary: Log in a user
       description: Authenticates a user and returns a JWT token for accessing protected endpoints.
       operationId: login_user
       tags:
-        - Account
+        - User
       security: [] # Public
       requestBody:
         required: true
@@ -82,13 +82,13 @@ paths:
                     type: string
                     example: "Invalid email or password."
 
-  /auth/register:
+  /user/register:
     post:
       summary: Register a new user
       description: Creates a new user account in the system.
       operationId: register_user
       tags:
-        - Account
+        - User
       security: [] # Public
       requestBody:
         required: true
@@ -147,13 +147,13 @@ paths:
                     type: string
                     example: "Email is already in use."
 
-  /account:
+  /user:
     put:
       summary: Update user account
       description: Updates the details of the currently authenticated user's account.
       operationId: update_user_account
       tags:
-        - Account
+        - User
       requestBody:
         required: true
         content:
@@ -199,7 +199,7 @@ paths:
       description: Deletes the currently authenticated user's account.
       operationId: delete_user_account
       tags:
-        - Account
+        - User
       responses:
         "204":
           description: Account deleted successfully.
