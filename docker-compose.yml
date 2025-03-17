@@ -18,6 +18,7 @@ services:
 
   db:
     image: postgres:17.4
+    container_name: database
     restart: always
     environment:
       - POSTGRES_USER=admin
@@ -31,11 +32,25 @@ services:
 
   ollama:
     image: ollama/ollama
+    container_name: ollama
     restart: always
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+      - ./backend/ollama/models:/models
+    command: >
+      bash -c "
+        ollama serve & 
+        sleep 5 &&
+        ollama create example-model -f /models/example_model/Modelfile.txt &&
+        wait
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
