@@ -136,6 +136,9 @@ paths:
                   email:
                     type: string
                     example: "johndoe@example.com"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         "400":
           description: Bad request.
           content:
@@ -183,6 +186,15 @@ paths:
       responses:
         "200":
           description: Account updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The JWT token for authentication.
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         "401":
           description: Unauthorized.
           content:
