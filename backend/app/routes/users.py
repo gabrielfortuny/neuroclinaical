@@ -97,7 +97,7 @@ def user_update_account():
     user.name = user_data["name"]
     user.username = user_data["username"]
     user.email = user_data["email"]
-    user.password = hash_password(
+    user.password_hash = hash_password(
         user_data["password"]
     )  # Hash new password for storage
     access_token = create_user_token(
