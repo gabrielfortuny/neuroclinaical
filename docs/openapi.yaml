@@ -150,6 +150,37 @@ paths:
                     type: string
                     example: "Email is already in use."
 
+  /user/logout:
+    post:
+      summary: Log out a user
+      description: Invalidates the user's JWT token and ends their session.
+      operationId: logout_user
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Successful logout.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User logged out successfully."
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized: Missing or invalid token."
+
   /user:
     put:
       summary: Update user account
