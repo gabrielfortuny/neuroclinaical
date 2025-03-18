@@ -83,7 +83,6 @@ def user_register():
 
 
 @users_bp.route("/user/register", methods=["PUT"])
-@jwt.jwt_required()  # Will authenticate token
 def user_update_account():
     user = jwt.get_current_user()  # Ensure token is for valid user in DB
     if not user:
