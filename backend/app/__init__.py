@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from app.config import Config
 
+EXEMPT_PATHS = ["/user/login", "/user/register"]
+
 db = SQLAlchemy()
 jwt = JWTManager()
 
@@ -22,7 +24,7 @@ def create_app():
 
     @app.before_request
     def require_jwt():
-        if request.path not in ["/user/login", "/user/register"]:
+        if request.path not in EXEMPT_PATHS:
             verify_jwt_in_request()
 
     return app
