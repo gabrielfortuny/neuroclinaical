@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
-from backend.app.__init__ import db, jwt
+from backend.app import db, jwt
 from backend.app.models import User
 from backend.api.authentication.passwordHandler import (
     check_password_hash,
