@@ -1,5 +1,6 @@
 from flask import g, json
 from backend.app.__init__ import jwt, db
+from backend.app.models import User
 
 
 @jwt.user_lookup_loader
@@ -9,14 +10,20 @@ def user_lookup(_jwt_header: json, jwt_data: json) -> bool:
 
     Requires:
     A JWT header exists
+
     Modifies:
-    Global flask variable g.current_user is updated for this request
+
     Effects:
+    Returns User object or None if it is not a valid user
 
     @param _jwt_header: Done by jwt
     @param current_id: Done by jwt
     """
     user_id = jwt_data["sub"]  # Extract the identity from the JWT
-    user = db.session.get(user_id)  # Lookup the user
-    g.current_user = user  # Attach user to the Flask global object
+    user = db.session.get(User, user_id)  # Lookup the user
+    if user is None:
+        return user
+    username = jwt_data.get("username")  # Verify their username
+    if user.username != username:
+        return None
     return user
