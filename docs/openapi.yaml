@@ -436,6 +436,9 @@ paths:
                 patient_id:
                   type: integer
                   example: 101
+                file_type:
+                  type: string
+                  example: "application/pdf"
                 file:
                   type: string
                   format: binary
