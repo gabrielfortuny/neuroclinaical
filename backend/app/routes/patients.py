@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from models import Patient
-from extensions import db
+from app.models import Patient
+from app import db
 
 
 patients_bp = Blueprint("patients", __name__, url_prefix="/patients")

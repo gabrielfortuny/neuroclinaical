@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
-from backend.app import db, jwt
-from backend.app.models import User
-from backend.api.authentication.passwordHandler import (
+from app import db, jwt
+from app.models import User
+from api.authentication.passwordHandler import (
     check_password_hash,
     hash_password,
 )
-from backend.api.authentication.authtokenHandler import create_user_token
+from api.authentication.authtokenHandler import create_user_token
 
 users_bp = Blueprint("users", __name__)
 api = Api(users_bp)
