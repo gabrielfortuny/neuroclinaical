@@ -84,6 +84,7 @@ def register_user():
 
 
 @users_bp.route("/user/logout", methods=["POST"])
+@jwt_required()
 def logout_user():
     user = current_user  # Ensure token is for valid user in DB
     if user is None:
@@ -100,6 +101,7 @@ def logout_user():
 
 
 @users_bp.route("/user", methods=["PUT"])
+@jwt_required()
 def update_user_account():
     user = current_user  # Ensure token is for valid user in DB
     if user is None:
@@ -127,6 +129,7 @@ def update_user_account():
 
 
 @users_bp.route("/user", methods=["DELETE"])
+@jwt_required()
 def delete_user_account():
     user = current_user  # Ensure token is for valid user in DB
     if user is None:
@@ -135,4 +138,4 @@ def delete_user_account():
             401,
         )  # User is not in DB / Invalid token
     db.session.delete(user)
-    return (jsonify({"token": delete_user_token()}), 204)
+    return 204

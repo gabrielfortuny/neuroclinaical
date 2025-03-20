@@ -170,6 +170,9 @@ paths:
                   message:
                     type: string
                     example: "User logged out successfully."
+                  token:
+                    type: string
+                    example: ""
         "401":
           description: Unauthorized.
           content:
