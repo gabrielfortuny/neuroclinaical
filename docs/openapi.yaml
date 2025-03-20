@@ -590,7 +590,7 @@ paths:
   /patients/{id}/seizures:
     get:
       summary: Get all seizures for a patient
-      description: Retrieves a list of all seizures associated with a specific patient.
+      description: Retrieves a list of all seizures associated with a specific patient, including related electrodes.
       operationId: get_seizures_by_patient
       tags:
         - Patients
@@ -631,13 +631,31 @@ paths:
                     modified_at:
                       type: string
                       format: date-time
+                    electrodes:
+                      type: array
+                      description: Electrodes associated with this seizure.
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 10
+                          name:
+                            type: string
+                            example: "Frontal-L"
+                          created_at:
+                            type: string
+                            format: date-time
+                          modified_at:
+                            type: string
+                            format: date-time
         "404":
           description: Patient not found.
 
   /seizures/{id}:
     get:
       summary: Get details of a seizure
-      description: Retrieves detailed information about a specific seizure by ID.
+      description: Retrieves detailed information about a specific seizure by ID, including related electrodes.
       operationId: get_seizure_by_id
       tags:
         - Seizures
@@ -669,7 +687,6 @@ paths:
                     type: string
                     format: time
                     example: "15:07:23"
-                    description: Start time in HH:MM:SS format.
                   duration:
                     type: integer
                     example: 90
@@ -680,6 +697,24 @@ paths:
                   modified_at:
                     type: string
                     format: date-time
+                  electrodes:
+                    type: array
+                    description: Electrodes associated with this seizure.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 5
+                        name:
+                          type: string
+                          example: "Temporal-R"
+                        created_at:
+                          type: string
+                          format: date-time
+                        modified_at:
+                          type: string
+                          format: date-time
         "404":
           description: Seizure not found.
 
