@@ -1,7 +1,9 @@
 services:
-  api:
-    build: ./api
-    container_name: flask_app
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
     ports:
       - "8000:5000" # go to http://localhost:8000 on host machine
     environment:
@@ -9,13 +11,14 @@ services:
       - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
     volumes:
-      - ./api:/app
+      - .:/workspaces/project
     depends_on:
       - db
       - ollama
 
   db:
     image: postgres:17.4
+    container_name: database
     restart: always
     environment:
       - POSTGRES_USER=admin
@@ -29,11 +32,24 @@ services:
 
   ollama:
     image: ollama/ollama
+    container_name: ollama
     restart: always
+    entrypoint: ["sh", "-c"]
+    command: >
+      "ollama serve & 
+       sleep 5 &&
+       ollama create example-model -f /models/example_model/Modelfile.txt &&
+       wait"
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+      - ./backend/ollama/models:/models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
