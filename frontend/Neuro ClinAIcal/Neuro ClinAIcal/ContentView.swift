@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     let patients = [
-        Patient(name: "Alice", age: 45),
-        Patient(name: "Bob", age: 52)
+        Patient(name: "Alice"),
+        Patient(name: "Bob")
     ]
     
     @State private var expandedPatientID: UUID? = nil
+    @State private var importing = false
     
     func patientTapped(_ patient: Patient) {
         print("\(patient.name) button tapped")
@@ -26,7 +28,7 @@ struct ContentView: View {
     }
     
     
-    func optionButton(icon: String, text: String, color: Color, action: @escaping () -> Void) -> some View {
+    func optionButton(icon: String, text: String, color: Color, action: @escaping () -> Void) -> some View { // why @escaping
         Button(action: action) {
             HStack {
                 Image(systemName: icon)
@@ -74,12 +76,13 @@ struct ContentView: View {
                                 }
                                 
                                 if expandedPatientID == patient.id {
-                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
-                                        handleOptionSelection("Manage Raw Files")
-                                    }
-                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
-                                        handleOptionSelection("Upload New Files")
-                                    }
+//                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
+//                                        handleOptionSelection("Manage Raw Files")
+//                                    }
+//                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
+//                                        handleOptionSelection("Upload New Files")
+//                                        importing = true
+//                                    }
                                     optionButton(icon: "play.fill", text: "Export Data", color: .black) {
                                         handleOptionSelection("Export Data")
                                     }
@@ -101,7 +104,7 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        .frame(maxWidth: .infinity, minHeight: expandedPatientID == patient.id ? 362 : 50)
+                        .frame(maxWidth: .infinity, minHeight: expandedPatientID == patient.id ? 239 : 50)
                         .background(Color.white)
                         .cornerRadius(10)
                         .padding(.horizontal, 20)

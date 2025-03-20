@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PatientView: View {
     let patient: Patient
+    
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: String = "View File"
     @Environment(\.presentationMode) var presentationMode
@@ -24,10 +25,14 @@ struct PatientView: View {
                                 
                 // Dynamic Content Box
                 VStack {
-                    Text(selectedTab)
-                        .font(.title)
-                        .foregroundColor(.black)
-                        .padding()
+                    if selectedTab == "View File" {
+                        DocumentImporterView()
+                    } else {
+                        Text(selectedTab)
+                            .font(.title)
+                            .foregroundColor(.black)
+                            .padding()
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
@@ -87,6 +92,6 @@ struct PatientView: View {
 
 #Preview {
     NavigationStack {
-        PatientView(patient: Patient(name: "John Doe", age: 40))
+        PatientView(patient: Patient(name: "John Doe"))
     }
 }
