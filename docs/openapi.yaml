@@ -890,6 +890,11 @@ paths:
                       type: integer
                       example: 200
                       description: Dosage in milligrams
+                    time:
+                      type: string
+                      format: time
+                      example: "08:45:00"
+                      description: Time of drug administration in HH:MM:SS 24-hour format
         "404":
           description: Patient not found.
         "500":
