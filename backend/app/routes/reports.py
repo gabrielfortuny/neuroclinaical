@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import current_user, jwt_required
 from flask_restful import Api, Resource
-from backend.app.__init__ import db
-from backend.app.models import Report
+from app.__init__ import db
+from app.models import Report
 
 reports_bp = Blueprint("reports", __name__, url_prefix="/reports")
+
 api = Api(reports_bp)
 
 
