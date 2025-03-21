@@ -5,7 +5,11 @@ from backend.app.__init__ import db
 from backend.app.models import Report
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 reports_bp = Blueprint("reports", __name__, url_prefix="/reports")
+=======
+reports_bp = Blueprint("reports", __name__)
+>>>>>>> Stashed changes
 =======
 reports_bp = Blueprint("reports", __name__)
 >>>>>>> Stashed changes

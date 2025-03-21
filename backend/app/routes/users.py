@@ -1,9 +1,12 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 from backend.app.__init__ import db, jwt
 from flask_jwt_extended import get_jwt_identity, jwt_required, current_user
 =======
+=======
+>>>>>>> Stashed changes
 from flask import g
 from app import db, jwt
 >>>>>>> Stashed changes
@@ -143,6 +146,7 @@ def user_update_account():
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 @users_bp.route("", methods=["DELETE"])
 @jwt_required()
 def delete_user_account():
@@ -155,6 +159,11 @@ def delete_user_account():
     db.session.delete(user)
     db.session.commit()
     return 204
+=======
+@users_bp.route("/test", methods=["GET"])
+def test_route():
+    return jsonify({"message": "Test route works!"}), 200
+>>>>>>> Stashed changes
 =======
 @users_bp.route("/test", methods=["GET"])
 def test_route():
