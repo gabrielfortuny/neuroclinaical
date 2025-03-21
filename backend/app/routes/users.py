@@ -1,7 +1,12 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
+<<<<<<< Updated upstream
 from backend.app.__init__ import db, jwt
 from flask_jwt_extended import get_jwt_identity, jwt_required, current_user
+=======
+from flask import g
+from app import db, jwt
+>>>>>>> Stashed changes
 from app.models import User
 from api.authentication.passwordHandler import (
     check_password_hash,
@@ -84,6 +89,7 @@ def register_user():
     )
 
 
+<<<<<<< Updated upstream
 @users_bp.route("/logout", methods=["POST"])
 @jwt_required()
 def logout_user():
@@ -106,6 +112,12 @@ def logout_user():
 def update_user_account():
     user = current_user  # Ensure token is for valid user in DB
     if user is None:
+=======
+@users_bp.route("/user/register", methods=["PUT"])
+def user_update_account():
+    user = g.current_user  # Ensure token is for valid user in DB
+    if not user:
+>>>>>>> Stashed changes
         return (
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
             401,
@@ -130,6 +142,7 @@ def update_user_account():
     )  # Respond to valid request resetting token
 
 
+<<<<<<< Updated upstream
 @users_bp.route("", methods=["DELETE"])
 @jwt_required()
 def delete_user_account():
@@ -142,3 +155,8 @@ def delete_user_account():
     db.session.delete(user)
     db.session.commit()
     return 204
+=======
+@users_bp.route("/test", methods=["GET"])
+def test_route():
+    return jsonify({"message": "Test route works!"}), 200
+>>>>>>> Stashed changes
