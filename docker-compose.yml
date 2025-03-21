@@ -1,56 +1,70 @@
 services:
-  backend:
+  flask:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend
-    ports:
-      - "8000:5000" # go to http://localhost:8000 on host machine
+    container_name: flask-app
     environment:
       - FLASK_ENV=development
-      - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
-      - FLASK_APP=/workspaces/project/backend/app/main.py
-    volumes:
-      - .:/workspaces/project
+      - OLLAMA_HOST=http://ollama:11434
+    ports:
+      - "8000:5000"
+    restart: always
     depends_on:
       - db
       - ollama
+    volumes:
+      - ./backend:/workspace/backend
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   db:
     image: postgres:17.4
-    container_name: database
-    restart: always
+    container_name: postgres-db
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U
       - POSTGRES_DB=database
-      # credentials could be stored elsewhere if better security is needed
-    ports:
-      - "5432:5432"
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  ollama:
-    image: ollama/ollama
-    container_name: ollama
-    restart: always
-    entrypoint: ["sh", "-c"]
-    command: >
-      "ollama serve & 
-       sleep 5 &&
-       ollama create example-model -f /models/model1/Modelfile.txt &&
-       wait"
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-      - ./backend/ollama/models:/models
+    networks:
+      - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 5s
+
+  ollama:
+    build:
+      context: ./backend/ollama
+      dockerfile: Dockerfile
+    container_name: ollama
+    restart: always
+    volumes:
+      - ollama_data:/root/.ollama/models
+      - ./backend/ollama:/workspace/backend/ollama
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+networks:
+  backend:
+    internal: true
+  frontend:
 
 volumes:
   postgres_data:

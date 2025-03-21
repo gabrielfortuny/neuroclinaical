@@ -5,9 +5,9 @@ from flask import jsonify, current_app
 app = create_app()
 
 
-@app.route("/hello", methods=["GET"])
-def hello():
-    return jsonify({"message": "Hello World"})
+@app.route("/health", methods=["GET"])
+def health_check():
+    return jsonify(status="OK", message="Service is healthy"), 200
 
 
 print("\n=== REGISTERED ROUTES ===\n")

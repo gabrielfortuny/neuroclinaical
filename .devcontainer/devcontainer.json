@@ -1,8 +1,8 @@
 {
   "name": "NeuroClinical Backend",
   "dockerComposeFile": "../docker-compose.yml",
-  "service": "backend",
-  "workspaceFolder": "/workspaces/project",
+  "service": "flask",
+  "workspaceFolder": "/workspace/backend",
   "forwardPorts": [5000],
   "customizations": {
     "vscode": {
