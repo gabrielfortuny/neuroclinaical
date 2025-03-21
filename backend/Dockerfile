@@ -12,5 +12,4 @@ COPY ./app ./app
 COPY gunicorn_config.py .
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
 ENTRYPOINT ["/entrypoint.sh"]
