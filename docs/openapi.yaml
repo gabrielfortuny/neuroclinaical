@@ -441,7 +441,7 @@ paths:
                   example: "application/pdf"
                 file:
                   type: string
-                  format: binary
+                  format: base64 encoded
       responses:
         "201":
           description: Report uploaded successfully.
