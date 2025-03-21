@@ -8,14 +8,20 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+enum PatientOption {
+    case export
+    case delete
+}
+
 struct ContentView: View {
-    let patients = [
-        Patient(name: "Alice"),
-        Patient(name: "Bob")
-    ]
+    @StateObject private var viewPatientModel = PatientViewModel()
     
     @State private var expandedPatientID: UUID? = nil
     @State private var importing = false
+    @State private var showAddPatientSheet = false
+    
+    @State private var newPatientName = ""
+    @State private var newPatientFileURL: URL? = nil
     
     func patientTapped(_ patient: Patient) {
         print("\(patient.name) button tapped")
@@ -46,71 +52,134 @@ struct ContentView: View {
         }
     }
     
-    func handleOptionSelection(_ option: String) {
+    func handleOptionSelection(_ patient: Patient, _ option: PatientOption) {
         print("\(option) option tapped")
+        switch option {
+        case .export:
+            print("Export Data for \(patient.name)")
+        case .delete:
+            viewPatientModel.deletePatient(withId: patient.id)
+        }
     }
     
     var body: some View {
         NavigationStack {
             ZStack{
                 Color(red: 80/255, green: 134/255, blue: 98/255).edgesIgnoringSafeArea(.all)
-                VStack {
-                    Text("Neuro ClinAIcal")
-                        .font(.largeTitle)
-                        .foregroundStyle(.white)
-                    
-                    ForEach(patients) {
-                        patient in Button(action: { patientTapped(patient) } ) {
-                            VStack{
-                                HStack {
-                                    Text(patient.name)
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                        .padding(.leading, 10)
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: expandedPatientID == patient.id ? "chevron.up" : "chevron.down") // Drop-down icon
-                                        .foregroundColor(.gray)
-                                        .padding(.trailing, 10)
-                                }
-                                
-                                if expandedPatientID == patient.id {
-//                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
-//                                        handleOptionSelection("Manage Raw Files")
-//                                    }
-//                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
-//                                        handleOptionSelection("Upload New Files")
-//                                        importing = true
-//                                    }
-                                    optionButton(icon: "play.fill", text: "Export Data", color: .black) {
-                                        handleOptionSelection("Export Data")
-                                    }
-                                    optionButton(icon: "trash", text: "Delete Patient", color: .red) {
-                                        handleOptionSelection("Delete Patient")
-                                    }
-                                    
-                                    NavigationLink(destination: PatientView(patient: patient)) {
-                                        Text("VIEW PATIENT")
+                ScrollView {
+                    VStack {
+                        Text("Neuro ClinAIcal")
+                            .font(.largeTitle)
+                            .foregroundStyle(.white)
+                        
+                        ForEach(viewPatientModel.patients) {
+                            patient in Button(action: { patientTapped(patient) } ) {
+                                VStack{
+                                    HStack {
+                                        Text(patient.name)
                                             .font(.headline)
                                             .foregroundColor(.black)
-                                            .padding()
-                                            .frame(maxWidth: 175)
-                                            .background(Color.white)
-                                            .cornerRadius(8)
-                                            .shadow(radius: 3)
+                                            .padding(.leading, 10)
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: expandedPatientID == patient.id ? "chevron.up" : "chevron.down") // Drop-down icon
+                                            .foregroundColor(.gray)
+                                            .padding(.trailing, 10)
                                     }
-                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    
+                                    if expandedPatientID == patient.id {
+                                        //                                    optionButton(icon: "folder", text: "Manage Raw Files", color: .black) {
+                                        //                                        handleOptionSelection("Manage Raw Files")
+                                        //                                    }
+                                        //                                    optionButton(icon: "arrow.up.circle", text: "Upload New Files", color: .black) {
+                                        //                                        handleOptionSelection("Upload New Files")
+                                        //                                        importing = true
+                                        //                                    }
+                                        optionButton(icon: "play.fill", text: "Export Data", color: .black) {
+                                            handleOptionSelection(patient, .export)
+                                        }
+                                        optionButton(icon: "trash", text: "Delete Patient", color: .red) {
+                                            handleOptionSelection(patient, .delete)
+                                        }
+                                        
+                                        NavigationLink(destination: PatientView(patient: patient)) {
+                                            Text("VIEW PATIENT")
+                                                .font(.headline)
+                                                .foregroundColor(.black)
+                                                .padding()
+                                                .frame(maxWidth: 175)
+                                                .background(Color.white)
+                                                .cornerRadius(8)
+                                                .shadow(radius: 3)
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                    }
                                 }
                             }
+                            .frame(maxWidth: .infinity, minHeight: expandedPatientID == patient.id ? 239 : 50)
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
                         }
-                        .frame(maxWidth: .infinity, minHeight: expandedPatientID == patient.id ? 239 : 50)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
+                        
+                        Button(action: {
+                            showAddPatientSheet = true
+                        }) {
+                            Text("Add Patient")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity, minHeight: 50)  // Half the height (if patient boxes are minHeight: 50)
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .padding(.horizontal, 125)
+                        }
+                        .padding(.top, 10) // Positions it slightly below the patient buttons
+                        
+                        Spacer()
+                        
                     }
+                }
+            }
+        }
+        .sheet(isPresented: $showAddPatientSheet) {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 10) {
+                    let titleLeading: CGFloat = 15
+                    
+                    Text("Patient Name:")
+                        .padding(.leading, titleLeading)
+                        .bold()
+                    TextField("Enter patient name", text: $newPatientName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal, 20)
+                    
+                    Text("Select LTM file:")
+                        .padding(.leading, titleLeading)
+                        .bold()
+                    DocumentImporterView(importedFileURL: $newPatientFileURL)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    
+                    Button("Add Patient") {
+                        if !newPatientName.isEmpty {
+                            viewPatientModel.addPatient(newPatientName, newPatientFileURL)
+                            newPatientName = ""
+                            showAddPatientSheet = false
+                        }
+                    }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
                     
                     Spacer()
+                }
+                .navigationTitle("Add Patient Form")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            showAddPatientSheet = false
+                        }
+                    }
                 }
             }
         }

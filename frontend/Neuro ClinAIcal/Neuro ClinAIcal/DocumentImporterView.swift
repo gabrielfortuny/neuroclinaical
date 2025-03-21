@@ -9,8 +9,9 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct DocumentImporterView: View {
+    @Binding var importedFileURL: URL?
+    
     @State private var isImporting = false
-    @State private var importedFileURL: URL?
     
     // Computed property to build allowed file types dynamically.
     var allowedTypes: [UTType] {
@@ -59,8 +60,8 @@ struct DocumentImporterView: View {
     }
 }
 
-struct DocumentImporterView_Previews: PreviewProvider {
-    static var previews: some View {
-        DocumentImporterView()
-    }
-}
+//struct DocumentImporterView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        DocumentImporterView()
+//    }
+//}

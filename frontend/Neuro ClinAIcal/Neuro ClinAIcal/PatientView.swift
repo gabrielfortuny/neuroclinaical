@@ -26,7 +26,7 @@ struct PatientView: View {
                 // Dynamic Content Box
                 VStack {
                     if selectedTab == "View File" {
-                        DocumentImporterView()
+//                        DocumentImporterView()
                     } else {
                         Text(selectedTab)
                             .font(.title)

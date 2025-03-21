@@ -9,5 +9,6 @@ import Foundation
 struct Patient: Identifiable {
     let id = UUID()
     let name: String
-    let ltmFileLocation: String? = nil
+    var ltmFileLocation: URL? = nil
+//    let supplementaryData: [String]? = nil
 }
