@@ -61,11 +61,13 @@ class Report(db.Model, TimestampMixin):
         Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
     summary = db.Column(Text)
-    filepath = db.Column(Text, nullable=False)
+    filepath = db.Column(Text)
+    filetype = db.Column(Text)
     patient = db.relationship("Patient", back_populates="reports")
     extracted_images = db.relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
+    days = db.Column(Integer)
 
 
 class ExtractedImage(db.Model, TimestampMixin):
@@ -96,7 +98,7 @@ class Seizure(db.Model, TimestampMixin):
     )
     day = db.Column(Integer, nullable=False)
     start_time = db.Column(Time)
-    duration = db.Column(Interval)
+    duration = db.Column(Text)
     patient = db.relationship("Patient", back_populates="seizures")
     electrodes = db.relationship(
         "Electrode",

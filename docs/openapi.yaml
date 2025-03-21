@@ -170,6 +170,9 @@ paths:
                   message:
                     type: string
                     example: "User logged out successfully."
+                  token:
+                    type: string
+                    example: ""
         "401":
           description: Unauthorized.
           content:
@@ -433,9 +436,12 @@ paths:
                 patient_id:
                   type: integer
                   example: 101
+                file_type:
+                  type: string
+                  example: "application/pdf"
                 file:
                   type: string
-                  format: binary
+                  format: base64 encoded
       responses:
         "201":
           description: Report uploaded successfully.

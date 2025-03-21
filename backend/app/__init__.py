@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
@@ -12,6 +13,7 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)  # Make Folder for Uploads
 
     db.init_app(app)
     jwt.init_app(app)

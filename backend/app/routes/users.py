@@ -1,19 +1,20 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
-from app import db, jwt
+from backend.app.__init__ import db, jwt
+from flask_jwt_extended import get_jwt_identity, jwt_required, current_user
 from app.models import User
 from api.authentication.passwordHandler import (
     check_password_hash,
     hash_password,
 )
-from api.authentication.authtokenHandler import create_user_token
+from api.authentication.authtokenHandler import create_user_token, delete_user_token
 
-users_bp = Blueprint("users", __name__)
+users_bp = Blueprint("user", __name__, url_prefix="/user")
 api = Api(users_bp)
 
 
-@users_bp.route("/user/login", methods=["POST"])
-def user_login():
+@users_bp.route("/login", methods=["POST"])
+def login_user():
     user_data = request.get_json()
     if not user_data:
         return (
@@ -39,8 +40,8 @@ def user_login():
         return jsonify({"error": "Invalid email or password"}), 401
 
 
-@users_bp.route("/user/register", methods=["POST"])
-def user_register():
+@users_bp.route("/register", methods=["POST"])
+def register_user():
     user_data = request.get_json()
     if not user_data:
         return jsonify({"error": "Invalid Request Format"}), 400
@@ -65,6 +66,7 @@ def user_register():
         password_hash=p_hash,
     )
     db.session.add(new_user)  # Add new user to DB
+    db.session.commit()
     access_token = create_user_token(
         new_user.username, new_user.id
     )  # Create access token
@@ -82,10 +84,28 @@ def user_register():
     )
 
 
-@users_bp.route("/user/register", methods=["PUT"])
-def user_update_account():
-    user = jwt.get_current_user()  # Ensure token is for valid user in DB
-    if not user:
+@users_bp.route("/logout", methods=["POST"])
+@jwt_required()
+def logout_user():
+    user = current_user  # Ensure token is for valid user in DB
+    if user is None:
+        return (
+            jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
+            401,
+        )  # User is not in DB / Invalid token
+    return (
+        jsonify(
+            {"message": "User logged out successfully", "token": delete_user_token()}
+        ),
+        200,
+    )
+
+
+@users_bp.route("", methods=["PUT"])
+@jwt_required()
+def update_user_account():
+    user = current_user  # Ensure token is for valid user in DB
+    if user is None:
         return (
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
             401,
@@ -103,7 +123,22 @@ def user_update_account():
     access_token = create_user_token(
         user.username, user.id
     )  # Recreate user token with new username
+    db.session.commit()
     return (
         jsonify({"token": access_token}),
         200,
     )  # Respond to valid request resetting token
+
+
+@users_bp.route("", methods=["DELETE"])
+@jwt_required()
+def delete_user_account():
+    user = current_user  # Ensure token is for valid user in DB
+    if user is None:
+        return (
+            jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
+            401,
+        )  # User is not in DB / Invalid token
+    db.session.delete(user)
+    db.session.commit()
+    return 204
