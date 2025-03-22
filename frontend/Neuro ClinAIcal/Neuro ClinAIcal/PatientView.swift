@@ -7,13 +7,57 @@
 
 import SwiftUI
 
+enum InfoOption: Equatable {
+    case viewFile
+    case data
+    case summary
+    case askQuestion
+
+    var title: String {
+        switch self {
+            case .viewFile: return "View File"
+            case .data: return "Data"
+            case .summary: return "Summary"
+            case .askQuestion: return "Ask Question"
+        }
+    }
+}
+
 struct PatientView: View {
     let patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
-    @State private var selectedTab: String = "View File"
+    @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
 
+    // Function for bottom navigation buttons
+    func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
+        Button(action: {
+            selectedTab = option
+        }) {
+            VStack {
+                Image(systemName: icon)
+                    .font(.system(size: 24))
+                    .foregroundColor(.white)
+
+                Text(option.title)
+                    .font(.footnote)
+                    .foregroundColor(.white)
+            }
+                .padding()
+                .background(Color.clear)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.white, lineWidth: 2)
+                )
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    func renderOption(_ option: InfoOption) -> some View {
+        Text(option.title)
+    }
+    
     var body: some View {
         ZStack {
             backgroundColor.edgesIgnoringSafeArea(.all)
@@ -24,14 +68,9 @@ struct PatientView: View {
                     .foregroundColor(.white)
                                 
                 // Dynamic Content Box
-                VStack {
-                    if selectedTab == "View File" {
-//                        DocumentImporterView()
-                    } else {
-                        Text(selectedTab)
-                            .font(.title)
-                            .foregroundColor(.black)
-                            .padding()
+                ScrollView {
+                    VStack {
+                        renderOption(selectedTab)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -41,12 +80,12 @@ struct PatientView: View {
                 
                 // Bottom Navigation Bar
                 HStack {
-                    tabButton(icon: "doc.text", text: "View File", isSelected: selectedTab == "View File")
-                    tabButton(icon: "chart.bar", text: "Data", isSelected: selectedTab == "Data")
-                    tabButton(icon: "doc.plaintext", text: "Summary", isSelected: selectedTab == "Summary")
-                    tabButton(icon: "brain.head.profile", text: "Ask AI", isSelected: selectedTab == "Ask AI")
+                    tabButton(icon: "doc.text", option: .viewFile, isSelected: selectedTab == .viewFile)
+                    tabButton(icon: "chart.bar", option: .data, isSelected: selectedTab == .data)
+                    tabButton(icon: "doc.plaintext", option: .summary, isSelected: selectedTab == .summary)
+                    tabButton(icon: "brain.head.profile", option: .askQuestion, isSelected: selectedTab == .askQuestion)
                 }
-
+                .padding(.horizontal, 20)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -63,30 +102,6 @@ struct PatientView: View {
                     }
                 }
                 .toolbarBackground(.hidden, for: .navigationBar)
-    }
-
-    // Function for bottom navigation buttons
-    func tabButton(icon: String, text: String, isSelected: Bool) -> some View {
-        Button(action: {
-            selectedTab = text
-        }) {
-            VStack {
-                Image(systemName: icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
-
-                Text(text)
-                    .font(.footnote)
-                    .foregroundColor(.white)
-            }
-            .padding()
-            .background(Color.clear)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.white, lineWidth: 2)
-            )
-        }
-        .frame(maxWidth: .infinity)
     }
 }
 

@@ -14,7 +14,7 @@ enum PatientOption {
 }
 
 struct ContentView: View {
-    @StateObject private var viewPatientModel = PatientViewModel()
+    @StateObject private var viewModel = PatientViewModel()
     
     @State private var expandedPatientID: UUID? = nil
     @State private var importing = false
@@ -58,7 +58,7 @@ struct ContentView: View {
         case .export:
             print("Export Data for \(patient.name)")
         case .delete:
-            viewPatientModel.deletePatient(withId: patient.id)
+            viewModel.deletePatient(withId: patient.id)
         }
     }
     
@@ -72,7 +72,7 @@ struct ContentView: View {
                             .font(.largeTitle)
                             .foregroundStyle(.white)
                         
-                        ForEach(viewPatientModel.patients) {
+                        ForEach(viewModel.patients) {
                             patient in Button(action: { patientTapped(patient) } ) {
                                 VStack{
                                     HStack {
@@ -162,7 +162,7 @@ struct ContentView: View {
                     
                     Button("Add Patient") {
                         if !newPatientName.isEmpty {
-                            viewPatientModel.addPatient(newPatientName, newPatientFileURL)
+                            viewModel.addPatient(newPatientName, newPatientFileURL)
                             newPatientName = ""
                             showAddPatientSheet = false
                         }
