@@ -1,6 +1,6 @@
 from flask import g, json
-from backend.app.__init__ import jwt, db
-from backend.app.models import User
+from app.__init__ import jwt, db
+from app.models import User
 
 
 @jwt.user_lookup_loader

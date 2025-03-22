@@ -104,10 +104,9 @@ def logout_user():
     )
 
 
-
-@users_bp.route("/user/register", methods=["PUT"])
+@users_bp.route("", methods=["PUT"])
 def user_update_account():
-    user = g.current_user  # Ensure token is for valid user in DB
+    user = current_user  # Ensure token is for valid user in DB
     if not user:
         return (
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
@@ -145,8 +144,8 @@ def delete_user_account():
     db.session.delete(user)
     db.session.commit()
     return 204
-    
+
+
 @users_bp.route("/test", methods=["GET"])
 def test_route():
     return jsonify({"message": "Test route works!"}), 200
-
