@@ -81,6 +81,19 @@ struct SignInView: View {
                             .padding(.top, 10)
                     }
                     
+                    Button(action: {
+                        isAuthenticated = true
+                    }) {
+                        Text("Demo")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
+                    }
+                    
                     Spacer()
                 }
             }
@@ -89,11 +102,11 @@ struct SignInView: View {
 
     // Function to Handle Sign-In Logic
     func signIn() {
-        if email == "test" && password == "123" {
-            isAuthenticated = true
-        } else {
-            showError = true
-        }
+//        if true == false {
+//            isAuthenticated = true
+//        } else {
+//            showError = true
+//        }
     }
 }
 
