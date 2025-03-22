@@ -1,0 +1,57 @@
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_app
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
+      - OLLAMA_HOST=http://ollama:11434
+    ports:
+      - "8000:5000" # Expose to host for iOS app to hit
+    depends_on:
+      - db
+      - ollama
+    networks:
+      - backend
+
+  db:
+    image: postgres:17.4
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U
+      - POSTGRES_DB=database
+      # credentials could be stored elsewhere if better security is needed
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  ollama:
+    build:
+      context: ./ollama
+      dockerfile: Dockerfile
+    container_name: ollama
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      - backend
+    healthcheck:
+      test:
+        ["CMD", "curl", "-s", "http://localhost:11434/api/tags | grep mymodel"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  postgres_data:
+  ollama_models:
+
+networks:
+  backend:
+    driver: bridge
