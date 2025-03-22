@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Neuro_ClinAIcalApp: App {
+    @StateObject private var session = SessionManager()
+        
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(session)
         }
     }
 }

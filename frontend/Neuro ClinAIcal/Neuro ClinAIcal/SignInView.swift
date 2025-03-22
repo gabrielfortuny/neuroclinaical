@@ -1,5 +1,5 @@
 //
-//  Signin.swift
+//  SignInView.swift
 //  Neuro ClinAIcal
 //
 //  Created by Adam Nehme on 3/9/25.
@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct SignInView: View {
+    @EnvironmentObject var session: SessionManager
+    
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
     @State private var showError: Bool = false
-    @State private var isAuthenticated: Bool = false
 
     var body: some View {
-        if isAuthenticated {
-            ContentView()
+        if session.currentUser != nil {
+            MainView()
+                .environmentObject(SessionManager())
         } else {
             ZStack {
                 Color(red: 80/255, green: 134/255, blue: 98/255)
@@ -61,7 +63,7 @@ struct SignInView: View {
                     
                     // Sign In Button
                     Button(action: {
-                        signIn()
+                        session.logIn(email: email, password: password)
                     }) {
                         Text("Sign In")
                             .font(.headline)
@@ -82,7 +84,7 @@ struct SignInView: View {
                     }
                     
                     Button(action: {
-                        isAuthenticated = true
+                        session.logIn(email: "Demo@example.com", password: "123")
                     }) {
                         Text("Demo")
                             .font(.headline)
@@ -99,17 +101,4 @@ struct SignInView: View {
             }
         }
     }
-
-    // Function to Handle Sign-In Logic
-    func signIn() {
-//        if true == false {
-//            isAuthenticated = true
-//        } else {
-//            showError = true
-//        }
-    }
-}
-
-#Preview {
-    SignInView()
 }

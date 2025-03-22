@@ -6,9 +6,16 @@
 //
 
 import Foundation
-struct Patient: Identifiable {
-    let id = UUID()
+
+struct Patient: Identifiable, Codable {
+    let id: UUID
     let name: String
-    var ltmFileLocation: URL? = nil
+    var ltmFileLocation: URL?
 //    let supplementaryData: [String]? = nil
+    
+    init(id: UUID = UUID(), name: String, ltmFileLocation: URL? = nil) {
+        self.id = id
+        self.name = name
+        self.ltmFileLocation = ltmFileLocation
+    }
 }

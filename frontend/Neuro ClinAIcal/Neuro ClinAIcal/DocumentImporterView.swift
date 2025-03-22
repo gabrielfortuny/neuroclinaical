@@ -60,8 +60,8 @@ struct DocumentImporterView: View {
     }
 }
 
-//struct DocumentImporterView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        DocumentImporterView()
-//    }
-//}
+struct DocumentImporterView_Previews: PreviewProvider {
+    static var previews: some View {
+        DocumentImporterView(importedFileURL: .constant(nil))
+    }
+}

@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MainView.swift
 //  Neuro ClinAIcal
 //
 //  Created by Adam Nehme on 3/4/25.
@@ -13,13 +13,15 @@ enum PatientOption {
     case delete
 }
 
-struct ContentView: View {
+struct MainView: View {
+    @EnvironmentObject var session: SessionManager
     @StateObject private var viewModel = PatientViewModel()
     
     @State private var expandedPatientID: UUID? = nil
     @State private var importing = false
     @State private var showAddPatientSheet = false
-    
+    @State private var showSettings = false
+
     @State private var newPatientName = ""
     @State private var newPatientFileURL: URL? = nil
     
@@ -141,51 +143,70 @@ struct ContentView: View {
                     }
                 }
             }
-        }
-        .sheet(isPresented: $showAddPatientSheet) {
-            NavigationStack {
-                VStack(alignment: .leading, spacing: 10) {
-                    let titleLeading: CGFloat = 15
-                    
-                    Text("Patient Name:")
-                        .padding(.leading, titleLeading)
-                        .bold()
-                    TextField("Enter patient name", text: $newPatientName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal, 20)
-                    
-                    Text("Select LTM file:")
-                        .padding(.leading, titleLeading)
-                        .bold()
-                    DocumentImporterView(importedFileURL: $newPatientFileURL)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    
-                    Button("Add Patient") {
-                        if !newPatientName.isEmpty {
-                            viewModel.addPatient(newPatientName, newPatientFileURL)
-                            newPatientName = ""
-                            showAddPatientSheet = false
-                        }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.white)
                     }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
-                    
-                    Spacer()
                 }
-                .navigationTitle("Add Patient Form")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button("Cancel") {
-                            showAddPatientSheet = false
+            }
+            .sheet(isPresented: $showSettings) {
+                NavigationStack {
+                    SettingsView()
+                        .environmentObject(session)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("Cancel") {
+                                    showSettings = false
+                                }
+                            }
+                        }
+                }
+            }
+            .sheet(isPresented: $showAddPatientSheet) {
+                NavigationStack {
+                    VStack(alignment: .leading, spacing: 10) {
+                        let titleLeading: CGFloat = 15
+                        
+                        Text("Patient Name:")
+                            .padding(.leading, titleLeading)
+                            .bold()
+                        TextField("Enter patient name", text: $newPatientName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.horizontal, 20)
+                        
+                        Text("Select LTM file:")
+                            .padding(.leading, titleLeading)
+                            .bold()
+                        DocumentImporterView(importedFileURL: $newPatientFileURL)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        
+                        Button("Add Patient") {
+                            if !newPatientName.isEmpty {
+                                viewModel.addPatient(newPatientName, newPatientFileURL)
+                                newPatientName = ""
+                                showAddPatientSheet = false
+                            }
+                        }
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                        
+                        Spacer()
+                    }
+                    .navigationTitle("Add Patient Form")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Cancel") {
+                                showAddPatientSheet = false
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
-
-#Preview {
-    ContentView()
 }

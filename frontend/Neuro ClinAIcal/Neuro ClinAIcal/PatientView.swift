@@ -54,8 +54,69 @@ struct PatientView: View {
         .frame(maxWidth: .infinity)
     }
     
-    func renderOption(_ option: InfoOption) -> some View {
-        Text(option.title)
+    @ViewBuilder
+    private func renderOption(_ option: InfoOption) -> some View {
+        switch option {
+            case .viewFile:
+                viewFileContent()
+            case .data:
+                Text(option.title)
+            case .summary:
+                Text(option.title)
+            case .askQuestion:
+                Text(option.title)
+        }
+    }
+    
+    @ViewBuilder
+    private func viewFileContent() -> some View {
+        if let fileLocation = patient.ltmFileLocation {
+            // We have a file location -> Show LTM
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Long Term Monitoring Report")
+                    .font(.title2)
+                    .padding(.bottom, 5)
+                
+                // A simple row that shows the file name and an icon to open or import
+                HStack {
+                    Text(fileLocation.absoluteString) // e.g., "Patient123LTM.pdf"
+                        .foregroundColor(.blue)
+                        .underline()
+                        // If you want tapping this text to open the file, you can add a gesture, link, or logic.
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        // TODO: Logic to open or share the file
+                        print("Open file at \(fileLocation)")
+                    }) {
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.headline)
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .padding(.top, 20)
+        } else {
+            // No file -> Prompt user to import
+            VStack(alignment: .leading, spacing: 20) {
+                Text("No LTM Report Found")
+                    .font(.title2)
+                
+                Text("Would you like to import a Long Term Monitoring Report for this patient?")
+                    .foregroundColor(.gray)
+                
+                Button("Import File") {
+                    // TODO: Trigger your file importer logic
+                    print("Trigger file import for \(patient.name)")
+                }
+                .font(.headline)
+                .padding()
+                .background(Color.blue.opacity(0.2))
+                .cornerRadius(8)
+            }
+            .padding(.top, 20)
+        }
     }
     
     var body: some View {
@@ -102,11 +163,5 @@ struct PatientView: View {
                     }
                 }
                 .toolbarBackground(.hidden, for: .navigationBar)
-    }
-}
-
-#Preview {
-    NavigationStack {
-        PatientView(patient: Patient(name: "John Doe"))
     }
 }

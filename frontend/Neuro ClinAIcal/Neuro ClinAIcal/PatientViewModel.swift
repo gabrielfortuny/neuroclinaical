@@ -1,5 +1,5 @@
 //
-//  PatientData.swift
+//  PatientViewModel.swift
 //  Neuro ClinAIcal
 //
 //  Created by Adam Nehme on 3/21/25.
@@ -8,10 +8,7 @@
 import SwiftUI
 
 class PatientViewModel: ObservableObject {
-    @Published var patients: [Patient] = [
-        Patient(name: "Alice"),
-        Patient(name: "Bob")
-    ]
+    @Published var patients: [Patient] = []
     
     func addPatient(_ name: String, _ ltmFileLocation: URL? = nil) {
         let newPatient = Patient(name: name, ltmFileLocation: ltmFileLocation)
