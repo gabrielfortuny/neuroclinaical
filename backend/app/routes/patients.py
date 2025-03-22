@@ -108,22 +108,44 @@ def delete_patient(patient_id):
 
 @patients_bp.route("/<int:patient_id>/reports", methods=["GET"])
 def get_patient_reports(patient_id):
+    # Import db only
+    from app import db
+    
+    # Check if patient exists
     patient = Patient.query.get(patient_id)
     if not patient:
         return jsonify({"error": "Patient not found."}), 404
 
-    # Assuming a `reports` relationship on Patient
-    reports = patient.reports
-    data = [
-        {
-            "report_id": report.id,
-            "uploaded_at": (
-                report.uploaded_at.isoformat() if report.uploaded_at else None
-            ),
-        }
-        for report in reports
-    ]
-    return jsonify(data), 200
+    # Use SQLAlchemy's text function to query reports directly
+    from sqlalchemy import text
+    
+    try:
+        # Execute raw SQL query to get reports for the patient
+        result = db.session.execute(
+            text("SELECT id, patient_id, summary, filepath, created_at, modified_at, filetype FROM reports WHERE patient_id = :patient_id"),
+            {"patient_id": patient_id}
+        )
+        
+        # Convert row objects to dictionaries
+        data = []
+        for row in result:
+            report_dict = {
+                "report_id": row.id,
+                "patient_id": row.patient_id,
+                "summary": row.summary,
+                "filepath": row.filepath,
+                "created_at": row.created_at.isoformat() if row.created_at else None,
+                "modified_at": row.modified_at.isoformat() if row.modified_at else None,
+                "filetype": row.filetype
+            }
+            data.append(report_dict)
+        
+        return jsonify(data), 200
+        
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Error retrieving patient reports: {str(e)}")
+        return jsonify({"error": "Failed to retrieve reports"}), 500
 
 
 @patients_bp.route("/<int:patient_id>/seizures", methods=["GET"])
@@ -205,3 +227,4 @@ def get_patient_drug_administration(patient_id):
         )
 
     return jsonify(data), 200
+

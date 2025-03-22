@@ -32,7 +32,7 @@ class User(db.Model, TimestampMixin):
     username = db.Column(String(100), unique=True, nullable=False)
     name = db.Column(String(100), nullable=False)
     email = db.Column(String(100), unique=True, nullable=False)
-    password_hash = db.Column(String(64), nullable=False)
+    password_hash = db.Column(String(128), nullable=False)
     conversations = db.relationship("Conversation", back_populates="user")
 
 
@@ -67,7 +67,7 @@ class Report(db.Model, TimestampMixin):
     extracted_images = db.relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
-    days = db.Column(Integer)
+    #days = db.Column(Integer)
 
 
 class ExtractedImage(db.Model, TimestampMixin):

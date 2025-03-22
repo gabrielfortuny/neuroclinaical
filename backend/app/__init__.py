@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from app.config import Config
 
+
 EXEMPT_PATHS = ["/users/user/login", "/users/user/register", "/users/test", "/hello", "/debug/routes"]
 
 db = SQLAlchemy()
@@ -17,6 +18,7 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
+    from api.authentication.jwtConfiguration import user_lookup
 
     with app.app_context():
         # pylint: disable-next=import-outside-toplevel, unused-import
@@ -29,14 +31,14 @@ def create_app():
         register_routes(app)
         db.create_all()
 
-    
+    '''
     @app.before_request
     def require_jwt():
         if request.path not in EXEMPT_PATHS:
             verify_jwt_in_request()
-
+    '''
     return app
-
+    
 
 
     

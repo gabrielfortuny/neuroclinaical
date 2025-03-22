@@ -1,6 +1,6 @@
 from flask import g, json
-from backend.app.__init__ import jwt, db
-from backend.app.models import User
+from app.__init__ import jwt, db
+from app.models import User
 
 
 @jwt.user_lookup_loader
@@ -20,7 +20,11 @@ def user_lookup(_jwt_header: json, jwt_data: json) -> bool:
     @param current_id: Done by jwt
     """
     user_id = jwt_data["sub"]  # Extract the identity from the JWT
-    user = db.session.get(User, user_id)  # Lookup the user
+    user = None
+    try:
+        user = db.session.get(User, user_id)  # Lookup the user
+    except Exception as err:
+        user = None
     if user is None:
         return user
     username = jwt_data.get("username")  # Verify their username

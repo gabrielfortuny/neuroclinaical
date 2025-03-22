@@ -1,8 +1,9 @@
 from app import create_app
 from flask import jsonify, current_app
-
+import os
 
 app = create_app()
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY") 
 
 
 @app.route("/hello", methods=["GET"])
