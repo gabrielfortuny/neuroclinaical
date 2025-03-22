@@ -2,9 +2,13 @@
 set -e
 
 echo "Starting Ollama server..."
-ollama serve
+ollama serve & pid=$!
+
+sleep 5
 
 echo "Creating Ollama model..."
 ollama create mymodel -f Modelfile
+echo "Created model!"
 
-wait
+# wait for ollama process to finish
+wait $pid

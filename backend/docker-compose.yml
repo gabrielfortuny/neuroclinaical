@@ -41,12 +41,7 @@ services:
       - ollama_models:/root/.ollama
     networks:
       - backend
-    healthcheck:
-      test:
-        ["CMD", "curl", "-s", "http://localhost:11434/api/tags | grep mymodel"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
+    mem_limit: 14.5g
 
 volumes:
   postgres_data:
