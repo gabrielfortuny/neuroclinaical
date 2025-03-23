@@ -77,6 +77,10 @@ def upload_report():
         db.session.commit()
         if not upload_controller(filetype, file_path, patient_id, new_report):
             raise Exception
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         print(f"reports_dir: {reports_dir}")
 
         return (
