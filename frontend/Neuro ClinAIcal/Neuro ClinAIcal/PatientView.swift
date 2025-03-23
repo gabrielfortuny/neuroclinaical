@@ -30,6 +30,40 @@ struct PatientView: View {
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
     @State private var importedFileURL: URL? = nil
+    @State private var sampleSummary: String = """
+    Sample summary
+    2:17
+    This report summarizes a 12-day long-term EEG-video monitoring study conducted on a patient with medically-refractory post-traumatic epilepsy and migraine headaches. The patient underwent the placement of 16 bilateral ROSA-guided depth electrodes for stereoEEG testing to localize seizure activity in anticipation of potential epilepsy surgery, likely neuromodulation. The study aimed to characterize the patient's clinical events and interictal epileptiform discharges (IEDs).
+
+    ### Key Findings:
+    1. **Electrode Placement and Targets**:
+    Electrodes were placed in various brain regions, including the amygdala, hippocampus (anterior, middle, posterior), cingulate, insula, and SPECT-related areas. The right hemisphere was more extensively monitored.
+    2. **Medication Adjustments**:
+    The patient was on multiple neuroactive medications, including Xcopri, Zonisamide, and others. Medications were adjusted during the monitoring period, with Zonisamide and Cenobamate being tapered off and later restarted.
+    3. **Interictal EEG Findings**:
+    - Frequent spikes and sharp waves were observed, particularly in the right middle hippocampus (RMH 1-2), with fields extending to other regions like the right anterior hippocampus (RAH) and right posterior hippocampus (RPH).
+    - Independent spikes were also noted in the left middle hippocampus (LMH) and left amygdala (LAM).
+    - Scalp EEG showed a symmetric, well-modulated posterior background rhythm with no focal or epileptiform abnormalities.
+    4. **Ictal EEG Findings**:
+    - **Subclinical Seizures**:
+        - Type 1: Rhythmic spikes starting at RMH 1-2, propagating to RAH 1-2, increasing to 1 Hz.
+        - Type 2: Evolved into faster frequency spikes (up to 8 Hz).
+        - Type 3: Low-amplitude spike-wave discharges at RAH 1-2 and RMH 1-2.
+    - **Clinical Seizures**:
+        - Type 1: Onset at RMH 1-2, with nausea, vomiting, aphasia.
+        - Type 2: Same onset with fear and inability to speak.
+    5. **Seizure Localization**:
+    - Interictal findings suggest RMH 1-2 is within the epileptogenic zone.
+    - Ictal onset localized to RMH 1-2, though not clearly distinct from interictal discharges.
+    6. **Clinical Correlation**:
+    - Seizures with vomiting and aphasia align with right mesial temporal localization.
+    7. **Final Diagnosis**:
+    - Focal symptomatic epilepsy with complex partial seizures, intractable, with status epilepticus.
+
+    ### Conclusion:
+    The 12-day monitoring localized the epileptogenic zone to RMH 1-2. This supports treatment decisions such as surgery or neuromodulation. Reviewed by attending physicians.
+    """
+
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -61,11 +95,11 @@ struct PatientView: View {
             case .viewFile:
                 viewFileContent()
             case .data:
-                dataContent()
+                Text(option.title)
             case .summary:
-                summaryContent()
+                SummaryView(title: "PATIENT 123", summaryText: sampleSummary)
             case .askQuestion:
-                askQuestionContent()
+                Text(option.title)
         }
     }
     
@@ -183,6 +217,27 @@ struct PatientView_Previews: PreviewProvider {
                     )
                 )
             )
+        }
+    }
+}
+
+
+struct SummaryView: View {
+    let title: String
+    let summaryText: String
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(title)
+                    .font(.title)
+                    .fontWeight(.bold)
+
+                Text(summaryText)
+                    .font(.body)
+                    .multilineTextAlignment(.leading)
+            }
+            .padding()
         }
     }
 }
