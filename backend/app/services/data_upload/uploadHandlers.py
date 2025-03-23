@@ -31,7 +31,7 @@ class pdf_upload_handler:
                 text.append(page.get_text())
         return "\n".join(text)
 
-    def __call__(self, file_path: str, p_id: int, report: Report) -> bool:
+    def __call__(self, file_path: str) -> str:
         # TODO: Write Docstring
         """
         Description:
@@ -45,9 +45,7 @@ class pdf_upload_handler:
 
         @param data: String to be used for pdf
         """
-        text = self.extract_text_from_pdf(
-            report.filepath
-        )  # Extract raw text from the docx
+        text = self.extract_text_from_pdf(file_path)  # Extract raw text from the docx
         return text
 
 

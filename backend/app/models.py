@@ -98,7 +98,7 @@ class Seizure(db.Model, TimestampMixin):
     )
     day = db.Column(Integer, nullable=False)
     start_time = db.Column(Time)
-    duration = db.Column(Text)
+    duration = db.Column(Integer)
     patient = db.relationship("Patient", back_populates="seizures")
     electrodes = db.relationship(
         "Electrode",
