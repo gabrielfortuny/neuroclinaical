@@ -1,3 +1,4 @@
+from app.services.data_upload.uploadHandlers import upload_controller
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import current_user, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
@@ -74,6 +75,8 @@ def upload_report():
 
         db.session.add(new_report)
         db.session.commit()
+        if not upload_controller(filetype, file_path, patient_id, new_report):
+            raise Exception
 
         print(f"reports_dir: {reports_dir}")
 
@@ -158,7 +161,7 @@ def delete_report(report_id):
 
         # Store filepath for later deletion
         filepath = report.filepath
-        
+
         # Ensure we're using absolute path
         if not os.path.isabs(filepath):
             filepath = os.path.abspath(filepath)
@@ -173,7 +176,7 @@ def delete_report(report_id):
         # Attempt to delete the actual file
         try:
             current_app.logger.info(f"Attempting to delete file at: {filepath}")
-            
+
             if os.path.exists(filepath):
                 os.remove(filepath)
                 current_app.logger.info(f"Successfully deleted file: {filepath}")
@@ -217,7 +220,7 @@ def download_report(report_id):
         file_path = report.filepath
         if not os.path.isabs(file_path):
             file_path = os.path.abspath(file_path)
-            
+
         current_app.logger.info(f"Preparing to download file: {file_path}")
 
         # Check if file exists
@@ -247,8 +250,10 @@ def download_report(report_id):
 
         # Get the filename from the path
         filename = os.path.basename(file_path)
-        
-        current_app.logger.info(f"Sending file: {filename} with content type: {content_type}")
+
+        current_app.logger.info(
+            f"Sending file: {filename} with content type: {content_type}"
+        )
 
         # Send the file with appropriate headers
         return send_file(
@@ -258,5 +263,6 @@ def download_report(report_id):
     except Exception as e:
         current_app.logger.error(f"Error downloading report: {str(e)}")
         import traceback
+
         current_app.logger.error(traceback.format_exc())
         return jsonify({"error": f"Failed to download report: {str(e)}"}), 500
