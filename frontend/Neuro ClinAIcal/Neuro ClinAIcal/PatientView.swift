@@ -29,6 +29,7 @@ struct PatientView: View {
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
+    @State private var importedFileURL: URL? = nil
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -60,7 +61,7 @@ struct PatientView: View {
             case .viewFile:
                 viewFileContent()
             case .data:
-                Text(option.title)
+                dataContent()
             case .summary:
                 Text(option.title)
             case .askQuestion:
@@ -69,9 +70,23 @@ struct PatientView: View {
     }
     
     @ViewBuilder
+    private func askQuestionContent() -> some View {
+        Text("Ask Question")
+    }
+    
+    @ViewBuilder
+    private func summaryContent() -> some View {
+        Text("Summary")
+    }
+    
+    @ViewBuilder
+    private func dataContent() -> some View {
+        Text("Data")
+    }
+    
+    @ViewBuilder
     private func viewFileContent() -> some View {
         if let fileLocation = patient.ltmFileLocation {
-            // We have a file location -> Show LTM
             VStack(alignment: .leading, spacing: 20) {
                 Text("Long Term Monitoring Report")
                     .font(.title2)
@@ -94,28 +109,20 @@ struct PatientView: View {
                             .font(.headline)
                     }
                 }
-                .padding(.horizontal)
             }
-            .padding(.top, 20)
         } else {
-            // No file -> Prompt user to import
             VStack(alignment: .leading, spacing: 20) {
                 Text("No LTM Report Found")
-                    .font(.title2)
-                
-                Text("Would you like to import a Long Term Monitoring Report for this patient?")
-                    .foregroundColor(.gray)
-                
-                Button("Import File") {
-                    // TODO: Trigger your file importer logic
-                    print("Trigger file import for \(patient.name)")
-                }
-                .font(.headline)
-                .padding()
-                .background(Color.blue.opacity(0.2))
-                .cornerRadius(8)
+//                    .font(.title2)
+                DocumentImporterView(importedFileURL: $importedFileURL)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .onChange(of: importedFileURL) { newValue, _ in
+                        if let newValue = newValue {
+                            patient.ltmFileLocation = newValue
+                        }
+                    }
             }
-            .padding(.top, 20)
+//            .padding(.top, 20)
         }
     }
     
@@ -130,9 +137,7 @@ struct PatientView: View {
                                 
                 // Dynamic Content Box
                 ScrollView {
-                    VStack {
-                        renderOption(selectedTab)
-                    }
+                    renderOption(selectedTab)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
@@ -163,5 +168,21 @@ struct PatientView: View {
                     }
                 }
                 .toolbarBackground(.hidden, for: .navigationBar)
+    }
+}
+
+struct PatientView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            PatientView(
+                patient: .constant(
+                    Patient(
+                        name: "John Doe",
+                        // URL(string: "https://example.com/report.pdf")
+                        ltmFileLocation: nil
+                    )
+                )
+            )
+        }
     }
 }
