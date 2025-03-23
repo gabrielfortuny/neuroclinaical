@@ -15,7 +15,7 @@ api = Api(reports_bp)
 
 
 @reports_bp.route("", methods=["POST"])
-@jwt_required()
+# @jwt_required()
 def upload_report():
     from app import db
 
