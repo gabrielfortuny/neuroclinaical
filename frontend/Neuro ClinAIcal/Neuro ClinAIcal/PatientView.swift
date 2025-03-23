@@ -24,7 +24,7 @@ enum InfoOption: Equatable {
 }
 
 struct PatientView: View {
-    let patient: Patient
+    @Binding var patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile

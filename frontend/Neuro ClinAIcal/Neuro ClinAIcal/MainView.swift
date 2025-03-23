@@ -74,8 +74,8 @@ struct MainView: View {
                             .font(.largeTitle)
                             .foregroundStyle(.white)
                         
-                        ForEach(viewModel.patients) {
-                            patient in Button(action: { patientTapped(patient) } ) {
+                        ForEach($viewModel.patients) {
+                            $patient in Button(action: { patientTapped(patient) } ) {
                                 VStack{
                                     HStack {
                                         Text(patient.name)
@@ -105,7 +105,7 @@ struct MainView: View {
                                             handleOptionSelection(patient, .delete)
                                         }
                                         
-                                        NavigationLink(destination: PatientView(patient: patient)) {
+                                        NavigationLink(destination: PatientView(patient: $patient)) {
                                             Text("VIEW PATIENT")
                                                 .font(.headline)
                                                 .foregroundColor(.black)
