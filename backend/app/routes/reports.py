@@ -158,6 +158,10 @@ def delete_report(report_id):
 
         # Store filepath for later deletion
         filepath = report.filepath
+        
+        # Ensure we're using absolute path
+        if not os.path.isabs(filepath):
+            filepath = os.path.abspath(filepath)
 
         # Delete the report from the database
         db.session.execute(
@@ -168,13 +172,13 @@ def delete_report(report_id):
 
         # Attempt to delete the actual file
         try:
-            if filepath and os.path.exists(filepath):
+            current_app.logger.info(f"Attempting to delete file at: {filepath}")
+            
+            if os.path.exists(filepath):
                 os.remove(filepath)
-            elif filepath:
-                # If file doesn't exist at the exact path, try with the corrected base path
-                corrected_path = os.path.normpath(os.path.join("/", filepath))
-                if os.path.exists(corrected_path):
-                    os.remove(corrected_path)
+                current_app.logger.info(f"Successfully deleted file: {filepath}")
+            else:
+                current_app.logger.warning(f"File not found at path: {filepath}")
         except Exception as file_error:
             # Log the error but don't affect the API response
             current_app.logger.warning(f"Could not delete file: {str(file_error)}")
@@ -209,15 +213,12 @@ def download_report(report_id):
         if not report or not report.filepath:
             return jsonify({"error": "Report not found"}), 404
 
-        # Fix path resolution - ensure we're using absolute path
-        # Replace relative path components if they exist
+        # Ensure we're using absolute path
         file_path = report.filepath
-        if not file_path.startswith("/"):
-            # If we need to construct a full path
-            file_path = os.path.join("/", file_path)
-
-        # Remove any './' from the path
-        file_path = os.path.normpath(file_path)
+        if not os.path.isabs(file_path):
+            file_path = os.path.abspath(file_path)
+            
+        current_app.logger.info(f"Preparing to download file: {file_path}")
 
         # Check if file exists
         if not os.path.exists(file_path):
@@ -246,6 +247,8 @@ def download_report(report_id):
 
         # Get the filename from the path
         filename = os.path.basename(file_path)
+        
+        current_app.logger.info(f"Sending file: {filename} with content type: {content_type}")
 
         # Send the file with appropriate headers
         return send_file(
@@ -254,4 +257,6 @@ def download_report(report_id):
 
     except Exception as e:
         current_app.logger.error(f"Error downloading report: {str(e)}")
-        return jsonify({"error": "Failed to download report"}), 500
+        import traceback
+        current_app.logger.error(traceback.format_exc())
+        return jsonify({"error": f"Failed to download report: {str(e)}"}), 500
