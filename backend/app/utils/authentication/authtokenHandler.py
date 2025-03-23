@@ -18,7 +18,7 @@ def create_user_token(current_username: str, current_id: int) -> str:
     """
     access_token = (
         create_access_token(  # Create user access token with autoset expiration date
-            identity=str(current_id), additional_claims={"username": current_username}
+            identity=current_id, additional_claims={"username": current_username}
         )
     )
     return access_token  # Return new user access token
