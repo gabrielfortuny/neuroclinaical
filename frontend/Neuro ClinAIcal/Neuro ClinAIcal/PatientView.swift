@@ -30,6 +30,10 @@ struct PatientView: View {
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
     @State private var importedFileURL: URL? = nil
+    
+    var sessions: [String] = []
+    var data: [String] = []
+    var summary: String? = nil
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -71,59 +75,83 @@ struct PatientView: View {
     
     @ViewBuilder
     private func askQuestionContent() -> some View {
-        Text("Ask Question")
+        ScrollView {
+            Text("Ask Question MVP")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
     }
     
     @ViewBuilder
     private func summaryContent() -> some View {
-        Text("Summary")
-    }
+        ScrollView {
+            Text("Summary")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)    }
     
     @ViewBuilder
     private func dataContent() -> some View {
-        Text("Data")
+        ScrollView {
+            Text("Data")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
     }
     
     @ViewBuilder
     private func viewFileContent() -> some View {
-        if let fileLocation = patient.ltmFileLocation {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Long Term Monitoring Report")
-                    .font(.title2)
-                    .padding(.bottom, 5)
-                
-                // A simple row that shows the file name and an icon to open or import
-                HStack {
-                    Text(fileLocation.absoluteString) // e.g., "Patient123LTM.pdf"
-                        .foregroundColor(.blue)
-                        .underline()
-                        // If you want tapping this text to open the file, you can add a gesture, link, or logic.
+        ScrollView {
+            Text("Session")
+            if let fileLocation = patient.ltmFileLocation {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Long Term Monitoring Report")
+                        .font(.title2)
+                        .padding(.bottom, 5)
                     
-                    Spacer()
-                    
-                    Button(action: {
-                        // TODO: Logic to open or share the file
-                        print("Open file at \(fileLocation)")
-                    }) {
-                        Image(systemName: "arrow.up.right.square")
-                            .font(.headline)
-                    }
-                }
-            }
-        } else {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("No LTM Report Found")
-//                    .font(.title2)
-                DocumentImporterView(importedFileURL: $importedFileURL)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .onChange(of: importedFileURL) { newValue, _ in
-                        if let newValue = newValue {
-                            patient.ltmFileLocation = newValue
+                    // A simple row that shows the file name and an icon to open or import
+                    HStack {
+                        Text(fileLocation.absoluteString) // e.g., "Patient123LTM.pdf"
+                            .foregroundColor(.blue)
+                            .underline()
+                            // If you want tapping this text to open the file, you can add a gesture, link, or logic.
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            // TODO: Logic to open or share the file
+                            print("Open file at \(fileLocation)")
+                        }) {
+                            Image(systemName: "arrow.up.right.square")
+                                .font(.headline)
                         }
                     }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("No LTM Report Found")
+    //                    .font(.title2)
+                    DocumentImporterView(importedFileURL: $importedFileURL)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .onChange(of: importedFileURL) { newValue, _ in
+                            if let newValue = newValue {
+                                patient.ltmFileLocation = newValue
+                            }
+                        }
+                }
+    //            .padding(.top, 20)
             }
-//            .padding(.top, 20)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
     }
     
     var body: some View {
@@ -135,14 +163,7 @@ struct PatientView: View {
                     .font(.largeTitle)
                     .foregroundColor(.white)
                                 
-                // Dynamic Content Box
-                ScrollView {
-                    renderOption(selectedTab)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
-                .cornerRadius(12)
-                .padding(.horizontal, 20)
+                renderOption(selectedTab)
                 
                 // Bottom Navigation Bar
                 HStack {

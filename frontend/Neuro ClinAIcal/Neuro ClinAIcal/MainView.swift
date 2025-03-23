@@ -178,11 +178,11 @@ struct MainView: View {
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding(.horizontal, 20)
                         
-                        Text("Select LTM file:")
-                            .padding(.leading, titleLeading)
-                            .bold()
-                        DocumentImporterView(importedFileURL: $newPatientFileURL)
-                            .frame(maxWidth: .infinity, alignment: .center)
+//                        Text("Select LTM file:")
+//                            .padding(.leading, titleLeading)
+//                            .bold()
+//                        DocumentImporterView(importedFileURL: $newPatientFileURL)
+//                            .frame(maxWidth: .infinity, alignment: .center)
                         
                         Button("Add Patient") {
                             if !newPatientName.isEmpty {
