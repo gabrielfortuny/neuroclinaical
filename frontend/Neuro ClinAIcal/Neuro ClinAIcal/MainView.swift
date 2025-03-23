@@ -210,3 +210,14 @@ struct MainView: View {
         }
     }
 }
+
+struct MainView_Previews: PreviewProvider {
+    static var previews: some View {
+        let session = SessionManager()
+        session.logIn(email: "Demo@example.com", password: "123")
+        return NavigationStack {
+            MainView()
+                .environmentObject(session)
+        }
+    }
+}
