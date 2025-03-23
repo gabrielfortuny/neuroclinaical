@@ -17,13 +17,13 @@ services:
     volumes:
       - ./:/app  #Mount the project directory
       - ./NeuroClin:/app/NeuroClin  #This should be outside of /backend
+
     depends_on:
       - db
       - ollama
     networks:
       - backend
 
-  # Other services remain the same
   db:
     image: postgres:17.4
     container_name: postgres_db
