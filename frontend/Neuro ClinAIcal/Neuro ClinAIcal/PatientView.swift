@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 enum InfoOption: Equatable {
     case viewFile
@@ -24,14 +25,28 @@ enum InfoOption: Equatable {
 }
 
 struct PatientView: View {
-    @EnvironmentObject var session: SessionManager
+    @EnvironmentObject var sessionManager: SessionManager
     @Binding var patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
-    @State private var importedFileURL: URL? = nil
     @State private var expandedSessionID: UUID? = nil
+    
+    @State private var isImporting = false
+    @State private var importedFileURL: URL? = nil
+    var allowedTypes: [UTType] {
+        var types: [UTType] = [.pdf]
+        // For DOC files:
+        if let docType = UTType("com.microsoft.word.doc") {
+            types.append(docType)
+        }
+        // For DOCX files:
+        if let docxType = UTType("org.openxmlformats.wordprocessingml.document") {
+            types.append(docxType)
+        }
+        return types
+    }
     
     var sessions: [String] = []
     var data: [String] = []
@@ -59,6 +74,28 @@ struct PatientView: View {
                 )
         }
         .frame(maxWidth: .infinity)
+    }
+    
+    private func importFileButton() -> some View {
+        Button("Import File") {
+            isImporting = true
+        }
+        .foregroundColor(.blue)
+        .fileImporter(
+            isPresented: $isImporting,
+            allowedContentTypes: allowedTypes,
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    importedFileURL = url
+                    print("Imported file: \(url.absoluteString)")
+                }
+            case .failure(let error):
+                print("File import error: \(error.localizedDescription)")
+            }
+        }
     }
     
     @ViewBuilder
@@ -123,6 +160,61 @@ struct PatientView: View {
                     .font(.title2)
                     
                     if expandedSessionID == session.id {
+                        VStack(alignment: .leading, spacing: 8) {
+                            // Title with a line underneath
+                            HStack {
+                                Text("Long Term Monitoring Report")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                Spacer()
+                                // If a file exists, show a trash icon to remove it.
+                                if session.ltmFile != nil {
+                                    Button {
+//                                            removeLTMFile(from: session.id)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red)
+                                    }
+                                }
+                            }
+                            Divider()
+                                .background(Color.gray)
+                            
+                            if let file = session.ltmFile {
+                                // If a file exists, display its name with a link icon.
+                                HStack {
+                                    Text(file.lastPathComponent)
+                                        .foregroundColor(.blue)
+                                        .underline()
+                                    Spacer()
+                                    Button {
+                                        // TODO: Open the file
+                                        print("Open file at \(file)")
+                                    } label: {
+                                        Image(systemName: "arrow.up.right.square")
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                            } else {
+                                // If no file, show "No LTM added" with an Import button.
+                                HStack {
+                                    Text("No LTM added")
+                                        .foregroundColor(.gray)
+                                    Spacer()
+                                    importFileButton()
+                                    .onChange(of: importedFileURL) { newValue, _ in
+                                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+                                            patient.sessions[index].ltmFile = importedFileURL
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        
+                        
                         Button("Delete Session") {
                             patient.deleteSession(withId: session.id)
                             expandedSessionID = nil

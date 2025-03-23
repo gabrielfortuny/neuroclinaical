@@ -14,7 +14,7 @@ enum PatientOption {
 }
 
 struct MainView: View {
-    @EnvironmentObject var session: SessionManager
+    @EnvironmentObject var sessionManager: SessionManager
     @StateObject private var viewModel = PatientViewModel()
     
     @State private var expandedPatientID: UUID? = nil
@@ -156,7 +156,7 @@ struct MainView: View {
             .sheet(isPresented: $showSettings) {
                 NavigationStack {
                     SettingsView()
-                        .environmentObject(session)
+                        .environmentObject(sessionManager)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button("Cancel") {

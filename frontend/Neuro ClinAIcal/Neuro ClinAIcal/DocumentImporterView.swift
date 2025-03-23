@@ -4,6 +4,7 @@
 //
 //  Created by Adam Nehme on 3/20/25.
 //
+//  NOT IN USE SAMPLE METHOD TO IMPORT
 
 import SwiftUI
 import UniformTypeIdentifiers
@@ -28,20 +29,10 @@ struct DocumentImporterView: View {
     }
     
     var body: some View {
-        VStack(spacing: 20) {
-            if let url = importedFileURL {
-                Text("Imported file: \(url.lastPathComponent)")
-                    .padding()
-            } else {
-                Text("No file imported yet.")
-                    .padding()
-            }
-            
-            Button("Import Document") {
-                isImporting = true
-            }
-            .padding()
+        Button("Import File") {
+            isImporting = true
         }
+        .foregroundColor(.blue)
         .fileImporter(
             isPresented: $isImporting,
             allowedContentTypes: allowedTypes,
