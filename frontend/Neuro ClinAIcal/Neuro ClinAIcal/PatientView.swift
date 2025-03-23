@@ -30,6 +30,17 @@ struct PatientView: View {
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
     @State private var importedFileURL: URL? = nil
+    @State private var sampleSummary: String = """
+    Sample summary
+    2:17
+    This report summarizes a 12-day long-term EEG-video monitoring study conducted on a patient with medically-refractory post-traumatic epilepsy and migraine headaches. The patient underwent the placement of 16 bilateral ROSA-guided depth electrodes for stereoEEG testing to localize seizure activity in anticipation of potential epilepsy surgery, likely neuromodulation. The study aimed to characterize the patient's clinical events and interictal epileptiform discharges (IEDs).
+
+    ### Key Findings:
+    1. **Electrode Placement and Targets**:
+    Electrodes were placed in various brain regions, including the amygdala, hippocampus (anterior, middle, posterior), cingulate, insula, and SPECT-related areas. The right hemisphere was more extensively monitored.
+    2. **Medication Adjustments**:
+    The patient was on multiple neuroactive medications, including Xcopri, Zonisamide, and others. Medications were adjusted during the monitoring period, with Zonisamide and Cenobamate being tapered off and later restarted.
+    3. **Interictal EEG Findings**:"""
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -77,6 +88,15 @@ struct PatientView: View {
     @ViewBuilder
     private func summaryContent() -> some View {
         Text("Summary")
+        VStack(alignment: .leading, spacing: 16) {
+                Text(title)
+                    .font(.title)
+                    .fontWeight(.bold)
+
+                Text(summaryText)
+                    .font(.body)
+                    .multilineTextAlignment(.leading)
+            }
     }
     
     @ViewBuilder
