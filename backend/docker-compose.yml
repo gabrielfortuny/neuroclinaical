@@ -11,6 +11,7 @@ services:
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
       - OLLAMA_HOST=http://ollama:11434
       - JWT_SECRET_KEY=password
+      - FLASK_APP=app/main.py
     ports:
       - "8000:5000" # Expose to host for iOS app to hit
     depends_on:
