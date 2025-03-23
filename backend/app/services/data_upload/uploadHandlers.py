@@ -7,12 +7,12 @@ from docx import Document
 from io import BytesIO
 from flask import current_app
 import sqlalchemy
-from nlpRequestHandler import (
+from app.services.data_upload.nlpRequestHandler import (
     handle_seizure_request,
     handle_summary_request,
     handle_drugadmin_request,
 )
-from uploadUtilities import (
+from app.services.data_upload.uploadUtilities import (
     extract_days_from_text,
     store_drugs_array,
     store_seizures_array,

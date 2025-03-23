@@ -2,7 +2,7 @@ import urllib
 import json
 from typing import List, Dict, Any
 
-from nlpValidationHandlers import (
+from app.services.data_upload.nlpValidationHandlers import (
     validate_drug,
     validate_seizure,
 )
