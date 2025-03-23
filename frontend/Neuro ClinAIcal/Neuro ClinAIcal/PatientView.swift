@@ -109,53 +109,57 @@ struct PatientView: View {
     
     @ViewBuilder
     private func viewFileContent() -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                ForEach(Array(patient.sessions.enumerated()), id: \.element.id) { index, session in
-                    ZStack {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Session \(index + 1)")
-                                .foregroundColor(.black)
-                            if expandedSessionID == session.id {
-                                Button("Delete Session") {
-                                    patient.deleteSession(withId: session.id)
-                                    expandedSessionID = nil
-                                }
-                                .font(.caption)
-                                .foregroundColor(.red)
-                                .padding(5)
-                                .background(Color.gray.opacity(0.2))
-                                .cornerRadius(5)
-                            }
-                        }
-                        .padding()
+        VStack {
+            ForEach (Array(patient.sessions.enumerated()), id: \.element.id) { index, session in
+                VStack {
+                    HStack {
+                        Text("Session \(index + 1)")
+                            .foregroundColor(.black)
+                        Spacer()
+                        Image(systemName: expandedSessionID == session.id ? "minus.circle" : "plus.circle")
+                            .foregroundColor(.black)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .onTapGesture {
-                        // Toggle expanded state for the entire cell.
-                        if expandedSessionID == session.id {
+                    .padding(.horizontal, 10)
+                    .font(.title2)
+                    
+                    if expandedSessionID == session.id {
+                        Button("Delete Session") {
+                            patient.deleteSession(withId: session.id)
                             expandedSessionID = nil
-                        } else {
-                            expandedSessionID = session.id
                         }
+                        .font(.headline)
+                        .padding(10)
+                        .foregroundColor(.red)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(5)
+                        .frame(alignment: .center)
                     }
                 }
-                
-                Button(action: {
-                    patient.sessions.append(Session())
-                }) {
-                    Text("Add Session")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color.white)
-                        .cornerRadius(8)
+                .frame(maxWidth: .infinity, minHeight: expandedSessionID == session.id ? 100 : 50)
+                .background(Color.white)
+                .cornerRadius(8)
+                .onTapGesture {
+                    if expandedSessionID == session.id {
+                        expandedSessionID = nil
+                    } else {
+                        expandedSessionID = session.id
+                    }
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
+        }
+        .padding(.horizontal, 10)
+        
+        Spacer()
+        
+        Button(action: {
+            patient.sessions.append(Session())
+        }) {
+            Text("Add Session")
+                .font(.headline)
+                .foregroundColor(.black)
+                .frame(maxWidth: 150, minHeight: 50)
+                .background(Color.white)
+                .cornerRadius(8)
         }
     }
     
@@ -167,8 +171,6 @@ struct PatientView: View {
                 Text("Patient: \(patient.name)")
                     .font(.largeTitle)
                     .foregroundColor(.white)
-                
-                Spacer()
                                 
                 renderOption(selectedTab)
                 
@@ -199,19 +201,26 @@ struct PatientView: View {
     }
 }
 
+
+
+struct PatientViewInteractivePreview: View {
+    @State var patient = Patient(name: "John Doe")
+    let session: SessionManager = {
+             let s = SessionManager()
+             s.logIn(email: "Demo@example.com", password: "123")
+             return s
+        }()
+
+    var body: some View {
+        NavigationStack {
+            PatientView(patient: $patient)
+                .environmentObject(session)
+        }
+    }
+}
+
 struct PatientView_Previews: PreviewProvider {
     static var previews: some View {
-        let session = SessionManager()
-        session.logIn(email: "Demo@example.com", password: "123")
-        return NavigationStack {
-            PatientView(
-                patient: .constant(
-                    Patient(
-                        name: "John Doe"
-                    )
-                )
-            )
-            .environmentObject(session)
-        }
+        PatientViewInteractivePreview()
     }
 }
