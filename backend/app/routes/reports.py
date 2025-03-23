@@ -6,6 +6,7 @@ from app.models import Report, Patient
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from app.services.data_upload.uploadHandlers import upload_controller
 
 
 reports_bp = Blueprint("reports", __name__, url_prefix="/reports")
@@ -74,7 +75,8 @@ def upload_report():
 
         db.session.add(new_report)
         db.session.commit()
-
+        if not upload_controller(filetype, file_path, patient_id, new_report):
+            raise Exception
         print(f"reports_dir: {reports_dir}")
 
         return (
