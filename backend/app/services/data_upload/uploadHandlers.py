@@ -50,6 +50,7 @@ class pdf_upload_handler:
         )  # Extract raw text from the docx
         return text
 
+
 class docx_upload_handler:
     def extract_text_from_docx(self, file_path: str) -> str:
         # TODO: Write Docstring
@@ -97,12 +98,8 @@ class docx_upload_handler:
         @param p_id: The Patient ID this report belongs to
         @return: bool indicating successful execution
         """
-        text = self.extract_text_from_docx(
-            file_path
-        )  # Extract raw text from the docx
+        text = self.extract_text_from_docx(file_path)  # Extract raw text from the docx
         return text
-
-            
 
 
 supported_file_types = {
@@ -112,7 +109,10 @@ supported_file_types = {
 
 # DIRECTLY USABLE UPLOAD HANDLERS:
 
-def upload_controller(content_ext: str, file_path: str, p_id: int, report: Report) -> bool:
+
+def upload_controller(
+    content_ext: str, file_path: str, p_id: int, report: Report
+) -> bool:
     """
     Description: Preforms all steps needed to upload and analyze a document
 
@@ -133,11 +133,11 @@ def upload_controller(content_ext: str, file_path: str, p_id: int, report: Repor
     else:
         return False
     with open(
-                f"{file_path}/report.txt",
-                "w",
-                encoding="utf-8",
-            ) as f:
-                f.write(text)
+        f"{file_path}/report.txt",
+        "w",
+        encoding="utf-8",
+    ) as f:
+        f.write(text)
     # Store raw text is same folder as report.txt for easy universal access
     days_dict = extract_days_from_text(
         text
