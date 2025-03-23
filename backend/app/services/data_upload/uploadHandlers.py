@@ -129,7 +129,7 @@ def upload_controller(content_ext: str, file_path: str, p_id: int, report: Repor
     """
     text = ""
     if content_ext in supported_file_types:
-        text = supported_file_types[content_ext](content, p_id)
+        text = supported_file_types[content_ext](file_path)
     else:
         return False
     with open(
