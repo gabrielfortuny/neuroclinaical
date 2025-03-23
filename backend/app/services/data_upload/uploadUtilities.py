@@ -1,6 +1,9 @@
 from datetime import datetime
 import re
-from typing import Dict
+from typing import List, Dict
+from app.__init__ import db
+
+from app.models import Drug, Seizure, DrugAdministration
 
 
 def extract_days_from_text(text: str) -> Dict[str, str]:
@@ -40,3 +43,43 @@ def extract_days_from_text(text: str) -> Dict[str, str]:
 
 def extract_time_for_DB(time: str) -> datetime:
     time_obj = datetime.strptime(time, "%H:%M:%S").time()
+    return time_obj
+
+
+def store_seizures_array(seizures: List[Dict[str, str]], p_id: int) -> bool:
+    try:
+        for seizure in seizures:
+            dbseizure = Seizure(
+                patient_id=p_id,
+                day=seizure["day"],
+                start_time=extract_time_for_DB(seizure["seizure_time"]),
+                duration=int(seizure["duration"]),
+            )
+            db.session.add(dbseizure)
+        db.session.commit()
+        return True
+    except Exception as err:
+        return False
+
+
+def store_drugs_array(drugs: List[Dict[str, str]], p_id: int) -> bool:
+    try:
+        for drug in drugs:
+            db_drugentry = Drug.query.filter_by(name=drug["name"]).first()
+            if db_drugentry is None:
+                db_drugentry = Drug(name=drug["name"])
+                db.session.add(db_drugentry)
+                db.session.commit()
+            db_adminentry = DrugAdministration(
+                patient_id=p_id,
+                drug_id=db_drugentry.id,
+                day=drug["day"],
+                time=extract_time_for_DB(
+                    drug["time"], dosage=int(drug["mg_administered"])
+                ),
+            )
+            db.session.add(db_adminentry)
+            db.session.commit()
+        return True
+    except Exception as err:
+        return False
