@@ -15,8 +15,8 @@ services:
     ports:
       - "8000:5000" # Expose to host for iOS app to hit
     volumes:
-      - ./:/app  # Mount the entire project directory
-      - ./NeuroClin:/app/NeuroClin  # This should be outside of /backend
+      - ./:/app  #Mount the project directory
+      - ./NeuroClin:/app/NeuroClin  #This should be outside of /backend
     depends_on:
       - db
       - ollama
