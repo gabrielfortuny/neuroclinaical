@@ -11,7 +11,7 @@ class PatientViewModel: ObservableObject {
     @Published var patients: [Patient] = []
     
     func addPatient(_ name: String, _ ltmFileLocation: URL? = nil) {
-        let newPatient = Patient(name: name, ltmFileLocation: ltmFileLocation)
+        let newPatient = Patient(name: name)
         patients.append(newPatient)
     }
     

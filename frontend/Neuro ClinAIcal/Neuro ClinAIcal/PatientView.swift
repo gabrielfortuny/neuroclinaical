@@ -24,12 +24,14 @@ enum InfoOption: Equatable {
 }
 
 struct PatientView: View {
+    @EnvironmentObject var session: SessionManager
     @Binding var patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
     @State private var importedFileURL: URL? = nil
+    @State private var expandedSessionID: UUID? = nil
     
     var sessions: [String] = []
     var data: [String] = []
@@ -108,50 +110,50 @@ struct PatientView: View {
     @ViewBuilder
     private func viewFileContent() -> some View {
         ScrollView {
-            Text("Session")
-            if let fileLocation = patient.ltmFileLocation {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Long Term Monitoring Report")
-                        .font(.title2)
-                        .padding(.bottom, 5)
-                    
-                    // A simple row that shows the file name and an icon to open or import
-                    HStack {
-                        Text(fileLocation.absoluteString) // e.g., "Patient123LTM.pdf"
-                            .foregroundColor(.blue)
-                            .underline()
-                            // If you want tapping this text to open the file, you can add a gesture, link, or logic.
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            // TODO: Logic to open or share the file
-                            print("Open file at \(fileLocation)")
-                        }) {
-                            Image(systemName: "arrow.up.right.square")
-                                .font(.headline)
+            VStack(alignment: .leading, spacing: 20) {
+                ForEach(Array(patient.sessions.enumerated()), id: \.element.id) { index, session in
+                    Button(action: {
+                        if expandedSessionID == session.id {
+                            expandedSessionID = nil
+                        } else {
+                            expandedSessionID = session.id
                         }
-                    }
-                }
-            } else {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("No LTM Report Found")
-    //                    .font(.title2)
-                    DocumentImporterView(importedFileURL: $importedFileURL)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .onChange(of: importedFileURL) { newValue, _ in
-                            if let newValue = newValue {
-                                patient.ltmFileLocation = newValue
+                    }) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Session \(index + 1)")
+                                .foregroundColor(.black)
+                            if expandedSessionID == session.id {
+                                Button("Delete Session") {
+                                    patient.deleteSession(withId: session.id)
+                                }
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(5)
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(5)
                             }
                         }
+                        .padding()
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(Color.white)
+                    .cornerRadius(8)
                 }
-    //            .padding(.top, 20)
+                
+                Button(action: {
+                    patient.sessions.append(Session())
+                }) {
+                    Text("Add Session")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(Color.white)
+                        .cornerRadius(8)
+                }
             }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
-        .cornerRadius(12)
-        .padding(.horizontal, 20)
     }
     
     var body: some View {
@@ -162,6 +164,8 @@ struct PatientView: View {
                 Text("Patient: \(patient.name)")
                     .font(.largeTitle)
                     .foregroundColor(.white)
+                
+                Spacer()
                                 
                 renderOption(selectedTab)
                 
@@ -194,16 +198,17 @@ struct PatientView: View {
 
 struct PatientView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack {
+        let session = SessionManager()
+        session.logIn(email: "Demo@example.com", password: "123")
+        return NavigationStack {
             PatientView(
                 patient: .constant(
                     Patient(
-                        name: "John Doe",
-                        // URL(string: "https://example.com/report.pdf")
-                        ltmFileLocation: nil
+                        name: "John Doe"
                     )
                 )
             )
+            .environmentObject(session)
         }
     }
 }
