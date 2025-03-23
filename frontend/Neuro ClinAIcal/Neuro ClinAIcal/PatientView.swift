@@ -112,19 +112,14 @@ struct PatientView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 ForEach(Array(patient.sessions.enumerated()), id: \.element.id) { index, session in
-                    Button(action: {
-                        if expandedSessionID == session.id {
-                            expandedSessionID = nil
-                        } else {
-                            expandedSessionID = session.id
-                        }
-                    }) {
+                    ZStack {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Session \(index + 1)")
                                 .foregroundColor(.black)
                             if expandedSessionID == session.id {
                                 Button("Delete Session") {
                                     patient.deleteSession(withId: session.id)
+                                    expandedSessionID = nil
                                 }
                                 .font(.caption)
                                 .foregroundColor(.red)
@@ -138,6 +133,14 @@ struct PatientView: View {
                     .frame(maxWidth: .infinity, minHeight: 50)
                     .background(Color.white)
                     .cornerRadius(8)
+                    .onTapGesture {
+                        // Toggle expanded state for the entire cell.
+                        if expandedSessionID == session.id {
+                            expandedSessionID = nil
+                        } else {
+                            expandedSessionID = session.id
+                        }
+                    }
                 }
                 
                 Button(action: {
