@@ -1,16 +1,11 @@
 FROM python:3.13.2-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-WORKDIR /workspace/backend
-
+WORKDIR /workspaces/project/backend
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./app ./app
-COPY gunicorn_config.py .
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY . .
 
-ENTRYPOINT ["/entrypoint.sh"]
+EXPOSE 5000
+
+CMD ["sh", "-c", "cd /workspaces/project/backend && if [ \"$FLASK_ENV\" = 'production' ]; then gunicorn -b 0.0.0.0:5000 app:app; else flask run --host=0.0.0.0 --port=5000 --debug; fi"]

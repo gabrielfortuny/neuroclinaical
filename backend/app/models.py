@@ -32,7 +32,7 @@ class User(db.Model, TimestampMixin):
     username = db.Column(String(100), unique=True, nullable=False)
     name = db.Column(String(100), nullable=False)
     email = db.Column(String(100), unique=True, nullable=False)
-    password_hash = db.Column(String(128), nullable=False)
+    password_hash = db.Column(String(64), nullable=False)
     conversations = db.relationship("Conversation", back_populates="user")
 
 
@@ -98,7 +98,7 @@ class Seizure(db.Model, TimestampMixin):
     )
     day = db.Column(Integer, nullable=False)
     start_time = db.Column(Time)
-    duration = db.Column(Integer)
+    duration = db.Column(Text)
     patient = db.relationship("Patient", back_populates="seizures")
     electrodes = db.relationship(
         "Electrode",
@@ -145,7 +145,6 @@ class DrugAdministration(db.Model, TimestampMixin):
         Integer, db.ForeignKey("drugs.id", ondelete="CASCADE"), nullable=False
     )
     day = db.Column(Integer, nullable=False)
-    time = db.Column(Time)
     dosage = db.Column(Integer, nullable=False)
     patient = db.relationship("Patient", back_populates="drug_administrations")
     drug = db.relationship("Drug")

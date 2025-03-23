@@ -1,10 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
-from app.__init__ import db, jwt
+from backend.app.__init__ import db, jwt
 from flask_jwt_extended import get_jwt_identity, jwt_required, current_user
-
-from flask import g
-from app import db, jwt
 from app.models import User
 from api.authentication.passwordHandler import (
     check_password_hash,
@@ -105,9 +102,10 @@ def logout_user():
 
 
 @users_bp.route("", methods=["PUT"])
-def user_update_account():
+@jwt_required()
+def update_user_account():
     user = current_user  # Ensure token is for valid user in DB
-    if not user:
+    if user is None:
         return (
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
             401,
@@ -144,8 +142,3 @@ def delete_user_account():
     db.session.delete(user)
     db.session.commit()
     return 204
-
-
-@users_bp.route("/test", methods=["GET"])
-def test_route():
-    return jsonify({"message": "Test route works!"}), 200

@@ -1,4 +1,3 @@
-"""
 from sqlalchemy import text
 from api import User, db
 
@@ -51,4 +50,3 @@ def test_rollback(test_client):
     user_from_db = User.query.filter_by(username="rollback_user").first()
     assert user_from_db is not None
     assert user_from_db.email == "rollback@example.com"
-"""
