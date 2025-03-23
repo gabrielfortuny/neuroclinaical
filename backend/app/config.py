@@ -7,6 +7,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = os.getenv("FLASK_DEBUG", "False") == "True"
     UPLOAD_FOLDER = "./NeuroClin"
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_COOKIE_CSRF_PROTECT = False
 
 
 class DevelopmentConfig(Config):

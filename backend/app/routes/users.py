@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
 from app.__init__ import db, jwt
-from flask_jwt_extended import get_jwt_identity, jwt_required, current_user
+from flask_jwt_extended import get_jwt_identity, jwt_required, current_user, set_access_cookies
 
 from flask import g
 from app import db, jwt
@@ -37,7 +37,9 @@ def login_user():
         access_token = create_user_token(
             user.username, user.id
         )  # Create a new access token
-        return jsonify({"token": access_token}), 200  # Return a new access token
+        response = jsonify({"token": access_token})
+        set_access_cookies(response, access_token)
+        return response, 200  # Return a new access token
 
     else:  # If the password is wrong, login fails
         return jsonify({"error": "Invalid email or password"}), 401
@@ -46,6 +48,7 @@ def login_user():
 @users_bp.route("/register", methods=["POST"])
 def register_user():
     user_data = request.get_json()
+    print(user_data)
     if not user_data:
         return jsonify({"error": "Invalid Request Format"}), 400
 
@@ -96,18 +99,21 @@ def logout_user():
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
             401,
         )  # User is not in DB / Invalid token
-    return (
-        jsonify(
+    response = jsonify(
             {"message": "User logged out successfully", "token": delete_user_token()}
-        ),
+        )
+    set_access_cookies(response, delete_user_token())
+    return (
+        response,
         200,
     )
 
 
 
-@users_bp.route("/user/register", methods=["PUT"])
+@users_bp.route("", methods=["PUT"])
+@jwt_required()
 def user_update_account():
-    user = g.current_user  # Ensure token is for valid user in DB
+    user = current_user  # Ensure token is for valid user in DB
     if not user:
         return (
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
@@ -127,26 +133,44 @@ def user_update_account():
         user.username, user.id
     )  # Recreate user token with new username
     db.session.commit()
+    response = jsonify({"token": access_token})
+    set_access_cookies(response, access_token)
     return (
-        jsonify({"token": access_token}),
-        200,
+        response,
+        200
     )  # Respond to valid request resetting token
 
-
-@users_bp.route("", methods=["DELETE"])
+@users_bp.route("/del", methods=["DELETE"])
 @jwt_required()
 def delete_user_account():
+    print("hello")
     user = current_user  # Ensure token is for valid user in DB
+    print("past curre")
     if user is None:
         return (
             jsonify({"error": "Unauthorized: Missing or Invalid Token"}),
             401,
         )  # User is not in DB / Invalid token
+    print(user)
     db.session.delete(user)
     db.session.commit()
-    return 204
+    return ("", 204)
     
 @users_bp.route("/test", methods=["GET"])
 def test_route():
     return jsonify({"message": "Test route works!"}), 200
 
+@users_bp.route("/all", methods=["GET"])
+@jwt_required()  # Optional: Only allow authorized users to see all user data
+def get_all_users():
+    users = User.query.all()  # Get all users from the DB
+    results = []
+    for user in users:
+        results.append({
+            "id": user.id,
+            "username": user.username,
+            "name": user.name,
+            "email": user.email,
+            # Omit password_hash or other sensitive fields
+        })
+    return jsonify(results), 200

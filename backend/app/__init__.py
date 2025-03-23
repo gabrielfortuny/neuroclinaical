@@ -23,6 +23,7 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
+    from .utils.authentication.jwtConfiguration import user_lookup
 
     with app.app_context():
         # pylint: disable-next=import-outside-toplevel, unused-import
@@ -35,9 +36,10 @@ def create_app():
         register_routes(app)
         db.create_all()
 
+    """
     @app.before_request
     def require_jwt():
         if request.path not in EXEMPT_PATHS:
             verify_jwt_in_request()
-
+    """
     return app

@@ -10,6 +10,7 @@ services:
       - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
       - OLLAMA_HOST=http://ollama:11434
+      - JWT_SECRET_KEY=password
     ports:
       - "8000:5000" # Expose to host for iOS app to hit
     depends_on:
