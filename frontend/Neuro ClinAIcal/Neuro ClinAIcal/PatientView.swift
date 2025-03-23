@@ -63,9 +63,9 @@ struct PatientView: View {
             case .data:
                 dataContent()
             case .summary:
-                Text(option.title)
+                summaryContent()
             case .askQuestion:
-                Text(option.title)
+                askQuestionContent()
         }
     }
     
