@@ -15,8 +15,9 @@ services:
     ports:
       - "8000:5000" # Expose to host for iOS app to hit
     volumes:
-      - ./:/app #Mount the project directory
-      - ./NeuroClin:/app/NeuroClin #This should be outside of /backend
+      - ./:/app  #Mount the project directory
+      - ./NeuroClin:/app/NeuroClin  #This should be outside of /backend
+
     depends_on:
       - db
       - ollama
@@ -31,7 +32,6 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U
       - POSTGRES_DB=database
-      # credentials could be stored elsewhere if better security is needed
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
