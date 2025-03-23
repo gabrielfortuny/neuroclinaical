@@ -1,16 +1,24 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
 from app.__init__ import db, jwt
-from flask_jwt_extended import get_jwt_identity, jwt_required, current_user, set_access_cookies
+from flask_jwt_extended import (
+    get_jwt_identity,
+    jwt_required,
+    current_user,
+    set_access_cookies,
+)
 
 from flask import g
 from app import db, jwt
 from app.models import User
-from api.authentication.passwordHandler import (
+from app.utils.authentication.passwordHandler import (
     check_password_hash,
     hash_password,
 )
-from api.authentication.authtokenHandler import create_user_token, delete_user_token
+from app.utils.authentication.authtokenHandler import (
+    create_user_token,
+    delete_user_token,
+)
 
 users_bp = Blueprint("user", __name__, url_prefix="/user")
 api = Api(users_bp)
@@ -100,14 +108,13 @@ def logout_user():
             401,
         )  # User is not in DB / Invalid token
     response = jsonify(
-            {"message": "User logged out successfully", "token": delete_user_token()}
-        )
+        {"message": "User logged out successfully", "token": delete_user_token()}
+    )
     set_access_cookies(response, delete_user_token())
     return (
         response,
         200,
     )
-
 
 
 @users_bp.route("", methods=["PUT"])
@@ -135,10 +142,8 @@ def user_update_account():
     db.session.commit()
     response = jsonify({"token": access_token})
     set_access_cookies(response, access_token)
-    return (
-        response,
-        200
-    )  # Respond to valid request resetting token
+    return (response, 200)  # Respond to valid request resetting token
+
 
 @users_bp.route("/del", methods=["DELETE"])
 @jwt_required()
@@ -155,10 +160,12 @@ def delete_user_account():
     db.session.delete(user)
     db.session.commit()
     return ("", 204)
-    
+
+
 @users_bp.route("/test", methods=["GET"])
 def test_route():
     return jsonify({"message": "Test route works!"}), 200
+
 
 @users_bp.route("/all", methods=["GET"])
 @jwt_required()  # Optional: Only allow authorized users to see all user data
@@ -166,11 +173,13 @@ def get_all_users():
     users = User.query.all()  # Get all users from the DB
     results = []
     for user in users:
-        results.append({
-            "id": user.id,
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            # Omit password_hash or other sensitive fields
-        })
+        results.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "name": user.name,
+                "email": user.email,
+                # Omit password_hash or other sensitive fields
+            }
+        )
     return jsonify(results), 200
