@@ -1,8 +1,10 @@
 from datetime import datetime
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from app.models import Patient
 from app import db
 from app.services.create_graphs.create_graphs import make_plot2
+from io import BytesIO
+from PIL import Image
 
 
 patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
@@ -209,11 +211,27 @@ def get_patient_supplemental_materials(patient_id):
     return jsonify(data), 200
 
 
-@patients_bp.route("/<int:patient_id>/graph/<int:screen>/<int:view_seizure_length>/<int:view_soz_heatmap>/<int:view_drug_admin>", methods=["PATCH"])
-def get_patient_graph(patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin):
-    graph_requested = make_plot2(patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin)
-    #TODO: Return the output png
+@patients_bp.route(
+    "/<int:patient_id>/graph/<int:screen>/<int:view_seizure_length>/<int:view_soz_heatmap>/<int:view_drug_admin>",
+    methods=["PATCH"],
+)
+def get_patient_graph(
+    patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin
+):
+    try:
+        graph_image: Image.Image = make_plot2(
+            patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin
+        )
 
+        # Save to in-memory buffer
+        img_io = BytesIO()
+        graph_image.save(img_io, "PNG")
+        img_io.seek(0)
+
+        return send_file(img_io, mimetype="image/png", as_attachment=False)
+
+    except Exception as e:
+        return {"error": str(e)}, 500
 
 
 @patients_bp.route("/<int:patient_id>/drug_administration", methods=["GET"])
@@ -275,7 +293,9 @@ def get_patient_drug_administration(patient_id):
                 "drug_class": drug["drug_class"],
                 "day": drug["day"],
                 "dosage": drug["dosage"],
-                "time": drug["time"],  # Since the time column doesn't exist in your database
+                "time": drug[
+                    "time"
+                ],  # Since the time column doesn't exist in your database
             }
             result.append(drug_data)
 
