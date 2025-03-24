@@ -5,8 +5,13 @@ from docx import Document
 from flask import current_app
 from app.__init__ import db
 from app.models import Report
+from app.services.data_upload.uploadUtilities import (
+    store_drugs_array,
+    store_seizures_array,
+)
 
 # INDIVIDUAL UPLOAD HANDLERS: DON'T USE DIRECTLY
+
 
 class pdf_upload_handler:
     def extract_text_from_pdf(self, file_path: str) -> str:
@@ -26,6 +31,7 @@ class pdf_upload_handler:
         text = self.extract_text_from_pdf(file_path)
         current_app.logger.info(f"Extracted {len(text)} characters from PDF")
         return text
+
 
 class docx_upload_handler:
     def extract_text_from_docx(self, file_path: str) -> str:
@@ -58,6 +64,7 @@ class docx_upload_handler:
         current_app.logger.info(f"Extracted {len(text)} characters from DOCX")
         return text
 
+
 supported_file_types = {
     "pdf": pdf_upload_handler(),
     "docx": docx_upload_handler(),
@@ -65,8 +72,9 @@ supported_file_types = {
 
 # DIRECTLY USABLE UPLOAD HANDLERS:
 
+
 def upload_controller(
-    content_ext: str, file_path: str, p_id: int, report
+    content_ext: str, file_path: str, p_id: int, report: Report
 ) -> bool:
     """
     Extract text from a document and set a basic summary.
@@ -77,7 +85,7 @@ def upload_controller(
         file_path: Path to the uploaded file
         p_id: The patient ID this report belongs to
         report: The Report object to update
-        
+
     Returns:
         True if successful, False otherwise
     """
@@ -88,13 +96,15 @@ def upload_controller(
         if content_ext not in supported_file_types:
             current_app.logger.warning(f"Unsupported file type: {content_ext}")
             return False
-            
+
         extracted_text = supported_file_types[content_ext](file_path)
         if not extracted_text:
             current_app.logger.warning("No text extracted from file")
             return False
-            
-        current_app.logger.info(f"Text extracted successfully, length: {len(extracted_text)}")
+
+        current_app.logger.info(
+            f"Text extracted successfully, length: {len(extracted_text)}"
+        )
 
         # Save a basic summary
         basic_summary = f"Document uploaded for patient {p_id}. File type: {content_ext.upper()}. Size: {len(extracted_text)} characters."
@@ -111,7 +121,7 @@ def upload_controller(
 
         current_app.logger.info("Upload controller completed successfully")
         return True
-        
+
     except Exception as e:
         current_app.logger.error(f"Error in upload_controller: {str(e)}")
         current_app.logger.error(traceback.format_exc())
