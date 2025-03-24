@@ -42,6 +42,7 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             # TODO: Something to stop infinite loop maybe?
             response = send_request_to_model(payload)
             finalized_jsons = validate_seizure(day, response)
+            finalized_jsons = True  # TODO remove this is broken
         seizures.extend(finalized_jsons)
     return seizures
 
@@ -81,6 +82,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             # TODO: Something to stop infinite loop maybe?
             response = send_request_to_model(payload)
             finalized_jsons = validate_drug(day, response)
+            finalized_jsons = True  # TODO remove this is broken
         drugs.extend(finalized_jsons)
     return drugs
 
@@ -97,9 +99,8 @@ def send_request_to_model(payload: Dict[str, Any]) -> str:
     )
 
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=None) as response:
             result = json.loads(response.read().decode("utf-8"))
-            result = json.dumps(result)
-            return result
+            return result["response"]
     except urllib.error.URLError as e:
         return ""

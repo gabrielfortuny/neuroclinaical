@@ -15,7 +15,7 @@ api = Api(reports_bp)
 
 
 @reports_bp.route("", methods=["POST"])
-# @jwt_required()
+# # @jwt_required()
 def upload_report():
     from app import db
 
@@ -73,12 +73,13 @@ def upload_report():
             filetype=filetype,
         )
 
-        db.session.add(new_report)
-        db.session.commit()
         if not upload_controller(filetype, file_path, patient_id, new_report):
             raise Exception
 
+        db.session.add(new_report)
+
         print(f"reports_dir: {reports_dir}")
+        db.session.commit()
 
         return (
             jsonify(
@@ -139,7 +140,7 @@ def get_report_metadata(report_id):
 
 
 @reports_bp.route("/<int:report_id>", methods=["DELETE"])
-@jwt_required()
+# @jwt_required()
 def delete_report(report_id):
     # Import required modules
     from sqlalchemy import text
