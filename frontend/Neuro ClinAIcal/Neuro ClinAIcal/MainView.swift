@@ -199,7 +199,7 @@ struct MainView: View {
                                 Task {
                                     do {
                                         // Call the async POST function.
-                                        let createdPatient = try await viewModel.createPatientServer(name: newPatientName, dob: nil)
+                                        try await viewModel.createPatientServer(name: newPatientName)
                                         // Optionally, refresh the patient list.
                                         try await viewModel.getPatientsServer()
                                         newPatientName = ""

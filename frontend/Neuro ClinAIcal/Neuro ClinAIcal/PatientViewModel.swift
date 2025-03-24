@@ -35,7 +35,7 @@ class PatientViewModel: ObservableObject {
         }
     }
     
-    func createPatientServer(name: String, dob: String? = nil) async throws -> Patient {
+    func createPatientServer(name: String, dob: String? = nil) async throws {
         // Replace with your actual API URL.
         guard let url = URL(string: "\(Self.baseURL)/patients") else {
             throw URLError(.badURL)
@@ -54,16 +54,12 @@ class PatientViewModel: ObservableObject {
         let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
         request.httpBody = jsonData
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (_, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
             throw URLError(.badServerResponse)
         }
-        
-        // Decode the response into a Patient object (assuming your API returns the created Patient)
-        let createdPatient = try JSONDecoder().decode(Patient.self, from: data)
-        return createdPatient
     }
     
     func deletePatientServer(patientId: Int) async throws {

@@ -12,6 +12,14 @@ struct Patient: Identifiable, Codable {
     let name: String
     var sessions: [Session] = []
     
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        // If sessions key is missing, default to an empty array.
+        sessions = try container.decodeIfPresent([Session].self, forKey: .sessions) ?? []
+    }
+    
     init(id: Int, name: String, sessions: [Session] = []) {
         self.id = id
         self.name = name
