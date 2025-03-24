@@ -143,10 +143,8 @@ def send_request_to_model(payload: Dict[str, Any]) -> str:
 
         with urllib.request.urlopen(req, timeout=None) as response:
             result = json.loads(response.read().decode("utf-8"))
-            if "response" in result:
-                return result["response"]
-            else:
-                return json.dumps(result)
+            return result["response"]
+
     except urllib.error.URLError as e:
         current_app.logger.error(f"Error connecting to model: {str(e)}")
         return ""

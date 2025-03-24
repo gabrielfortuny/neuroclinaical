@@ -2,6 +2,7 @@ import json
 import re
 from typing import List, Dict, Union, Any
 
+
 def extract_json_content(text):
     """Extract JSON content from text, finding the outermost array."""
     start = text.find("[")  # Find the index of the first '['
@@ -58,11 +59,11 @@ def split_electrodes(electrode_str):
 def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
     """
     Validate and process seizure data from JSON response.
-    
+
     Args:
         day: The day number
         json_text: JSON string from model response
-        
+
     Returns:
         List of processed seizure dictionaries or empty list on error
     """
@@ -70,22 +71,30 @@ def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
         json_data = extract_json_content(json_text)
         data = json.loads(json_data)
         seizure_list = []
-        
+
         # Process each seizure entry
         for seizure in data:
             try:
                 # Check required fields
-                if not all(field in seizure for field in ["start_time", "electrodes_involved", "duration"]):
+                if not all(
+                    field in seizure
+                    for field in ["start_time", "electrodes_involved", "duration"]
+                ):
                     # Try to normalize field names
                     if "seizure_time" in seizure:
                         seizure["start_time"] = seizure.pop("seizure_time")
                     if "seizure_onset_electrodes" in seizure:
-                        seizure["electrodes_involved"] = seizure.pop("seizure_onset_electrodes")
-                    
+                        seizure["electrodes_involved"] = seizure.pop(
+                            "seizure_onset_electrodes"
+                        )
+
                 # If still missing required fields, skip this seizure
-                if not all(field in seizure for field in ["start_time", "electrodes_involved", "duration"]):
+                if not all(
+                    field in seizure
+                    for field in ["start_time", "electrodes_involved", "duration"]
+                ):
                     continue
-                
+
                 # Process electrodes
                 if isinstance(seizure["electrodes_involved"], list):
                     electrodes = []
@@ -94,20 +103,24 @@ def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
                             electrodes.extend(split_electrodes(elec))
                     seizure["electrodes_involved"] = electrodes
                 elif isinstance(seizure["electrodes_involved"], str):
-                    seizure["electrodes_involved"] = split_electrodes(seizure["electrodes_involved"])
-                
+                    seizure["electrodes_involved"] = split_electrodes(
+                        seizure["electrodes_involved"]
+                    )
+
                 # Convert duration to seconds
                 if isinstance(seizure["duration"], str):
-                    seizure["duration"] = convert_duration_to_seconds(seizure["duration"])
-                
+                    seizure["duration"] = convert_duration_to_seconds(
+                        seizure["duration"]
+                    )
+
                 # Add the day field
                 seizure["day"] = day
-                
+
                 seizure_list.append(seizure)
             except Exception as e:
                 print(f"Error processing seizure: {e}")
                 continue
-                
+
         return seizure_list
 
     except Exception as err:
@@ -118,11 +131,11 @@ def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
 def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
     """
     Validate and process drug administration data from JSON response.
-    
+
     Args:
         day: The day number
         input_json: JSON string from model response
-        
+
     Returns:
         List of processed drug dictionaries or empty list on error
     """
@@ -143,7 +156,10 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
             "AM": ["08:00:00"],  # Every morning (e.g., 8:00 AM)
             "QAM": ["08:00:00"],  # Every morning (e.g., 8:00 AM)
             "QPM": ["20:00:00"],  # Every evening (e.g., 8:00 PM)
-            "mg/mg": ["08:00:00", "20:00:00"],  # Twice a day (e.g., 8:00 AM and 8:00 PM)
+            "mg/mg": [
+                "08:00:00",
+                "20:00:00",
+            ],  # Twice a day (e.g., 8:00 AM and 8:00 PM)
         }
 
         # Parse the input JSON string: Extract content between the first '[' and the last ']'
@@ -163,9 +179,11 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
         updated_data = []
         for drug in data:
             try:
-                if not all(field in drug for field in ["name", "code", "mg_administered"]):
+                if not all(
+                    field in drug for field in ["name", "code", "mg_administered"]
+                ):
                     continue
-                    
+
                 drug_name = drug["name"].lower()
                 code = drug.pop("code") if "code" in drug else "QD"
                 times = CODE_TO_TIME.get(code, None)
@@ -181,12 +199,14 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
                             }
                         )
                 else:
-                    updated_data.append({
-                        "name": drug_name, 
-                        "time": None, 
-                        "day": day, 
-                        "mg_administered": drug.get("mg_administered", "0")
-                    })
+                    updated_data.append(
+                        {
+                            "name": drug_name,
+                            "time": None,
+                            "day": day,
+                            "mg_administered": drug.get("mg_administered", "0"),
+                        }
+                    )
             except Exception as e:
                 print(f"Error processing drug: {e}")
                 continue

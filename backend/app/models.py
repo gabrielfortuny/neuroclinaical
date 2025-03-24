@@ -67,7 +67,7 @@ class Report(db.Model, TimestampMixin):
     extracted_images = db.relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
-    days = db.Column(Integer)
+    days = db.Column(Integer, nullable=True)
 
 
 class ExtractedImage(db.Model, TimestampMixin):
