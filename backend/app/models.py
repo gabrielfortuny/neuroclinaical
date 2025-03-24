@@ -67,7 +67,7 @@ class Report(db.Model, TimestampMixin):
     extracted_images = db.relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
-    days = db.Column(Integer)
+    days = db.Column(Integer, nullable=True)
 
 
 class ExtractedImage(db.Model, TimestampMixin):
@@ -148,6 +148,7 @@ class DrugAdministration(db.Model, TimestampMixin):
     dosage = db.Column(Integer, nullable=False)
     patient = db.relationship("Patient", back_populates="drug_administrations")
     drug = db.relationship("Drug")
+    time = db.Column(Time, nullable=False)
 
 
 class Conversation(db.Model, TimestampMixin):

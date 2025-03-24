@@ -4,6 +4,7 @@ from .reports import reports_bp
 from .seizures import seizures_bp
 from .supplemental_materials import supplemental_materials_bp
 from .chats import chats_bp
+from .process import process_bp
 
 
 def register_routes(app):
@@ -15,3 +16,4 @@ def register_routes(app):
         supplemental_materials_bp, url_prefix="/supplemental_materials"
     )
     app.register_blueprint(chats_bp, url_prefix="/chats")
+    app.register_blueprint(process_bp)

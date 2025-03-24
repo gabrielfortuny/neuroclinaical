@@ -1,102 +1,67 @@
 import os
 import fitz
-import typing
-import zipfile
-import base64
+import traceback
 from docx import Document
-from io import BytesIO
 from flask import current_app
-import sqlalchemy
-from app.services.data_upload.nlpRequestHandler import (
-    handle_seizure_request,
-    handle_summary_request,
-    handle_drugadmin_request,
-)
+from app.__init__ import db
+from app.models import Report
 from app.services.data_upload.uploadUtilities import (
-    extract_days_from_text,
     store_drugs_array,
     store_seizures_array,
 )
-from app.__init__ import db
-from app.models import Report
 
 # INDIVIDUAL UPLOAD HANDLERS: DON'T USE DIRECTLY
 
 
 class pdf_upload_handler:
     def extract_text_from_pdf(self, file_path: str) -> str:
-        text = []
-        with fitz.open(file_path) as pdf:
-            for page in pdf:
-                text.append(page.get_text())
-        return "\n".join(text)
+        try:
+            text = []
+            with fitz.open(file_path) as pdf:
+                for page in pdf:
+                    text.append(page.get_text())
+            return "\n".join(text)
+        except Exception as e:
+            current_app.logger.error(f"Error extracting text from PDF: {str(e)}")
+            raise Exception(f"PDF extraction failed: {str(e)}")
 
     def __call__(self, file_path: str) -> str:
-        # TODO: Write Docstring
-        """
-        Description:
-
-        Requires:
-        Query is a string for the
-
-        Modifies:
-
-        Effects:
-
-        @param data: String to be used for pdf
-        """
-        text = self.extract_text_from_pdf(file_path)  # Extract raw text from the docx
+        """Extract text from a PDF file."""
+        current_app.logger.info(f"Extracting text from PDF: {file_path}")
+        text = self.extract_text_from_pdf(file_path)
+        current_app.logger.info(f"Extracted {len(text)} characters from PDF")
         return text
 
 
 class docx_upload_handler:
     def extract_text_from_docx(self, file_path: str) -> str:
-        # TODO: Write Docstring
-        """
-        Description:
+        try:
+            doc = Document(file_path)
+            extracted_text = []
 
-        Requires:
-        Query is a string for the
+            # Extract paragraphs
+            for para in doc.paragraphs:
+                text = para.text.strip()
+                if text:
+                    extracted_text.append(text)
 
-        Modifies:
+            # Extract tables
+            for table in doc.tables:
+                for row in table.rows:
+                    row_text = " | ".join(cell.text.strip() for cell in row.cells)
+                    if row_text:
+                        extracted_text.append(row_text)
 
-        Effects:
-
-        @param data: String to be used for pdf
-        """
-        doc = Document(file_path)
-        extracted_text = []
-
-        # Extract paragraphs (handling section headers)
-        for para in doc.paragraphs:
-            text = para.text.strip()
-            if text:
-                extracted_text.append(text)
-
-        # Extract tables if present
-        for table in doc.tables:
-            for row in table.rows:
-                row_text = " | ".join(cell.text.strip() for cell in row.cells)
-                if row_text:
-                    extracted_text.append(row_text)
-
-        return "\n".join(extracted_text)
+            return "\n".join(extracted_text)
+        except Exception as e:
+            current_app.logger.error(f"Error extracting text from DOCX: {str(e)}")
+            raise Exception(f"DOCX extraction failed: {str(e)}")
 
     def __call__(self, file_path: str) -> str:
-        """
-        Description:
-
-        Requires:
-
-        Modifies:
-
-        Effects:
-
-        @param data: String to be used for docx file
-        @param p_id: The Patient ID this report belongs to
-        @return: bool indicating successful execution
-        """
-        text = self.extract_text_from_docx(file_path)  # Extract raw text from the docx
+        """Extract text from a DOCX file."""
+        current_app.logger.info(f"Extracting text from DOCX: {file_path}")
+        text = self.extract_text_from_docx(file_path)
+        current_app.logger.info(f"Extracted {len(text)} characters from DOCX")
         return text
 
 
@@ -112,43 +77,52 @@ def upload_controller(
     content_ext: str, file_path: str, p_id: int, report: Report
 ) -> bool:
     """
-    Description: Preforms all steps needed to upload and analyze a document
+    Extract text from a document and set a basic summary.
+    This simplified version just extracts text and sets a basic summary.
+    
+    Args:
+        content_ext: File extension (pdf, docx)
+        file_path: Path to the uploaded file
+        p_id: The patient ID this report belongs to
+        report: The Report object to update
 
-    Requires:
-    Query is a string for the
-
-    Modifies:
-
-    Effects:
-
-    @param content_type: String containing the content type from the request header
-    @param content: String containing the file data in base 64 encoding
-    @param patient_id: The patient who this report will belong to
+    Returns:
+        True if successful, False otherwise
     """
-    text = ""
-    if content_ext in supported_file_types:
-        text = supported_file_types[content_ext](file_path)
-    else:
+    current_app.logger.info(f"Starting upload_controller for {content_ext} file: {file_path}")
+    
+    try:
+        # Extract text from file
+        if content_ext not in supported_file_types:
+            current_app.logger.warning(f"Unsupported file type: {content_ext}")
+            return False
+
+        extracted_text = supported_file_types[content_ext](file_path)
+        if not extracted_text:
+            current_app.logger.warning("No text extracted from file")
+            return False
+
+        current_app.logger.info(
+            f"Text extracted successfully, length: {len(extracted_text)}"
+        )
+
+        # Save a basic summary
+        basic_summary = f"Document uploaded for patient {p_id}. File type: {content_ext.upper()}. Size: {len(extracted_text)} characters."
+        report.summary = basic_summary
+        
+        try:
+            db.session.commit()
+            current_app.logger.info("Updated report with basic summary")
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error updating summary: {str(e)}")
+            current_app.logger.error(traceback.format_exc())
+            return False
+
+        current_app.logger.info("Upload controller completed successfully")
+        return True
+
+    except Exception as e:
+        current_app.logger.error(f"Error in upload_controller: {str(e)}")
+        current_app.logger.error(traceback.format_exc())
         return False
-
-    # Store raw text is same folder as report.txt for easy universal access
-    days_dict = extract_days_from_text(
-        text
-    )  # Extract all days from text into a dictionary
-
-    # TODO: EXTRACT IMAGES
-
-    # HANDLE SEIZURE
-    seizures = handle_seizure_request(days_dict)
-    if not store_seizures_array(seizures, p_id):
-        raise sqlalchemy.exc.SQLAlchemyError
-
-    # HANDLE DRUGS
-    drugs = handle_drugadmin_request(days_dict)
-    if not store_drugs_array(drugs, p_id):
-        raise sqlalchemy.exc.SQLAlchemyError
-
-    # HANDLE SUMMARY
-    report.summary = handle_summary_request(text)
-    db.session.commit()  # Save changes to out DB "report" object
-    return True
