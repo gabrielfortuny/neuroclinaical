@@ -148,6 +148,7 @@ class DrugAdministration(db.Model, TimestampMixin):
     dosage = db.Column(Integer, nullable=False)
     patient = db.relationship("Patient", back_populates="drug_administrations")
     drug = db.relationship("Drug")
+    time = db.Column(Time, nullable=False)
 
 
 class Conversation(db.Model, TimestampMixin):
