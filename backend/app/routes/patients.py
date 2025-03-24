@@ -210,21 +210,74 @@ def get_patient_drug_administration(patient_id):
     patient = Patient.query.get(patient_id)
     if not patient:
         return jsonify({"error": "Patient not found."}), 404
-
-    # Assuming patient.drug_administrations exists and each record links to a Drug model
-    data = []
-    for record in patient.drug_administrations:
-        data.append(
-            {
-                "id": record.id,
-                "drug_id": record.drug_id,
-                "drug_name": record.drug.name if record.drug else None,
-                "drug_class": record.drug.drug_class if record.drug else None,
-                "day": record.day,
-                "dosage": record.dosage,
-                "time": record.time.strftime("%H:%M:%S") if record.time else None,
-            }
+    
+    # Import psycopg2 for direct database access
+    import psycopg2
+    import psycopg2.extras
+    
+    try:
+        # Get database connection parameters from the environment
+        host = "db"  # Container name from docker-compose
+        port = 5432  # Default PostgreSQL port
+        user = "admin"
+        password = "dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U"
+        database = "database"
+        
+        # Create direct connection to PostgreSQL
+        conn = psycopg2.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database
         )
-
-    return jsonify(data), 200
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        # Get drug administrations with drug information - removed the time column
+        cursor.execute("""
+            SELECT 
+                da.id, 
+                da.drug_id, 
+                d.name AS drug_name, 
+                d.drug_class, 
+                da.day, 
+                da.dosage
+            FROM 
+                drug_administration da
+            JOIN 
+                drugs d ON da.drug_id = d.id
+            WHERE 
+                da.patient_id = %s
+            ORDER BY 
+                da.day ASC
+        """, (patient_id,))
+        
+        # Fetch all results
+        drugs = cursor.fetchall()
+        
+        # Convert to list of dictionaries for JSON response
+        result = []
+        for drug in drugs:
+            drug_data = {
+                "id": drug['id'],
+                "drug_id": drug['drug_id'],
+                "drug_name": drug['drug_name'],
+                "drug_class": drug['drug_class'],
+                "day": drug['day'],
+                "dosage": drug['dosage'],
+                "time": None  # Since the time column doesn't exist in your database
+            }
+            result.append(drug_data)
+            
+        # Close the database connection
+        cursor.close()
+        conn.close()
+            
+        return jsonify(result), 200
+        
+    except Exception as e:
+        #current_app.logger.error(f"Error retrieving drug administrations: {str(e)}")
+        import traceback
+        #current_app.logger.error(traceback.format_exc())
+        return jsonify({"error": "Failed to retrieve drug administrations"}), 500
 
