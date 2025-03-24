@@ -33,7 +33,7 @@ struct PatientView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var expandedSessionID: UUID? = nil
     
-    @State private var isImporting = false
+    @State private var isImportingLTMFile = false
     @State private var importedFileURL: URL? = nil
     var allowedTypes: [UTType] {
         var types: [UTType] = [.pdf]
@@ -47,6 +47,7 @@ struct PatientView: View {
         }
         return types
     }
+    @State private var isImportingSupplementary = false
     
     var sessions: [String] = []
     var data: [String] = []
@@ -124,11 +125,11 @@ struct PatientView: View {
     
     private func importFileButton() -> some View {
         Button("Import File") {
-            isImporting = true
+            isImportingLTMFile = true
         }
         .foregroundColor(.blue)
         .fileImporter(
-            isPresented: $isImporting,
+            isPresented: $isImportingLTMFile,
             allowedContentTypes: allowedTypes,
             allowsMultipleSelection: false
         ) { result in
@@ -160,6 +161,7 @@ struct PatientView: View {
                     .font(.title2)
                     
                     if expandedSessionID == session.id {
+                        // LTM File Code
                         VStack(alignment: .leading, spacing: 8) {
                             // Title with a line underneath
                             HStack {
@@ -212,8 +214,57 @@ struct PatientView: View {
                             }
                         }
                         .padding()
-                        .background(Color.white)
-                        .cornerRadius(8)
+                        
+                        // Start Supplementary File Code
+                        VStack (alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Supplementary Files")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                Spacer()
+                            }
+                            Divider()
+                                .background(Color.gray)
+                            
+                            ForEach(session.supplementaryFiles, id: \.self) { file in
+                                HStack {
+                                    Text(file.lastPathComponent)
+                                        .foregroundColor(.blue)
+                                        .underline()
+                                    Spacer()
+                                    Button {
+                                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+                                            patient.sessions[index].supplementaryFiles.removeAll(where: { $0 == file })
+                                        }
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red)
+                                    }
+                                }
+                            }
+                            
+                            Button("Add New File") {
+                                isImportingSupplementary = true
+                            }
+                            .foregroundColor(.blue)
+                            .fileImporter(
+                                isPresented: $isImportingSupplementary,
+                                allowedContentTypes: allowedTypes,
+                                allowsMultipleSelection: false
+                            ) { result in
+                                switch result {
+                                case .success(let urls):
+                                    if let url = urls.first,
+                                       let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+                                        patient.sessions[index].supplementaryFiles.append(url)
+                                    }
+                                case .failure(let error):
+                                    print("Supplementary file import error: \(error.localizedDescription)")
+                                }
+                            }
+                        }
+                        .padding()
+                        // End Supplementary File Code
                         
                         
                         Button("Delete Session") {
