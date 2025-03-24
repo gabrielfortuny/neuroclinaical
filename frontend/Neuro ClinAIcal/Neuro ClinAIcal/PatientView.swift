@@ -237,25 +237,25 @@ struct PatientView: View {
                                 }
                             }
                             
-//                            Button("Add New File") {
-//                                isImportingSupplementary = true
-//                            }
-//                            .foregroundColor(.blue)
-//                            .fileImporter(
-//                                isPresented: $isImportingSupplementary,
-//                                allowedContentTypes: allowedTypes,
-//                                allowsMultipleSelection: false
-//                            ) { result in
-//                                switch result {
-//                                case .success(let urls):
-//                                    if let url = urls.first,
-//                                       let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-//                                        patient.sessions[index].supplementaryFiles.append(url)
-//                                    }
-//                                case .failure(let error):
-//                                    print("Supplementary file import error: \(error.localizedDescription)")
-//                                }
-//                            }
+                            Button("Add New File") {
+                                isImportingSupplementary = true
+                            }
+                            .foregroundColor(.blue)
+                            .fileImporter(
+                                isPresented: $isImportingSupplementary,
+                                allowedContentTypes: allowedTypes,
+                                allowsMultipleSelection: false
+                            ) { result in
+                                switch result {
+                                case .success(let urls):
+                                    if let url = urls.first,
+                                       let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+                                        patient.sessions[index].supplementaryFiles.append(url)
+                                    }
+                                case .failure(let error):
+                                    print("Supplementary file import error: \(error.localizedDescription)")
+                                }
+                            }
                         }
                         .padding()
                         // End Supplementary File Code
@@ -289,16 +289,16 @@ struct PatientView: View {
         
         Spacer()
         
-        Button(action: {
-            patient.sessions.append(Session())
-        }) {
-            Text("Add Session")
-                .font(.headline)
-                .foregroundColor(.black)
-                .frame(maxWidth: 150, minHeight: 50)
-                .background(Color.white)
-                .cornerRadius(8)
-        }
+//        Button(action: {
+//            patient.sessions.append(Session())
+//        }) {
+//            Text("Add Session")
+//                .font(.headline)
+//                .foregroundColor(.black)
+//                .frame(maxWidth: 150, minHeight: 50)
+//                .background(Color.white)
+//                .cornerRadius(8)
+//        }
     }
     
     var body: some View {
