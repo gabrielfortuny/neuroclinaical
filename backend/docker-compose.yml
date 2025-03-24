@@ -23,7 +23,6 @@ services:
     networks:
       - backend
 
-  # Other services remain the same
   db:
     image: postgres:17.4
     container_name: postgres_db

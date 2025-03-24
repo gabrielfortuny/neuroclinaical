@@ -7,6 +7,7 @@ from app.models import Report, Patient
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from app.services.data_upload.uploadHandlers import upload_controller
 
 
 reports_bp = Blueprint("reports", __name__, url_prefix="/reports")

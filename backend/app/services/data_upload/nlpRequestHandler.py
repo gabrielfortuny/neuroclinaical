@@ -13,6 +13,8 @@ MODEL_NAME = "mymodel"
 
 # TODO: Add Docstrings for everything
 
+# TODO: Add Docstrings for everything
+
 
 def handle_summary_request(data: str) -> str:
     payload = {
@@ -102,5 +104,6 @@ def send_request_to_model(payload: Dict[str, Any]) -> str:
         with urllib.request.urlopen(req, timeout=None) as response:
             result = json.loads(response.read().decode("utf-8"))
             return result["response"]
+      
     except urllib.error.URLError as e:
         return ""
