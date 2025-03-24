@@ -18,8 +18,6 @@ class PatientViewModel: ObservableObject {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        // Optionally set your authorization header here:
-        // request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -36,7 +34,6 @@ class PatientViewModel: ObservableObject {
     }
     
     func createPatientServer(name: String, dob: String? = nil) async throws {
-        // Replace with your actual API URL.
         guard let url = URL(string: "\(Self.baseURL)/patients") else {
             throw URLError(.badURL)
         }
@@ -69,7 +66,6 @@ class PatientViewModel: ObservableObject {
         
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-//        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let (_, response) = try await URLSession.shared.data(for: request)
         
