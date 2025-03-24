@@ -20,7 +20,7 @@ struct Patient: Identifiable, Codable {
         sessions = try container.decodeIfPresent([Session].self, forKey: .sessions) ?? []
     }
     
-    init(id: Int, name: String, sessions: [Session] = []) {
+    init(id: Int, name: String, sessions: [Session] = [Session()]) {
         self.id = id
         self.name = name
         self.sessions = sessions
