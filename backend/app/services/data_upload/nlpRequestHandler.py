@@ -1,3 +1,4 @@
+import os
 import urllib
 import json
 from typing import List, Dict, Any
@@ -7,14 +8,17 @@ from app.services.data_upload.nlpValidationHandlers import (
     validate_seizure,
 )
 
-ollama_url = "http://ollama:11434/api/generate"
+OLLAMA_URL = os.getenv("OLLAMA_HOST")
+MODEL_NAME = "mymodel"
+
+# TODO: Add Docstrings for everything
 
 # TODO: Add Docstrings for everything
 
 
 def handle_summary_request(data: str) -> str:
     payload = {
-        "model": "example-model",
+        "model": MODEL_NAME,
         "prompt": f"Give a summary of the report: {data}",
         "stream": False,
     }
@@ -26,7 +30,7 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     seizures = []
     for day, content in data.items():
         payload = {
-            "model": "example-model",
+            "model": MODEL_NAME,
             "prompt": f"Extract all seizure events from the provided medical report and return them in a JSON list. Each seizure event should include the following fields:\
             1. **start_time**: The start time of the seizure in the format `HH:MM:SS` (e.g., `06:32:06`).\
             2. **electrodes_involved**: A list of electrodes involved at seizure onset, separated by commas (e.g., `['RMH1', 'RMH2']`).\
@@ -40,6 +44,7 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             # TODO: Something to stop infinite loop maybe?
             response = send_request_to_model(payload)
             finalized_jsons = validate_seizure(day, response)
+            finalized_jsons = True  # TODO remove this is broken
         seizures.extend(finalized_jsons)
     return seizures
 
@@ -48,7 +53,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     drugs = []
     for day, content in data.items():
         payload = {
-            "model": "example-model",
+            "model": MODEL_NAME,
             "prompt": f"Extract all drug administration details from the following medical report and return them in a JSON list. Each drug administration should include the following fields:\
             1. `name`: The name of the drug (e.g., Lamotrigine).\
             2. `mg_administered`: The amount of drug administered in milligrams (e.g., '1000').\
@@ -79,6 +84,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             # TODO: Something to stop infinite loop maybe?
             response = send_request_to_model(payload)
             finalized_jsons = validate_drug(day, response)
+            finalized_jsons = True  # TODO remove this is broken
         drugs.extend(finalized_jsons)
     return drugs
 
@@ -89,15 +95,15 @@ def handle_question_request():
 
 def send_request_to_model(payload: Dict[str, Any]) -> str:
     req = urllib.request.Request(
-        ollama_url,
+        OLLAMA_URL,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
     )
 
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=None) as response:
             result = json.loads(response.read().decode("utf-8"))
-            result = json.dumps(result).encode("utf-8")
-            return result
+            return result["response"]
+      
     except urllib.error.URLError as e:
         return ""

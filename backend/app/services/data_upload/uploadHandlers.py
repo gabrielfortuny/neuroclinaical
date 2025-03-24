@@ -130,12 +130,7 @@ def upload_controller(
         text = supported_file_types[content_ext](file_path)
     else:
         return False
-    with open(
-        f"{file_path}/report.txt",
-        "w",
-        encoding="utf-8",
-    ) as f:
-        f.write(text)
+
     # Store raw text is same folder as report.txt for easy universal access
     days_dict = extract_days_from_text(
         text
