@@ -17,7 +17,7 @@ struct Patient: Identifiable, Codable {
         id = try container.decode(Int.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         // If sessions key is missing, default to an empty array.
-        sessions = try container.decodeIfPresent([Session].self, forKey: .sessions) ?? []
+        sessions = try container.decodeIfPresent([Session].self, forKey: .sessions) ?? [Session()]
     }
     
     init(id: Int, name: String, sessions: [Session] = [Session()]) {
