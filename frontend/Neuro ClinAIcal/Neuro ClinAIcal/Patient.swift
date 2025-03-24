@@ -10,7 +10,7 @@ import Foundation
 struct Patient: Identifiable, Codable {
     let id: Int
     let name: String
-    var sessions: [Session] = []
+    var sessions: [Session]
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
