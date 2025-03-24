@@ -1,9 +1,9 @@
 import urllib.request
 import json
 
-ollama_url = "http://ollama:11434/api/generate"  # Docker service URL
+ollama_url = "http://ollama:11434/api/"  # Docker service URL
 
-payload = {"model": "example-model", "prompt": "Hello, Ollama!", "stream": False}
+payload = {"model": "mymodel", "prompt": "Hello, Ollama!", "stream": False}
 
 req = urllib.request.Request(
     ollama_url,
@@ -12,7 +12,7 @@ req = urllib.request.Request(
 )
 
 try:
-    with urllib.request.urlopen(req) as response:
+    with urllib.request.urlopen(req, timeout=None) as response:
         result = json.loads(response.read().decode("utf-8"))
         print("Ollama response:", result["response"])
 except urllib.error.URLError as e:

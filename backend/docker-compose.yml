@@ -9,15 +9,14 @@ services:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://admin:dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U@db:5432/database
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_HOST=http://ollama:11434/api/generate
       - JWT_SECRET_KEY=password
       - FLASK_APP=app/main.py
     ports:
       - "8000:5000" # Expose to host for iOS app to hit
     volumes:
-      - ./:/app  #Mount the project directory
-      - ./NeuroClin:/app/NeuroClin  #This should be outside of /backend
-
+      - ./:/app #Mount the project directory
+      - ./NeuroClin:/app/NeuroClin #This should be outside of /backend
     depends_on:
       - db
       - ollama
