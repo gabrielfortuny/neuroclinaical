@@ -10,7 +10,7 @@ import SwiftUI
 class PatientViewModel: ObservableObject {
     @Published var patients: [Patient] = []
     
-    static var baseURL: String = "https://localhost:8000.com"
+    static var baseURL: String = "http://localhost:8000"
     
     func getPatientsServer() async throws {
         guard let url = URL(string: "\(Self.baseURL)/patients") else {
