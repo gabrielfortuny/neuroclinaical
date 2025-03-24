@@ -76,28 +76,6 @@ struct PatientView: View {
         .frame(maxWidth: .infinity)
     }
     
-    private func importFileButton() -> some View {
-        Button("Import File") {
-            isImporting = true
-        }
-        .foregroundColor(.blue)
-        .fileImporter(
-            isPresented: $isImporting,
-            allowedContentTypes: allowedTypes,
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    importedFileURL = url
-                    print("Imported file: \(url.absoluteString)")
-                }
-            case .failure(let error):
-                print("File import error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
     @ViewBuilder
     private func renderOption(_ option: InfoOption) -> some View {
         switch option {
@@ -142,6 +120,28 @@ struct PatientView: View {
         .background(Color.white)
         .cornerRadius(12)
         .padding(.horizontal, 20)
+    }
+    
+    private func importFileButton() -> some View {
+        Button("Import File") {
+            isImporting = true
+        }
+        .foregroundColor(.blue)
+        .fileImporter(
+            isPresented: $isImporting,
+            allowedContentTypes: allowedTypes,
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    importedFileURL = url
+                    print("Imported file: \(url.absoluteString)")
+                }
+            case .failure(let error):
+                print("File import error: \(error.localizedDescription)")
+            }
+        }
     }
     
     @ViewBuilder
@@ -204,7 +204,8 @@ struct PatientView: View {
                                     importFileButton()
                                     .onChange(of: importedFileURL) { newValue, _ in
                                         if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-                                            patient.sessions[index].ltmFile = importedFileURL
+                                            patient.sessions[index].ltmFile = newValue
+                                            importedFileURL = nil
                                         }
                                     }
                                 }
