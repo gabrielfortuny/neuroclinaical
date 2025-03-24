@@ -213,7 +213,7 @@ def get_patient_supplemental_materials(patient_id):
 
 @patients_bp.route(
     "/<int:patient_id>/graph/<int:screen>/<int:view_seizure_length>/<int:view_soz_heatmap>/<int:view_drug_admin>",
-    methods=["PATCH"],
+    methods=["GET"],
 )
 def get_patient_graph(
     patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin
