@@ -8,11 +8,11 @@
 import Foundation
 
 struct Patient: Identifiable, Codable {
-    let id: UUID
+    let id: Int
     let name: String
     var sessions: [Session] = []
     
-    init(id: UUID = UUID(), name: String, sessions: [Session] = []) {
+    init(id: Int, name: String, sessions: [Session] = []) {
         self.id = id
         self.name = name
         self.sessions = sessions

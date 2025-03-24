@@ -17,7 +17,7 @@ struct MainView: View {
     @EnvironmentObject var sessionManager: SessionManager
     @StateObject private var viewModel = PatientViewModel()
     
-    @State private var expandedPatientID: UUID? = nil
+    @State private var expandedPatientID: Int? = nil
     @State private var importing = false
     @State private var showAddPatientSheet = false
     @State private var showSettings = false
@@ -56,11 +56,20 @@ struct MainView: View {
     
     func handleOptionSelection(_ patient: Patient, _ option: PatientOption) {
         print("\(option) option tapped")
-        switch option {
-        case .export:
-            print("Export Data for \(patient.name)")
-        case .delete:
-            viewModel.deletePatient(withId: patient.id)
+        Task {
+            do {
+                switch option {
+                case .export:
+                    print("Export Data for \(patient.name)")
+                case .delete:
+                    // Call async delete function:
+                    try await viewModel.deletePatientServer(patientId: patient.id)
+                }
+                // Refresh the list after deletion.
+                try await viewModel.getPatientsServer()
+            } catch {
+                print("Error in handleOptionSelection: \(error)")
+            }
         }
     }
     
@@ -186,9 +195,19 @@ struct MainView: View {
                         
                         Button("Add Patient") {
                             if !newPatientName.isEmpty {
-                                viewModel.addPatient(newPatientName, newPatientFileURL)
-                                newPatientName = ""
-                                showAddPatientSheet = false
+//                                viewModel.addPatient(newPatientName, newPatientFileURL)
+                                Task {
+                                    do {
+                                        // Call the async POST function.
+                                        let createdPatient = try await viewModel.createPatientServer(name: newPatientName, dob: nil)
+                                        // Optionally, refresh the patient list.
+                                        try await viewModel.getPatientsServer()
+                                        newPatientName = ""
+                                        showAddPatientSheet = false
+                                    } catch {
+                                        print("Error creating patient: \(error)")
+                                    }
+                                }
                             }
                         }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -206,6 +225,13 @@ struct MainView: View {
                         }
                     }
                 }
+            }
+        }
+        .task {
+            do {
+                try await viewModel.getPatientsServer()
+            } catch {
+                print("Error fetching patients: \(error)")
             }
         }
     }

@@ -338,27 +338,3 @@ struct PatientView: View {
                 .toolbarBackground(.hidden, for: .navigationBar)
     }
 }
-
-
-
-struct PatientViewInteractivePreview: View {
-    @State var patient = Patient(name: "John Doe")
-    let session: SessionManager = {
-             let s = SessionManager()
-             s.logIn(email: "Demo@example.com", password: "123")
-             return s
-        }()
-
-    var body: some View {
-        NavigationStack {
-            PatientView(patient: $patient)
-                .environmentObject(session)
-        }
-    }
-}
-
-struct PatientView_Previews: PreviewProvider {
-    static var previews: some View {
-        PatientViewInteractivePreview()
-    }
-}
