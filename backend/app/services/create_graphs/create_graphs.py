@@ -115,7 +115,7 @@ def make_plot2(patient_id: int, screen: int, view_seizure_length: int, view_soz_
     """
 
     data1, data2 = fetch_graph_data(patient_id)
-
+    #TODO: Only do code below this, code above is needed, only replace below
     # Create a blank image
     img = Image.new('RGB', (800, 600), color='white')
     draw = ImageDraw.Draw(img)
@@ -372,13 +372,3 @@ def make_plot2(patient_id: int, screen: int, view_seizure_length: int, view_soz_
         plt.close()
 
     return plt
-
-# Example usage
-print(make_plot2(screen=2, view_seizure_length=1, view_drug_admin=1, view_soz_heatmap=1))
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-
-img = mpimg.imread("plot.png")  # Load image
-plt.imshow(img)
-plt.axis("off")  # Hide axes
-plt.show()
