@@ -161,7 +161,7 @@ struct PatientView: View {
                     .font(.title2)
                     
                     if expandedSessionID == session.id {
-                        // LTM File Code
+                        // Start LTM File Code
                         VStack(alignment: .leading, spacing: 8) {
                             // Title with a line underneath
                             HStack {
@@ -169,15 +169,6 @@ struct PatientView: View {
                                     .font(.headline)
                                     .foregroundColor(.black)
                                 Spacer()
-                                // If a file exists, show a trash icon to remove it.
-                                if session.ltmFile != nil {
-                                    Button {
-//                                            removeLTMFile(from: session.id)
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .foregroundColor(.red)
-                                    }
-                                }
                             }
                             Divider()
                                 .background(Color.gray)
@@ -190,12 +181,14 @@ struct PatientView: View {
                                         .underline()
                                     Spacer()
                                     Button {
-                                        // TODO: Open the file
-                                        print("Open file at \(file)")
+                                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+                                            patient.sessions[index].ltmFile = nil
+                                        }
                                     } label: {
-                                        Image(systemName: "arrow.up.right.square")
-                                            .foregroundColor(.blue)
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red)
                                     }
+                                    
                                 }
                             } else {
                                 // If no file, show "No LTM added" with an Import button.
@@ -214,6 +207,7 @@ struct PatientView: View {
                             }
                         }
                         .padding()
+                        // End LTM File Code
                         
                         // Start Supplementary File Code
                         VStack (alignment: .leading, spacing: 8) {
