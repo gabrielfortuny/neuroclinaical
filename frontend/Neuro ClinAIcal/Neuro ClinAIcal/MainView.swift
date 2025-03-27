@@ -7,6 +7,8 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import Foundation
+import Combine
 
 enum PatientOption {
     case export
