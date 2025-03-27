@@ -85,6 +85,66 @@ class PatientViewModel: ObservableObject {
         }
     }
     
+    func fetchFirstReportID(forPatientId patientId: Int) async throws -> Int {
+        guard let url = URL(string: "\(Self.baseURL)/patients/\(patientId)/reports") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        // Parse the JSON using JSONSerialization.
+        guard let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] else {
+            throw URLError(.cannotParseResponse)
+        }
+        
+        // Extract report_id from each dictionary.
+        let reportIDs = jsonArray.compactMap { $0["report_id"] as? Int }
+        
+        // Return only the first report id.
+        guard let firstReportID = reportIDs.first else {
+            throw URLError(.cannotParseResponse)
+        }
+        return firstReportID
+    }
+    
+    func fetchReportSummary(forReportID reportId: Int) async throws -> String {
+        guard let url = URL(string: "\(Self.baseURL)/reports/\(reportId)") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        // Parse the JSON into a dictionary.
+        guard let jsonDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+            throw URLError(.cannotParseResponse)
+        }
+        
+        // Extract the summary value using its key.
+        guard let summary = jsonDict["summary"] as? String else {
+            throw URLError(.cannotParseResponse)
+        }
+        
+        return summary
+    }
+    
 //    func addPatient(_ name: String, _ ltmFileLocation: URL? = nil) {
 //        let newPatient = Patient(name: name)
 //        patients.append(newPatient)

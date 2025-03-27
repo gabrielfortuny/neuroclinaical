@@ -25,13 +25,14 @@ enum InfoOption: Equatable {
 }
 
 struct PatientView: View {
-    @EnvironmentObject var sessionManager: SessionManager
+    @EnvironmentObject private var sessionManager: SessionManager
+    @EnvironmentObject private var viewModel: PatientViewModel
     @Binding var patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
-    @State private var expandedSessionID: UUID? = nil
+    @State private var expandedSessionID: Int? = nil
     
     @State private var isImportingLTMFile = false
     @State private var importedFileURL: URL? = nil
@@ -49,9 +50,8 @@ struct PatientView: View {
     }
     @State private var isImportingSupplementary = false
     
-    var sessions: [String] = []
-    var data: [String] = []
-    var summary: String? = nil
+//    var session: Session? = nil
+    @State private var summary: String? = nil
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -160,7 +160,8 @@ struct PatientView: View {
                     .padding(.horizontal, 10)
                     .font(.title2)
                     
-                    if expandedSessionID == session.id {
+                    // Supossed to be expandedSessionID == session.id
+                    if session.id == session.id {
                         // Start LTM File Code
                         VStack(alignment: .leading, spacing: 8) {
                             // Title with a line underneath
@@ -261,16 +262,16 @@ struct PatientView: View {
                         // End Supplementary File Code
                         
                         
-                        Button("Delete Session") {
-                            patient.deleteSession(withId: session.id)
-                            expandedSessionID = nil
-                        }
-                        .font(.headline)
-                        .padding(10)
-                        .foregroundColor(.red)
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(5)
-                        .frame(alignment: .center)
+//                        Button("Delete Session") {
+//                            patient.deleteSession(withId: session.id)
+//                            expandedSessionID = nil
+//                        }
+//                        .font(.headline)
+//                        .padding(10)
+//                        .foregroundColor(.red)
+//                        .background(Color.gray.opacity(0.2))
+//                        .cornerRadius(5)
+//                        .frame(alignment: .center)
                     }
                 }
                 .frame(maxWidth: .infinity, minHeight: expandedSessionID == session.id ? 100 : 50)
@@ -323,18 +324,29 @@ struct PatientView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                            HStack {
-                                Image(systemName: "chevron.left")
-                                    .foregroundColor(.white)
-                                Text("Back")
-                                    .foregroundColor(.white)
-                            }
-                        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                    HStack {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.white)
+                        Text("Back")
+                            .foregroundColor(.white)
                     }
                 }
-                .toolbarBackground(.hidden, for: .navigationBar)
+            }
+        }
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .task {
+            do {
+                // Replace 101 with the appropriate patient ID.
+                let firstReportID = try await viewModel.fetchFirstReportID(forPatientId: patient.id)
+                summary = try await viewModel.fetchReportSummary(forReportID: firstReportID)
+                print("Report Summary: \(summary ?? "NIL")")
+                // You can also update your UI here on the MainActor if needed.
+            } catch {
+                print("Error fetching report: \(error)")
+            }
+        }
     }
 }

@@ -20,15 +20,17 @@ struct Patient: Identifiable, Codable {
         sessions = try container.decodeIfPresent([Session].self, forKey: .sessions) ?? [Session()]
     }
     
-    init(id: Int, name: String, sessions: [Session] = [Session()]) {
-        self.id = id
-        self.name = name
-        self.sessions = sessions
-    }
+    // Shouldn't be used since patients are always populated through a request
+//    init(id: Int, name: String, sessions: [Session] = [Session()]) {
+//        self.id = id
+//        self.name = name
+//        self.sessions = sessions
+//    }
     
-    mutating func deleteSession(withId id: UUID) {
-        if let index = sessions.firstIndex(where: { $0.id == id }) {
-            sessions.remove(at: index)
-        }
-    }
+    // Should make an api request
+//    mutating func deleteSession(withId id: Int) {
+//        if let index = sessions.firstIndex(where: { $0.id == id }) {
+//            sessions.remove(at: index)
+//        }
+//    }
 }
