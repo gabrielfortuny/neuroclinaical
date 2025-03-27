@@ -9,10 +9,10 @@ import SwiftUI
 
 struct Session: Identifiable, Codable {
     let id: Int?
-    var ltmFile: URL? = nil
-    var supplementaryFiles: [URL] = []
+    var ltmFile: File? = nil
+    var supplementaryFiles: [File] = []
     
-    init(id: Int? = nil, ltmFile: URL? = nil, supplementaryFiles: [URL] = []) {
+    init(id: Int? = nil, ltmFile: File? = nil, supplementaryFiles: [File] = []) {
         self.id = id
         self.ltmFile = ltmFile
         self.supplementaryFiles = supplementaryFiles

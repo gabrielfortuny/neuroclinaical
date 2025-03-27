@@ -59,10 +59,11 @@ struct MainView: View {
         Task {
             do {
                 switch option {
-                case .export:
+                case PatientOption.export:
                     print("Export Data for \(patient.name)")
-                case .delete:
+                case PatientOption.delete:
                     // Call async delete function:
+                    print("Delete Patient for \(patient.name)")
                     try await viewModel.deletePatientServer(patientId: patient.id)
                 }
                 // Refresh the list after deletion.
@@ -114,7 +115,9 @@ struct MainView: View {
                                             handleOptionSelection(patient, .delete)
                                         }
                                         
-                                        NavigationLink(destination: PatientView(patient: $patient)) {
+                                        NavigationLink(destination: PatientView(patient: $patient)
+                                            .environmentObject(sessionManager)
+                                            .environmentObject(viewModel)) {
                                             Text("VIEW PATIENT")
                                                 .font(.headline)
                                                 .foregroundColor(.black)
