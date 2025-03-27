@@ -26,8 +26,7 @@ enum InfoOption: Equatable {
 
 struct PatientView: View {
     @EnvironmentObject private var sessionManager: SessionManager
-    @EnvironmentObject private var viewModel: PatientViewModel
-    @Binding var patient: Patient
+    var patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
@@ -50,7 +49,7 @@ struct PatientView: View {
     }
     @State private var isImportingSupplementary = false
     
-//    var session: Session? = nil
+    @State private var sessions: [Session] = [Session(id: 0)]
     @State private var summary: String? = nil
 
     // Function for bottom navigation buttons
@@ -80,13 +79,13 @@ struct PatientView: View {
     @ViewBuilder
     private func renderOption(_ option: InfoOption) -> some View {
         switch option {
-            case .viewFile:
+            case InfoOption.viewFile:
                 viewFileContent()
-            case .data:
+            case InfoOption.data:
                 dataContent()
-            case .summary:
+            case InfoOption.summary:
                 summaryContent()
-            case .askQuestion:
+            case InfoOption.askQuestion:
                 askQuestionContent()
         }
     }
@@ -110,7 +109,8 @@ struct PatientView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
         .cornerRadius(12)
-        .padding(.horizontal, 20)    }
+        .padding(.horizontal, 20)
+    }
     
     @ViewBuilder
     private func dataContent() -> some View {
@@ -145,123 +145,145 @@ struct PatientView: View {
         }
     }
     
+    private func renderLTMFile(_ session: Session) -> some View {
+        // Start LTM File Code
+        VStack(alignment: .leading, spacing: 8) {
+            // Title with a line underneath
+            HStack {
+                Text("Long Term Monitoring Report")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                Spacer()
+            }
+            Divider()
+                .background(Color.gray)
+            
+            Group {
+                if let file = session.ltmFile {
+                    // If a file exists, display its name with a link icon.
+                    HStack {
+                        Text(file.filePath)
+                            .foregroundColor(.blue)
+                            .underline()
+                        Spacer()
+                        Button {
+                            Task {
+                                do {
+                                    try await sessionManager.deleteReport(reportId: file.reportId)
+                                    try await refresh()
+                                } catch {
+                                    print("Error deleting report: \(error)")
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                        
+                    }
+                } else {
+                    // If no file, show "No LTM added" with an Import button.
+                    HStack {
+                        Text("No LTM added")
+                            .foregroundColor(.gray)
+                        Spacer()
+                        importFileButton()
+                        .onChange(of: importedFileURL) { newValue, _ in
+                            if let newValue = newValue {
+                                Task {
+                                    do {
+                                        try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: newValue)
+                                        try await refresh()
+                                    } catch {
+                                        print("Error uploading report: \(error)")
+                                    }
+                                }
+                                importedFileURL = nil
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+    }
+    /*
+    private func renderSupplementaryFiles(_ session: Session) -> some View {
+        // Start Supplementary File Code
+        VStack (alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Supplementary Files")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                Spacer()
+            }
+            Divider()
+                .background(Color.gray)
+            
+            ForEach(supplementaryFiles, id: \.id) { file in
+                HStack {
+                    Text(file.url.lastPathComponent)
+                        .foregroundColor(.blue)
+                        .underline()
+                    Spacer()
+                    Button {
+                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+                            patient.sessions[index].supplementaryFiles.removeAll(where: { $0.id == file.id })
+                        }
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
+            }
+            
+            Button("Add New File") {
+                isImportingSupplementary = true
+            }
+            .foregroundColor(.blue)
+            .fileImporter(
+                isPresented: $isImportingSupplementary,
+                allowedContentTypes: allowedTypes,
+                allowsMultipleSelection: false
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    if let url = urls.first {
+//                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
+//                            patient.sessions[index].supplementaryFiles.append(File(id: /* provide an id */, url: url))
+//                        }
+                        print("Upload Supplementary File Success: \(url.absoluteString)")
+                    }
+                case .failure(let error):
+                    print("Supplementary file import error: \(error.localizedDescription)")
+                }
+            }
+        }
+        .padding()
+        // End Supplementary File Code
+    }*/
+    
     @ViewBuilder
     private func viewFileContent() -> some View {
         VStack {
-            ForEach (Array(patient.sessions.enumerated()), id: \.element.id) { index, session in
-                VStack {
-                    HStack {
-                        Text("Session \(index + 1)")
-                            .foregroundColor(.black)
-                        Spacer()
-                        Image(systemName: expandedSessionID == session.id ? "minus.circle" : "plus.circle")
-                            .foregroundColor(.black)
-                    }
-                    .padding(.horizontal, 10)
-                    .font(.title2)
+            ForEach (Array(sessions)) {
+                session in VStack {
+//                    HStack {
+//                        Text("Session \(index + 1)")
+//                            .foregroundColor(.black)
+//                        Spacer()
+////                        Image(systemName: expandedSessionID == session.id ? "minus.circle" : "plus.circle")
+////                            .foregroundColor(.black)
+//                    }
+//                    .padding(.horizontal, 10)
+//                    .font(.title2)
                     
                     // Supossed to be expandedSessionID == session.id
                     if session.id == session.id {
-                        // Start LTM File Code
-                        VStack(alignment: .leading, spacing: 8) {
-                            // Title with a line underneath
-                            HStack {
-                                Text("Long Term Monitoring Report")
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                Spacer()
-                            }
-                            Divider()
-                                .background(Color.gray)
-                            
-                            if let file = session.ltmFile {
-                                // If a file exists, display its name with a link icon.
-                                HStack {
-                                    Text(file.lastPathComponent)
-                                        .foregroundColor(.blue)
-                                        .underline()
-                                    Spacer()
-                                    Button {
-                                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-                                            patient.sessions[index].ltmFile = nil
-                                        }
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .foregroundColor(.red)
-                                    }
-                                    
-                                }
-                            } else {
-                                // If no file, show "No LTM added" with an Import button.
-                                HStack {
-                                    Text("No LTM added")
-                                        .foregroundColor(.gray)
-                                    Spacer()
-                                    importFileButton()
-                                    .onChange(of: importedFileURL) { newValue, _ in
-                                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-                                            patient.sessions[index].ltmFile = newValue
-                                            importedFileURL = nil
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding()
-                        // End LTM File Code
-                        
-                        // Start Supplementary File Code
-                        VStack (alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("Supplementary Files")
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                Spacer()
-                            }
-                            Divider()
-                                .background(Color.gray)
-                            
-                            ForEach(session.supplementaryFiles, id: \.self) { file in
-                                HStack {
-                                    Text(file.lastPathComponent)
-                                        .foregroundColor(.blue)
-                                        .underline()
-                                    Spacer()
-                                    Button {
-                                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-                                            patient.sessions[index].supplementaryFiles.removeAll(where: { $0 == file })
-                                        }
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .foregroundColor(.red)
-                                    }
-                                }
-                            }
-                            
-                            Button("Add New File") {
-                                isImportingSupplementary = true
-                            }
-                            .foregroundColor(.blue)
-                            .fileImporter(
-                                isPresented: $isImportingSupplementary,
-                                allowedContentTypes: allowedTypes,
-                                allowsMultipleSelection: false
-                            ) { result in
-                                switch result {
-                                case .success(let urls):
-                                    if let url = urls.first,
-                                       let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-                                        patient.sessions[index].supplementaryFiles.append(url)
-                                    }
-                                case .failure(let error):
-                                    print("Supplementary file import error: \(error.localizedDescription)")
-                                }
-                            }
-                        }
-                        .padding()
-                        // End Supplementary File Code
-                        
-                        
+                        renderLTMFile(session)
+//                        renderSupplementaryFiles(session)
+                        Spacer()
+                               
 //                        Button("Delete Session") {
 //                            patient.deleteSession(withId: session.id)
 //                            expandedSessionID = nil
@@ -302,6 +324,11 @@ struct PatientView: View {
 //        }
     }
     
+    private func refresh() async throws {
+        sessions[0].ltmFile = try await sessionManager.fetchFirstReportID(forPatientId: patient.id)
+        print("LTM File Location: \(sessions[0].ltmFile?.filePath ?? "Not Found")")
+    }
+    
     var body: some View {
         ZStack {
             backgroundColor.edgesIgnoringSafeArea(.all)
@@ -339,11 +366,7 @@ struct PatientView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .task {
             do {
-                // Replace 101 with the appropriate patient ID.
-                let firstReportID = try await viewModel.fetchFirstReportID(forPatientId: patient.id)
-                summary = try await viewModel.fetchReportSummary(forReportID: firstReportID)
-                print("Report Summary: \(summary ?? "NIL")")
-                // You can also update your UI here on the MainActor if needed.
+                try await refresh()
             } catch {
                 print("Error fetching report: \(error)")
             }

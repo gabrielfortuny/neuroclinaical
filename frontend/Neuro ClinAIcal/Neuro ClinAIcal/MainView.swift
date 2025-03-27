@@ -15,8 +15,9 @@ enum PatientOption {
 
 struct MainView: View {
     @EnvironmentObject private var sessionManager: SessionManager
-    @StateObject private var viewModel = PatientViewModel()
+//    @StateObject private var viewModel = PatientViewModel()
     
+    @State private var patients: [Patient] = []
     @State private var expandedPatientID: Int? = nil
     @State private var importing = false
     @State private var showAddPatientSheet = false
@@ -64,10 +65,10 @@ struct MainView: View {
                 case PatientOption.delete:
                     // Call async delete function:
                     print("Delete Patient for \(patient.name)")
-                    try await viewModel.deletePatientServer(patientId: patient.id)
+                    try await sessionManager.deletePatientServer(patientId: patient.id)
                 }
                 // Refresh the list after deletion.
-                try await viewModel.getPatientsServer()
+                patients = try await sessionManager.getPatientsServer()
             } catch {
                 print("Error in handleOptionSelection: \(error)")
             }
@@ -84,8 +85,8 @@ struct MainView: View {
                             .font(.largeTitle)
                             .foregroundStyle(.white)
                         
-                        ForEach($viewModel.patients) {
-                            $patient in Button(action: { patientTapped(patient) } ) {
+                        ForEach(patients) {
+                            patient in Button(action: { patientTapped(patient) } ) {
                                 VStack{
                                     HStack {
                                         Text(patient.name)
@@ -115,9 +116,8 @@ struct MainView: View {
                                             handleOptionSelection(patient, .delete)
                                         }
                                         
-                                        NavigationLink(destination: PatientView(patient: $patient)
-                                            .environmentObject(sessionManager)
-                                            .environmentObject(viewModel)) {
+                                        NavigationLink(destination: PatientView(patient: patient)
+                                            .environmentObject(sessionManager)) {
                                             Text("VIEW PATIENT")
                                                 .font(.headline)
                                                 .foregroundColor(.black)
@@ -202,9 +202,9 @@ struct MainView: View {
                                 Task {
                                     do {
                                         // Call the async POST function.
-                                        try await viewModel.createPatientServer(name: newPatientName)
+                                        try await sessionManager.createPatientServer(name: newPatientName)
                                         // Optionally, refresh the patient list.
-                                        try await viewModel.getPatientsServer()
+                                        patients = try await sessionManager.getPatientsServer()
                                         newPatientName = ""
                                         showAddPatientSheet = false
                                     } catch {
@@ -232,7 +232,7 @@ struct MainView: View {
         }
         .task {
             do {
-                try await viewModel.getPatientsServer()
+                patients = try await sessionManager.getPatientsServer()
             } catch {
                 print("Error fetching patients: \(error)")
             }

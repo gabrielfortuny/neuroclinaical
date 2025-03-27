@@ -9,14 +9,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var session: SessionManager
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack(spacing: 20) {
-//            Text("Settings")
-//                .font(.largeTitle)
-//                .padding()
-
             Button("Log Out") {
                 session.logOut()
             }
