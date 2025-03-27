@@ -33,8 +33,8 @@ struct PatientView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var expandedSessionID: Int? = nil
     
-    @State private var isImportingLTMFile = false
     @State private var importedFileURL: URL? = nil
+    @State private var isImportingLTMFile = false
     var allowedTypes: [UTType] {
         var types: [UTType] = [.pdf]
         // For DOC files:
@@ -90,37 +90,22 @@ struct PatientView: View {
         }
     }
     
-    @ViewBuilder
     private func askQuestionContent() -> some View {
         ScrollView {
             Text("Ask Question MVP")
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
-        .cornerRadius(12)
-        .padding(.horizontal, 20)
     }
     
-    @ViewBuilder
     private func summaryContent() -> some View {
         ScrollView {
             Text("Summary")
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
-        .cornerRadius(12)
-        .padding(.horizontal, 20)
     }
     
-    @ViewBuilder
     private func dataContent() -> some View {
         ScrollView {
             Text("Data")
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
-        .cornerRadius(12)
-        .padding(.horizontal, 20)
     }
     
     private func importFileButton() -> some View {
@@ -146,9 +131,7 @@ struct PatientView: View {
     }
     
     private func renderLTMFile(_ session: Session) -> some View {
-        // Start LTM File Code
-        VStack(alignment: .leading, spacing: 8) {
-            // Title with a line underneath
+        VStack {
             HStack {
                 Text("Long Term Monitoring Report")
                     .font(.headline)
@@ -158,57 +141,51 @@ struct PatientView: View {
             Divider()
                 .background(Color.gray)
             
-            Group {
+            HStack {
                 if let file = session.ltmFile {
-                    // If a file exists, display its name with a link icon.
-                    HStack {
-                        Text(file.filePath)
-                            .foregroundColor(.blue)
-                            .underline()
-                        Spacer()
-                        Button {
-                            Task {
-                                do {
-                                    try await sessionManager.deleteReport(reportId: file.reportId)
-                                    try await refresh()
-                                } catch {
-                                    print("Error deleting report: \(error)")
-                                }
+                    Text(file.filePath)
+                        .foregroundColor(.blue)
+                        .underline()
+                    Spacer()
+                    Button {
+                        Task {
+                            do {
+                                try await sessionManager.deleteReport(reportId: file.reportId)
+                                try await refresh()
+                            } catch {
+                                print("Error deleting report: \(error)")
                             }
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
                         }
-                        
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
                     }
                 } else {
-                    // If no file, show "No LTM added" with an Import button.
-                    HStack {
-                        Text("No LTM added")
-                            .foregroundColor(.gray)
-                        Spacer()
-                        importFileButton()
-                        .onChange(of: importedFileURL) { newValue, _ in
-                            if let newValue = newValue {
-                                Task {
-                                    do {
-                                        try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: newValue)
-                                        try await refresh()
-                                    } catch {
-                                        print("Error uploading report: \(error)")
-                                    }
+                    Text("No LTM added")
+                        .foregroundColor(.gray)
+                    Spacer()
+                    importFileButton()
+                    .onChange(of: importedFileURL) { oldValue, newValue in
+                        if let newValue = newValue {
+                            Task {
+                                do {
+                                    print("Uploading LTM Report: \(newValue)")
+                                    try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: newValue)
+                                    try await refresh()
+                                } catch {
+                                    print("Error uploading report: \(error)")
                                 }
-                                importedFileURL = nil
                             }
+                            importedFileURL = nil
                         }
                     }
                 }
-            }
-        }
+            } // HStack 2
+        } // VStack
         .padding()
     }
-    /*
-    private func renderSupplementaryFiles(_ session: Session) -> some View {
+    
+    /*private func renderSupplementaryFiles(_ session: Session) -> some View {
         // Start Supplementary File Code
         VStack (alignment: .leading, spacing: 8) {
             HStack {
@@ -265,68 +242,61 @@ struct PatientView: View {
     
     @ViewBuilder
     private func viewFileContent() -> some View {
-        VStack {
-            ForEach (Array(sessions)) {
-                session in VStack {
-//                    HStack {
-//                        Text("Session \(index + 1)")
-//                            .foregroundColor(.black)
-//                        Spacer()
-////                        Image(systemName: expandedSessionID == session.id ? "minus.circle" : "plus.circle")
-////                            .foregroundColor(.black)
-//                    }
-//                    .padding(.horizontal, 10)
-//                    .font(.title2)
-                    
-                    // Supossed to be expandedSessionID == session.id
-                    if session.id == session.id {
-                        renderLTMFile(session)
-//                        renderSupplementaryFiles(session)
-                        Spacer()
-                               
-//                        Button("Delete Session") {
-//                            patient.deleteSession(withId: session.id)
-//                            expandedSessionID = nil
-//                        }
-//                        .font(.headline)
-//                        .padding(10)
-//                        .foregroundColor(.red)
-//                        .background(Color.gray.opacity(0.2))
-//                        .cornerRadius(5)
-//                        .frame(alignment: .center)
-                    }
+        ForEach (Array(sessions)) {
+            session in ScrollView {
+                /*HStack {
+                    Text("Session \(index + 1)")
+                        .foregroundColor(.black)
+                    Spacer()
+                    Image(systemName: expandedSessionID == session.id ? "minus.circle" : "plus.circle")
+                        .foregroundColor(.black)
                 }
-                .frame(maxWidth: .infinity, minHeight: expandedSessionID == session.id ? 100 : 50)
+                .padding(.horizontal, 10)
+                .font(.title2)*/
+                
+                // Supossed to be expandedSessionID == session.id
+                if session.id == session.id {
+                    renderLTMFile(session)
+//                        renderSupplementaryFiles(session)
+//                    Spacer()
+                           
+                    /*Button("Delete Session") {
+                        patient.deleteSession(withId: session.id)
+                        expandedSessionID = nil
+                    }
+                    .font(.headline)
+                    .padding(10)
+                    .foregroundColor(.red)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(5)
+                    .frame(alignment: .center)*/
+                }
+            } // ScrollView
+            .background(Color.white)
+            /*.onTapGesture {
+                if expandedSessionID == session.id {
+                    expandedSessionID = nil
+                } else {
+                    expandedSessionID = session.id
+                }
+            }*/
+        } // ForEach
+
+        /*Button(action: {
+            patient.sessions.append(Session())
+        }) {
+            Text("Add Session")
+                .font(.headline)
+                .foregroundColor(.black)
+                .frame(maxWidth: 150, minHeight: 50)
                 .background(Color.white)
                 .cornerRadius(8)
-                .onTapGesture {
-                    if expandedSessionID == session.id {
-                        expandedSessionID = nil
-                    } else {
-                        expandedSessionID = session.id
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 10)
-        
-        Spacer()
-        
-//        Button(action: {
-//            patient.sessions.append(Session())
-//        }) {
-//            Text("Add Session")
-//                .font(.headline)
-//                .foregroundColor(.black)
-//                .frame(maxWidth: 150, minHeight: 50)
-//                .background(Color.white)
-//                .cornerRadius(8)
-//        }
-    }
+        }*/
+    } // viewFileContet()
     
     private func refresh() async throws {
         sessions[0].ltmFile = try await sessionManager.fetchFirstReportID(forPatientId: patient.id)
-        print("LTM File Location: \(sessions[0].ltmFile?.filePath ?? "Not Found")")
+        print("LTM File Location (refresh): \(sessions[0].ltmFile?.filePath ?? "Not Found")")
     }
     
     var body: some View {
@@ -339,6 +309,10 @@ struct PatientView: View {
                     .foregroundColor(.white)
                                 
                 renderOption(selectedTab)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
                 
                 // Bottom Navigation Bar
                 HStack {
@@ -347,7 +321,7 @@ struct PatientView: View {
                     tabButton(icon: "doc.plaintext", option: .summary, isSelected: selectedTab == .summary)
                     tabButton(icon: "brain.head.profile", option: .askQuestion, isSelected: selectedTab == .askQuestion)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 10)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -370,6 +344,18 @@ struct PatientView: View {
             } catch {
                 print("Error fetching report: \(error)")
             }
+        }
+    }
+}
+
+struct PatientView_Previews: PreviewProvider {
+    static var previews: some View {
+        let session = SessionManager()
+        session.logIn(email: "Demo@example.com", password: "123")
+        let patient = Patient(id: 1, name: "John")
+        return NavigationStack {
+            PatientView(patient: patient)
+                .environmentObject(session)
         }
     }
 }
