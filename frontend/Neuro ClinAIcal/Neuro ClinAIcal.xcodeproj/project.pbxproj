@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		667208742D961E0000263668 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 667208732D961E0000263668 /* Alamofire */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		66281DAC2D779CD60023826D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				667208742D961E0000263668 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = "Neuro ClinAIcal";
 			packageProductDependencies = (
+				667208732D961E0000263668 /* Alamofire */,
 			);
 			productName = "Neuro ClinAIcal";
 			productReference = 66281D9B2D779CD50023826D /* Neuro ClinAIcal.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 66281D922D779CD50023826D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				667208722D961E0000263668 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 66281D9C2D779CD50023826D /* Products */;
 			projectDirPath = "";
@@ -554,6 +563,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		667208722D961E0000263668 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		667208732D961E0000263668 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 667208722D961E0000263668 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 66281D932D779CD50023826D /* Project object */;
 }

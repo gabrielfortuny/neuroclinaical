@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 class SessionManager: ObservableObject {
     @Published var currentUser: User? = nil
@@ -125,58 +126,28 @@ class SessionManager: ObservableObject {
     }
     
     func uploadReport(forPatientId patientId: Int, fileURL: URL) async throws {
-        // Construct the API URL.
-        guard let url = URL(string: "\(Self.baseURL)/reports") else {
-            throw URLError(.badURL)
-        }
+        let fileType = fileURL.pathExtension.lowercased()
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        // Generate a unique boundary string.
-        let boundary = "Boundary-\(UUID().uuidString)"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        // Grab filetype
-        let fileType: String = fileURL.pathExtension.lowercased()
-        
-        // Read the file data from the URL.
         let fileData = try Data(contentsOf: fileURL)
+        // Base64‑encode the file data.
         let base64EncodedFile = fileData.base64EncodedString()
         
-        // Build the multipart/form-data body.
-        var body = Data()
+        // Use Alamofire's multipart upload.
+        let responseData = try await AF.upload(multipartFormData: { mpFD in
+            if let patientIdData = "\(patientId)".data(using: .utf8) {
+                mpFD.append(patientIdData, withName: "patient_id")
+            }
+            if let fileTypeData = fileType.data(using: .utf8) {
+                mpFD.append(fileTypeData, withName: "file_type")
+            }
+            if let fileFieldData = base64EncodedFile.data(using: .utf8) {
+                mpFD.append(fileFieldData, withName: "file", fileName: fileURL.lastPathComponent)
+            }
+        }, to: "\(Self.baseURL)/reports", method: .post)
+            .validate(statusCode: 201..<300)
+            .serializingData().value
         
-        // Append patient_id field.
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"patient_id\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(patientId)\r\n".data(using: .utf8)!)
-        
-        // Append file_type field.
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file_type\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(fileType)\r\n".data(using: .utf8)!)
-        
-        // Append file field (the base64-encoded file).
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(base64EncodedFile)\r\n".data(using: .utf8)!)
-        
-        // Close the multipart/form-data.
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        request.httpBody = body
-        
-        // Execute the request.
-        let (_, response) = try await URLSession.shared.data(for: request)
-        
-        // Validate the response status code.
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 201 else {
-            throw URLError(.badServerResponse)
-        }
-        
-        print("Report uploaded successfully")
+        print("Report uploaded successfully, response data: \(responseData)")
     }
     
     func deleteReport(reportId: Int) async throws {
