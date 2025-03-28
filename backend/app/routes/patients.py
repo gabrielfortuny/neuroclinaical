@@ -23,6 +23,7 @@ def get_all_patients():
 @patients_bp.route("", methods=["POST"])
 def create_patient():
     data = request.get_json()
+    print("📥 Received patient POST:", data)
     name = data.get("name")
     dob_str = data.get("dob")
 
