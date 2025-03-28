@@ -16,10 +16,11 @@ enum PatientOption {
 }
 
 struct MainView: View {
-    @EnvironmentObject var session: SessionManager
-    @StateObject private var viewModel = PatientViewModel()
+    @EnvironmentObject private var sessionManager: SessionManager
+//    @StateObject private var viewModel = PatientViewModel()
     
-    @State private var expandedPatientID: UUID? = nil
+    @State private var patients: [Patient] = []
+    @State private var expandedPatientID: Int? = nil
     @State private var importing = false
     @State private var showAddPatientSheet = false
     @State private var showSettings = false
@@ -58,11 +59,21 @@ struct MainView: View {
     
     func handleOptionSelection(_ patient: Patient, _ option: PatientOption) {
         print("\(option) option tapped")
-        switch option {
-        case .export:
-            print("Export Data for \(patient.name)")
-        case .delete:
-            viewModel.deletePatient(withId: patient.id)
+        Task {
+            do {
+                switch option {
+                case PatientOption.export:
+                    print("Export Data for \(patient.name)")
+                case PatientOption.delete:
+                    // Call async delete function:
+                    print("Delete Patient for \(patient.name)")
+                    try await sessionManager.deletePatientServer(patientId: patient.id)
+                }
+                // Refresh the list after deletion.
+                patients = try await sessionManager.getPatientsServer()
+            } catch {
+                print("Error in handleOptionSelection: \(error)")
+            }
         }
     }
     
@@ -76,8 +87,8 @@ struct MainView: View {
                             .font(.largeTitle)
                             .foregroundStyle(.white)
                         
-                        ForEach($viewModel.patients) {
-                            $patient in Button(action: { patientTapped(patient) } ) {
+                        ForEach(patients) {
+                            patient in Button(action: { patientTapped(patient) } ) {
                                 VStack{
                                     HStack {
                                         Text(patient.name)
@@ -107,7 +118,8 @@ struct MainView: View {
                                             handleOptionSelection(patient, .delete)
                                         }
                                         
-                                        NavigationLink(destination: PatientView(patient: $patient)) {
+                                        NavigationLink(destination: PatientView(patient: patient)
+                                            .environmentObject(sessionManager)) {
                                             Text("VIEW PATIENT")
                                                 .font(.headline)
                                                 .foregroundColor(.black)
@@ -158,7 +170,7 @@ struct MainView: View {
             .sheet(isPresented: $showSettings) {
                 NavigationStack {
                     SettingsView()
-                        .environmentObject(session)
+                        .environmentObject(sessionManager)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button("Cancel") {
@@ -180,17 +192,27 @@ struct MainView: View {
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding(.horizontal, 20)
                         
-                        Text("Select LTM file:")
-                            .padding(.leading, titleLeading)
-                            .bold()
-                        DocumentImporterView(importedFileURL: $newPatientFileURL)
-                            .frame(maxWidth: .infinity, alignment: .center)
+//                        Text("Select LTM file:")
+//                            .padding(.leading, titleLeading)
+//                            .bold()
+//                        DocumentImporterView(importedFileURL: $newPatientFileURL)
+//                            .frame(maxWidth: .infinity, alignment: .center)
                         
                         Button("Add Patient") {
                             if !newPatientName.isEmpty {
-                                viewModel.addPatient(newPatientName, newPatientFileURL)
-                                newPatientName = ""
-                                showAddPatientSheet = false
+//                                viewModel.addPatient(newPatientName, newPatientFileURL)
+                                Task {
+                                    do {
+                                        // Call the async POST function.
+                                        try await sessionManager.createPatientServer(name: newPatientName)
+                                        // Optionally, refresh the patient list.
+                                        patients = try await sessionManager.getPatientsServer()
+                                        newPatientName = ""
+                                        showAddPatientSheet = false
+                                    } catch {
+                                        print("Error creating patient: \(error)")
+                                    }
+                                }
                             }
                         }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -209,6 +231,24 @@ struct MainView: View {
                     }
                 }
             }
+        }
+        .task {
+            do {
+                patients = try await sessionManager.getPatientsServer()
+            } catch {
+                print("Error fetching patients: \(error)")
+            }
+        }
+    }
+}
+
+struct MainView_Previews: PreviewProvider {
+    static var previews: some View {
+        let session = SessionManager()
+        session.logIn(email: "Demo@example.com", password: "123")
+        return NavigationStack {
+            MainView()
+                .environmentObject(session)
         }
     }
 }

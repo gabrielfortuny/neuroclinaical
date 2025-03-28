@@ -13,8 +13,13 @@ struct Neuro_ClinAIcalApp: App {
         
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environmentObject(session)
+            if session.currentUser == nil {
+                SignInView()
+                    .environmentObject(session)
+            } else {
+                MainView()
+                    .environmentObject(session)
+            }
         }
     }
 }

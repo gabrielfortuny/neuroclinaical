@@ -18,7 +18,7 @@ struct SignInView: View {
     var body: some View {
         if session.currentUser != nil {
             MainView()
-                .environmentObject(SessionManager())
+                .environmentObject(session)
         } else {
             ZStack {
                 Color(red: 80/255, green: 134/255, blue: 98/255)

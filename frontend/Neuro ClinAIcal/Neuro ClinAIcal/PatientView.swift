@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 enum InfoOption: Equatable {
     case viewFile
@@ -38,7 +39,8 @@ enum DataSubOption: Equatable {
 }
 
 struct PatientView: View {
-    @Binding var patient: Patient
+    @EnvironmentObject private var sessionManager: SessionManager
+    var patient: Patient
     
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     
@@ -52,6 +54,8 @@ struct PatientView: View {
     @State private var withSOZAdminBar: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
+    @State private var expandedSessionID: Int? = nil
+    
     @State private var importedFileURL: URL? = nil
     @State private var sampleSummary: String = """
     Sample summary
@@ -195,13 +199,11 @@ struct PatientView: View {
         }
     }
     
-    @ViewBuilder
     private func askQuestionContent() -> some View {
         Text("Ask Question")
             .padding()
     }
     
-    @ViewBuilder
     private func summaryContent() -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("EEG Monitoring Summary")
@@ -216,7 +218,6 @@ struct PatientView: View {
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
     
-    @ViewBuilder
     private func dataContent() -> some View {
         VStack(spacing: 16) {
             Text("SEIZURE GRAPHICS")

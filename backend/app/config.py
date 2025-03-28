@@ -5,11 +5,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///local.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = os.getenv("FLASK_DEBUG", "False") == "True"
-
-    # Use absolute path if needed
-    UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
-
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-jwt")  
+    
+    # Set as absolute path in the container
+    UPLOAD_FOLDER = "/app/NeuroClin"
+    
+    # Make sure logging is enabled
+    FLASK_LOG_LEVEL = os.getenv("FLASK_LOG_LEVEL", "INFO")
+    
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_COOKIE_CSRF_PROTECT = False
 
