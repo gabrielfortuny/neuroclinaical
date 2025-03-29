@@ -25,17 +25,13 @@ def create_patient():
     data = request.get_json()
     print("📥 Received patient POST:", data)
     name = data.get("name")
-    dob_str = data.get("dob")
+    dob_str = data.get("DOB")
 
     if not name:
         return jsonify({"error": "Invalid input: 'name' is required."}), 400
 
-    try:
-        dob = datetime.strptime(dob_str, "%Y-%m-%d").date() if dob_str else None
-    except ValueError:
-        return jsonify({"error": "Invalid input: 'dob' must be YYYY-MM-DD."}), 400
 
-    patient = Patient(name=name, dob=dob)
+    patient = Patient(name=name)
     db.session.add(patient)
     db.session.commit()
 
@@ -44,7 +40,6 @@ def create_patient():
             {
                 "id": patient.id,
                 "name": patient.name,
-                "dob": patient.dob.isoformat() if patient.dob else None,
             }
         ),
         201,
