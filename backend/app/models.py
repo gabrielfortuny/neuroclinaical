@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from app import db  # Import the existing db instance from __init__.py
 from sqlalchemy import (
     Table,
     Column,
@@ -13,7 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import INTERVAL
 from sqlalchemy.sql import func
 
-db = SQLAlchemy()
+#db = SQLAlchemy()
 
 # Association table: many-to-many between seizures and electrodes
 seizures_electrodes = db.Table(

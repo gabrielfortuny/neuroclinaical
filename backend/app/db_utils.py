@@ -39,17 +39,18 @@ def close_connection(connection, cursor):
         connection.close()
 
 def get_report(report_id):
-    """Get a report by ID using direct database access."""
-    conn, cursor = get_db_connection()
-    try:
-        cursor.execute(
-            "SELECT id, patient_id, filepath, filetype, summary FROM reports WHERE id = %s",
-            (report_id,)
-        )
-        report = cursor.fetchone()
-        return report
-    finally:
-        close_connection(conn, cursor)
+    """Get a report by ID using direct database access with proper app context."""
+    with app.app_context():  # Ensure Flask app context
+        conn, cursor = get_db_connection()
+        try:
+            cursor.execute(
+                "SELECT id, patient_id, filepath, filetype, summary FROM reports WHERE id = %s",
+                (report_id,)
+            )
+            report = cursor.fetchone()
+            return report
+        finally:
+            close_connection(conn, cursor)
 
 def update_report_summary(report_id, summary):
     """Update a report's summary using direct database access."""
