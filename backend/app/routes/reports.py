@@ -68,10 +68,7 @@ def upload_report():
         new_report = Report(
             patient_id=patient_id,
             summary=f"Report uploaded for patient {patient_id}",
-            filepath=file_path,
-            created_at=datetime.now(),
-            modified_at=datetime.now(),
-            filetype=filetype,
+            file_path=file_path,
         )
 
         if not upload_controller(filetype, file_path, patient_id, new_report):
