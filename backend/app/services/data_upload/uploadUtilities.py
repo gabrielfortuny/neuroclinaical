@@ -4,7 +4,7 @@ from typing import List, Dict
 from flask import current_app
 from app.__init__ import db
 
-from app.models import Drug, Seizure, DrugAdministration, Electrode
+from app.models import Seizure, DrugAdministration, Electrode
 
 
 def extract_days_from_text(text: str) -> Dict[str, str]:
