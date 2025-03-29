@@ -25,7 +25,6 @@ def create_patient():
     data = request.get_json()
     print("📥 Received patient POST:", data)
     name = data.get("name")
-    dob_str = data.get("DOB")
 
     if not name:
         return jsonify({"error": "Invalid input: 'name' is required."}), 400
