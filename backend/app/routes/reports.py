@@ -107,7 +107,7 @@ def get_report_metadata(report_id):
         # Query the database to get the report metadata
         result = db.session.execute(
             text(
-                "SELECT id, patient_id, summary, created_at, modified_at, filepath, filetype FROM reports WHERE id = :report_id"
+                "SELECT id, patient_id, summary, file_path FROM reports WHERE id = :report_id"
             ),
             {"report_id": report_id},
         )
@@ -122,12 +122,7 @@ def get_report_metadata(report_id):
             "report_id": report.id,
             "patient_id": report.patient_id,
             "summary": report.summary,
-            "uploaded_at": report.created_at.isoformat() if report.created_at else None,
-            "modified_at": (
-                report.modified_at.isoformat() if report.modified_at else None
-            ),
-            "filepath": report.filepath,
-            "filetype": report.filetype,
+            "filepath": report.file_path,
         }
 
         return jsonify(report_data), 200
