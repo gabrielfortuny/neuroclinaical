@@ -1,0 +1,67 @@
+services:
+  flask:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neuroclinaical-flask
+    depends_on:
+      - db
+      - ollama
+    ports:
+      - "8000:5000"
+    environment:
+      - FLASK_APP=app/main.py
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://postgres:password@db:5432/neuroclinaical
+      - OLLAMA_HOST=http://ollama:11434
+      - JWT_SECRET_KEY=your_jwt_secret_key_change_this_in_production
+      - UPLOAD_FOLDER=/app/uploads
+    volumes:
+      - ./backend:/app
+      - app_uploads:/app/uploads
+    networks:
+      - public-network
+      - backend-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:17.4
+    container_name: neuroclinaical-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=neuroclinaical
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    build:
+      context: ./backend/ollama
+      dockerfile: Dockerfile
+    container_name: neuroclinaical-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - backend-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  ollama_data:
+  app_uploads:
+
+networks:
+  public-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
+    internal: true

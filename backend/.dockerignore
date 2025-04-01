@@ -1,10 +1,73 @@
-__pycache__
+# Python cache files
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database files
 *.sqlite3
 *.db
+
+# Environment files
 .env
 .env.*
+.venv/
+venv/
+ENV/
+env/
+
+# Logs
 *.log
-*.DS_Store
+logs/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE specific files
+## VSCode
+.vscode/
+*.code-workspace
+
+## PyCharm/IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+## Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+*.xcuserstate
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.[Cc]ache
+!*.xcassets
+!.gitkeep
+
+# Test files
+.coverage
+.pytest_cache/
+.tox/
+
+# Docker specific
+.dockerignore
+.git/
+.github/
+bin/
+docs/
