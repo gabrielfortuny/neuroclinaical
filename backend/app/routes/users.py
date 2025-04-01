@@ -20,7 +20,7 @@ from app.utils.authentication.authtokenHandler import (
     delete_user_token,
 )
 
-users_bp = Blueprint("user", __name__)
+users_bp = Blueprint("user", __name__, url_prefix="/user")
 api = Api(users_bp)
 
 
