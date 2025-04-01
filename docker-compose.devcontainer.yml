@@ -1,0 +1,32 @@
+services:
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/workspace/backend
+      - app_uploads:/workspace/backend/uploads
+      - ~/.gitconfig:/home/vscode/.gitconfig
+      - vscode-extensions:/home/vscode/.vscode-server/extensions
+      - vscode-server-data:/home/vscode/.vscode-server/data
+      - vscode-server-bin:/home/vscode/.vscode-server/bin
+    command: sleep infinity
+    environment:
+      - FLASK_APP=app/main.py
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://postgres:password@db:5432/neuroclinaical
+      - OLLAMA_HOST=http://ollama:11434
+      - JWT_SECRET_KEY=your_jwt_secret_key_change_this_in_production
+      - UPLOAD_FOLDER=/workspace/backend/uploads
+    networks:
+      - public-network
+      - backend-network
+    depends_on:
+      - db
+      - ollama
+
+volumes:
+  vscode-extensions:
+  vscode-server-data:
+  vscode-server-bin:

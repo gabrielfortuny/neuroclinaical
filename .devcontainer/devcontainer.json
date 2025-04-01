@@ -1,0 +1,39 @@
+{
+  "name": "NeuroClinAIcal Backend Development",
+  "dockerComposeFile": ["../docker-compose.yml", "../docker-compose.devcontainer.yml"],
+  "service": "backend-dev",
+  "workspaceFolder": "/workspace/backend",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-python.vscode-pylance",
+        "esbenp.prettier-vscode",
+        "ms-python.black-formatter",
+        "njpwerner.autodocstring",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "42Crunch.vscode-openapi",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.rulers": [79]
+        },
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "black-formatter.args": ["--line-length", "79"]
+      }
+    }
+  },
+  "remoteUser": "vscode",
+  "forwardPorts": [5000],
+  "postCreateCommand": "pip install -r requirements.txt",
+  "postStartCommand": "flask run --host=0.0.0.0 --port=5000"
+}
