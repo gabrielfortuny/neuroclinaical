@@ -1,3 +1,5 @@
+"""User model with password hashing logic."""
+
 from typing import List
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
@@ -6,6 +8,8 @@ from app.models.conversations import Conversation
 
 
 class User(BaseModel):
+    """Model representing a user."""
+
     __tablename__ = "users"
     username: str = db.Column(db.Text, nullable=False, unique=True)
     name: str = db.Column(db.Text, nullable=False)
