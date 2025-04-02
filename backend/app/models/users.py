@@ -1,6 +1,6 @@
 """User model with password hashing logic."""
 
-from typing import List
+from typing import List, TYPE_CHECKING
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models.base import BaseModel
