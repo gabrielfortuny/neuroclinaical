@@ -5,10 +5,13 @@ Patients have a name, reports, supplemental materials, and conversations
 associated with them.
 """
 
-from typing import List
+from typing import TYPE_CHECKING, List
 from app.models.base import BaseModel, db
-from app.models.files import Report, SupplementalMaterial
-from app.models.conversations import Conversation
+
+# avoids circular import
+if TYPE_CHECKING:
+    from app.models.files import Report, SupplementalMaterial
+    from app.models.conversations import Conversation
 
 
 class Patient(BaseModel):
