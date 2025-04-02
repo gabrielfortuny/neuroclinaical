@@ -1,62 +1,35 @@
-"""Seizures and electrode models."""
+"""Drug administration model."""
 
+from typing import TYPE_CHECKING
 import uuid
-from datetime import time
-from typing import TYPE_CHECKING, List, Optional
-from sqlalchemy import INTERVAL
 from sqlalchemy.dialects.postgresql import UUID
 from app import db
 from app.models.base import BaseModel
-
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # avoids circular import
 if TYPE_CHECKING:
     from app.models.files import Report
 
-# Association table: many-to-many between seizures and electrodes
-seizures_electrodes = db.Table(
-    "seizures_electrodes",
-    db.Column(
-        "seizure_id",
-        UUID(as_uuid=True),
-        db.ForeignKey("seizures.id", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-    db.Column(
-        "electrode_id",
-        UUID(as_uuid=True),
-        db.ForeignKey("electrodes.id", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-)
 
+class DrugAdministration(BaseModel):
+    """Model for a drug administration instance."""
 
-class Seizure(BaseModel):
-    """Model representing a seizure."""
-
-    __tablename__ = "seizures"
-    report_id: uuid.UUID = db.Column(
+    __tablename__ = "drug_administration"
+    report_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("reports.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
-    day: int = db.Column(db.Integer, nullable=False)
-    start_time: Optional[time] = db.Column(db.Time)
-    duration: Optional[INTERVAL] = db.Column(INTERVAL)
+    drug_name: Mapped[str] = mapped_column(db.Text, nullable=False, index=True)
+    day: Mapped[int] = mapped_column(db.Integer, nullable=False)
+    dosage: Mapped[int] = mapped_column(db.Integer, nullable=False)
 
-    report: "Report" = db.relationship("Report", back_populates="seizures")
-    electrodes: List["Electrode"] = db.relationship(
-        "Electrode", secondary=seizures_electrodes, back_populates="seizures"
+    report: Mapped["Report"] = relationship(
+        "Report", back_populates="drug_administrations"
     )
 
-
-class Electrode(BaseModel):
-    """Model representing an electrode."""
-
-    __tablename__ = "electrodes"
-    name: str = db.Column(db.Text, nullable=False, index=True)
-
-    seizures: List["Seizure"] = db.relationship(
-        "Seizure", secondary=seizures_electrodes, back_populates="electrodes"
+    __table_args__ = (
+        db.CheckConstraint("dosage > 0", name="check_positive_dosage"),
     )

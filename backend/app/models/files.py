@@ -12,6 +12,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from app import db
 from app.models.base import BaseModel
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # avoids circular import
 if TYPE_CHECKING:
@@ -25,10 +26,11 @@ class FileMixin:
     Mixin for models that contain file paths.
 
     Attributes:
-        file_name (Optional[str]): The original filename of the uploaded file
+        file_name (Mapped[Optional[str]]): The original filename of the uploaded
+            file
     """
 
-    file_name: Optional[str] = db.Column(db.Text)
+    file_name: Mapped[Optional[str]] = mapped_column(db.Text)
 
     @hybrid_property
     def file_path(self) -> str:
@@ -78,22 +80,24 @@ class Report(BaseModel, FileMixin):
     """Long term monitoring report for a patient."""
 
     __tablename__ = "reports"
-    patient_id: uuid.UUID = db.Column(
+    patient_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("patients.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
-    summary: Optional[str] = db.Column(db.Text)
+    summary: Mapped[Optional[str]] = mapped_column(db.Text)
 
-    patient: "Patient" = db.relationship("Patient", back_populates="reports")
-    extracted_images: List["ExtractedImage"] = db.relationship(
+    patient: Mapped["Patient"] = relationship(
+        "Patient", back_populates="reports"
+    )
+    extracted_images: Mapped[List["ExtractedImage"]] = relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
-    seizures: List["Seizure"] = db.relationship(
+    seizures: Mapped[List["Seizure"]] = relationship(
         "Seizure", back_populates="report", cascade="all, delete"
     )
-    drug_administrations: List["DrugAdministration"] = db.relationship(
+    drug_administrations: Mapped[List["DrugAdministration"]] = relationship(
         "DrugAdministration", back_populates="report", cascade="all, delete"
     )
 
@@ -102,14 +106,14 @@ class ExtractedImage(BaseModel, FileMixin):
     """Image extracted from a long term monitoring report."""
 
     __tablename__ = "extracted_images"
-    report_id: uuid.UUID = db.Column(
+    report_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("reports.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
-    report: "Report" = db.relationship(
+    report: Mapped["Report"] = relationship(
         "Report", back_populates="extracted_images"
     )
 
@@ -118,13 +122,13 @@ class SupplementalMaterial(BaseModel, FileMixin):
     """Supplemental material file related to a patient."""
 
     __tablename__ = "supplemental_materials"
-    patient_id: uuid.UUID = db.Column(
+    patient_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("patients.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
-    patient: "Patient" = db.relationship(
+    patient: Mapped["Patient"] = relationship(
         "Patient", back_populates="supplemental_materials"
     )

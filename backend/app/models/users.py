@@ -4,6 +4,7 @@ from typing import List, TYPE_CHECKING
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models.base import BaseModel
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # avoids circular import
 if TYPE_CHECKING:
@@ -14,12 +15,12 @@ class User(BaseModel):
     """Model representing a user."""
 
     __tablename__ = "users"
-    username: str = db.Column(db.Text, nullable=False, unique=True)
-    name: str = db.Column(db.Text, nullable=False)
-    email: str = db.Column(db.Text, nullable=False, unique=True)
-    password_hash: str = db.Column(db.String(128), nullable=False)
+    username: Mapped[str] = mapped_column(db.Text, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(db.Text, nullable=False)
+    email: Mapped[str] = mapped_column(db.Text, nullable=False, unique=True)
+    password_hash: Mapped[str] = mapped_column(db.String(128), nullable=False)
 
-    conversations: List["Conversation"] = db.relationship(
+    conversations: Mapped[List["Conversation"]] = relationship(
         "Conversation", back_populates="user", cascade="all, delete"
     )
 

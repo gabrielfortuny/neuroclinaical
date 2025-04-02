@@ -5,6 +5,7 @@ from typing import List, TYPE_CHECKING
 from sqlalchemy.dialects.postgresql import UUID
 from app import db
 from app.models.base import BaseModel
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # avoids circular import
 if TYPE_CHECKING:
@@ -16,24 +17,24 @@ class Conversation(BaseModel):
     """Model representing a conversation with the AI."""
 
     __tablename__ = "conversations"
-    user_id: uuid.UUID = db.Column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
-    patient_id: uuid.UUID = db.Column(
+    patient_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("patients.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
-    user: "User" = db.relationship("User", back_populates="conversations")
-    patient: "Patient" = db.relationship(
+    user: Mapped["User"] = relationship("User", back_populates="conversations")
+    patient: Mapped["Patient"] = relationship(
         "Patient", back_populates="conversations"
     )
-    messages: List["Message"] = db.relationship(
+    messages: Mapped[List["Message"]] = relationship(
         "Message", back_populates="conversation", cascade="all, delete"
     )
 
@@ -42,15 +43,15 @@ class Message(BaseModel):
     """Model representing a message within a conversation."""
 
     __tablename__ = "messages"
-    conversation_id: uuid.UUID = db.Column(
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         db.ForeignKey("conversations.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
-    query: str = db.Column(db.Text, nullable=False)
-    response: str = db.Column(db.Text, nullable=False)
+    query: Mapped[str] = mapped_column(db.Text, nullable=False)
+    response: Mapped[str] = mapped_column(db.Text, nullable=False)
 
-    conversation: "Conversation" = db.relationship(
+    conversation: Mapped["Conversation"] = relationship(
         "Conversation", back_populates="messages"
     )
