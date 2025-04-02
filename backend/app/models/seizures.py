@@ -3,7 +3,8 @@
 import uuid
 from datetime import time
 from typing import TYPE_CHECKING, List, Optional
-from sqlalchemy.dialects.postgresql import UUID, INTERVAL
+from sqlalchemy import INTERVAL
+from sqlalchemy.dialects.postgresql import UUID
 from app import db
 from app.models.base import BaseModel
 

@@ -1,4 +1,20 @@
+"""Models for Conversations and Messages within them."""
+
+import uuid
+from typing import List, TYPE_CHECKING
+from sqlalchemy.dialects.postgresql import UUID
+from app import db
+from app.models.base import BaseModel
+
+# avoids circular import
+if TYPE_CHECKING:
+    from app.models.users import User
+    from app.models.patients import Patient
+
+
 class Conversation(BaseModel):
+    """Model representing a conversation with the AI."""
+
     __tablename__ = "conversations"
     user_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),
@@ -23,6 +39,8 @@ class Conversation(BaseModel):
 
 
 class Message(BaseModel):
+    """Model representing a message within a conversation."""
+
     __tablename__ = "messages"
     conversation_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),

@@ -4,7 +4,10 @@ from typing import List
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models.base import BaseModel
-from app.models.conversations import Conversation
+
+# avoids circular import
+if TYPE_CHECKING:
+    from app.models.conversations import Conversation
 
 
 class User(BaseModel):
