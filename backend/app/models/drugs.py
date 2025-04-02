@@ -1,4 +1,19 @@
+"""Drug administration model."""
+
+from typing import TYPE_CHECKING
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
+from app import db
+from app.models.base import BaseModel
+
+# avoids circular import
+if TYPE_CHECKING:
+    from app.models.files import Report
+
+
 class DrugAdministration(BaseModel):
+    """Model for a drug administration instance."""
+
     __tablename__ = "drug_administration"
     report_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),
@@ -17,4 +32,3 @@ class DrugAdministration(BaseModel):
     __table_args__ = (
         db.CheckConstraint("dosage > 0", name="check_positive_dosage"),
     )
-
