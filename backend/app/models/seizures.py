@@ -1,6 +1,4 @@
-"""
-Seizures and electrode models.
-"""
+"""Seizures and electrode models."""
 
 import uuid
 from datetime import time
@@ -33,7 +31,7 @@ seizures_electrodes = db.Table(
 
 
 class Seizure(BaseModel):
-    "Model representing a seizure."
+    """Model representing a seizure."""
 
     __tablename__ = "seizures"
     report_id: uuid.UUID = db.Column(
@@ -53,7 +51,7 @@ class Seizure(BaseModel):
 
 
 class Electrode(BaseModel):
-    "Model representing an electrode."
+    """Model representing an electrode."""
 
     __tablename__ = "electrodes"
     name: str = db.Column(db.Text, nullable=False, index=True)
