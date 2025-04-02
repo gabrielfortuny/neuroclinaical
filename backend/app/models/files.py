@@ -1,38 +1,82 @@
+"""
+File handling models.
+
+Includes Report, ExtractedImage, and SupplementalMaterial.
+"""
+
+import os
+from typing import TYPE_CHECKING, Optional, List
+import uuid
+from flask import current_app
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
+from app import db
+from app.models.base import BaseModel
+
+# avoids circular import
+if TYPE_CHECKING:
+    from app.models.patients import Patient
+    from app.models.seizures import Seizure
+    from app.models.drugs import DrugAdministration
+
+
 class FileMixin:
-    """Mixin for models that contain file paths."""
+    """
+    Mixin for models that contain file paths.
+
+    Attributes:
+        file_name (Optional[str]): The original filename of the uploaded file
+    """
 
     file_name: Optional[str] = db.Column(db.Text)
 
     @hybrid_property
     def file_path(self) -> str:
-        """Returns the physical storage path of the file."""
-        return f"{current_app.config['UPLOAD_FOLDER']}/{self.id}"
+        """Return the physical storage path of the file."""
+        return os.path.join(current_app.config["UPLOAD_FOLDER"], str(self.id))
 
     @hybrid_property
     def content_type(self) -> str:
-        """Derive content type from original filename if available."""
-        if self.file_name:
-            # Get extension and map to content type
-            extension = (
-                self.file_name.split(".")[-1].lower()
-                if "." in self.file_name
-                else None
-            )
-            if extension is not None:
-                content_types = {
-                    "pdf": "application/pdf",
-                    "jpg": "image/jpeg",
-                    "jpeg": "image/jpeg",
-                    "png": "image/png",
-                    # Add more mappings as needed
-                }
-                return content_types.get(extension, "application/octet-stream")
+        """
+        Derive content type from original filename if available.
+
+        Uses the file extension to determine the appropriate MIME type
+        for HTTP responses and file handling.
+
+        Returns:
+            str: MIME type string corresponding to the file's extension
+                 or 'application/octet-stream' if type cannot be determined
+        """
+        if not self.file_name:
+            return "application/octet-stream"
+
+        # Use os.path.splitext to correctly extract the extension
+        _, extension = os.path.splitext(self.file_name)
+
+        # Remove the leading dot and convert to lowercase
+        if extension:
+            extension = extension[1:].lower()
+
+            content_types = {
+                "pdf": "application/pdf",
+                "jpg": "image/jpeg",
+                "jpeg": "image/jpeg",
+                "png": "image/png",
+                "txt": "text/plain",
+                "doc": "application/msword",
+                "docx": "application/vnd.openxmlformats-officedocument.\
+                    wordprocessingml.document",
+                # Add more mappings as needed
+            }
+            return content_types.get(extension, "application/octet-stream")
 
         # Default return for cases with no filename or no extension
         return "application/octet-stream"
 
 
 class Report(BaseModel, FileMixin):
+    """Long term monitoring report for a patient."""
+
     __tablename__ = "reports"
     patient_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),
@@ -55,6 +99,8 @@ class Report(BaseModel, FileMixin):
 
 
 class ExtractedImage(BaseModel, FileMixin):
+    """Image extracted from a long term monitoring report."""
+
     __tablename__ = "extracted_images"
     report_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),
@@ -69,6 +115,8 @@ class ExtractedImage(BaseModel, FileMixin):
 
 
 class SupplementalMaterial(BaseModel, FileMixin):
+    """Supplemental material file related to a patient."""
+
     __tablename__ = "supplemental_materials"
     patient_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),
