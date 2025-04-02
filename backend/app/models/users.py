@@ -25,7 +25,7 @@ class User(BaseModel):
 
     def set_password(self, password: str) -> None:
         """
-        Hash and a new password and updates it in the User's record.
+        Hash a new password and update the User's record.
 
         Args:
             password (str): The provided plaintext password
