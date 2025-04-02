@@ -1,3 +1,19 @@
+"""
+Seizures and electrode models.
+"""
+
+import uuid
+from datetime import time
+from typing import TYPE_CHECKING, List, Optional
+from sqlalchemy.dialects.postgresql import UUID, INTERVAL
+from app import db
+from app.models.base import BaseModel
+
+
+# avoids circular import
+if TYPE_CHECKING:
+    from app.models.files import Report
+
 # Association table: many-to-many between seizures and electrodes
 seizures_electrodes = db.Table(
     "seizures_electrodes",
@@ -17,6 +33,8 @@ seizures_electrodes = db.Table(
 
 
 class Seizure(BaseModel):
+    "Model representing a seizure."
+
     __tablename__ = "seizures"
     report_id: uuid.UUID = db.Column(
         UUID(as_uuid=True),
@@ -35,6 +53,8 @@ class Seizure(BaseModel):
 
 
 class Electrode(BaseModel):
+    "Model representing an electrode."
+
     __tablename__ = "electrodes"
     name: str = db.Column(db.Text, nullable=False, index=True)
 
