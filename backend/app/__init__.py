@@ -19,7 +19,9 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)  # Make Folder for Uploads
+    os.makedirs(
+        app.config["UPLOAD_FOLDER"], exist_ok=True
+    )  # Make Folder for Uploads
 
     db.init_app(app)
     jwt.init_app(app)
@@ -36,10 +38,8 @@ def create_app():
         register_routes(app)
         db.create_all()
 
-    """
-    @app.before_request
-    def require_jwt():
-        if request.path not in EXEMPT_PATHS:
-            verify_jwt_in_request()
-    """
+    # @app.before_request
+    # def require_jwt():
+    #     if request.path not in EXEMPT_PATHS:
+    #         verify_jwt_in_request()
     return app

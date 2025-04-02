@@ -8,7 +8,7 @@ class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "False") == "True"
 
     # Set as absolute path in the container
-    UPLOAD_FOLDER = UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
+    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
 
     # Make sure logging is enabled
     FLASK_LOG_LEVEL = os.getenv("FLASK_LOG_LEVEL", "INFO")
