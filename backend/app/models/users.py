@@ -24,23 +24,25 @@ class User(BaseModel):
         "Conversation", back_populates="user", cascade="all, delete"
     )
 
-    def set_password(self, password: str) -> None:
-        """
-        Hash a new password and update the User's record.
+    # we have password stuff in utils
 
-        Args:
-            password (str): The provided plaintext password
-        """
-        self.password_hash = generate_password_hash(password)
+    # def set_password(self, password: str) -> None:
+    #     """
+    #     Hash a new password and update the User's record.
 
-    def check_password(self, password_attempt: str) -> bool:
-        """
-        Check if the provided password hashes to the stored password hash.
+    #     Args:
+    #         password (str): The provided plaintext password
+    #     """
+    #     self.password_hash = generate_password_hash(password)
 
-        Args:
-            password_attempt (str): The plaintext password to be checked.
+    # def check_password(self, password_attempt: str) -> bool:
+    #     """
+    #     Check if the provided password hashes to the stored password hash.
 
-        Returns:
-            bool: True if the password is correct, false otherwise.
-        """
-        return check_password_hash(self.password_hash, password_attempt)
+    #     Args:
+    #         password_attempt (str): The plaintext password to be checked.
+
+    #     Returns:
+    #         bool: True if the password is correct, false otherwise.
+    #     """
+    #     return check_password_hash(self.password_hash, password_attempt)

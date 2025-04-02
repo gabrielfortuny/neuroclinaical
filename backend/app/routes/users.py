@@ -108,7 +108,10 @@ def logout_user():
             401,
         )  # User is not in DB / Invalid token
     response = jsonify(
-        {"message": "User logged out successfully", "token": delete_user_token()}
+        {
+            "message": "User logged out successfully",
+            "token": delete_user_token(),
+        }
     )
     set_access_cookies(response, delete_user_token())
     return (
