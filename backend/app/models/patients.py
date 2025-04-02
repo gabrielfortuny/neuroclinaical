@@ -6,7 +6,8 @@ associated with them.
 """
 
 from typing import TYPE_CHECKING, List
-from app.models.base import BaseModel, db
+from app import db
+from app.models.base import BaseModel
 
 # avoids circular import
 if TYPE_CHECKING:
