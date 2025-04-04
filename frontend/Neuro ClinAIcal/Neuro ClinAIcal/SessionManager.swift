@@ -130,7 +130,7 @@ class SessionManager: ObservableObject {
         
         let fileData = try Data(contentsOf: fileURL)
         // Base64‑encode the file data.
-        let base64EncodedFile = fileData.base64EncodedString()
+//        let base64EncodedFile = fileData.base64EncodedString()
         
         // Use Alamofire's multipart upload.
         let responseData = try await AF.upload(multipartFormData: { mpFD in
@@ -140,9 +140,10 @@ class SessionManager: ObservableObject {
             if let fileTypeData = fileType.data(using: .utf8) {
                 mpFD.append(fileTypeData, withName: "file_type")
             }
-            if let fileFieldData = base64EncodedFile.data(using: .utf8) {
-                mpFD.append(fileFieldData, withName: "file", fileName: fileURL.lastPathComponent)
-            }
+//            if let fileFieldData = base64EncodedFile.data(using: .utf8) {
+//                mpFD.append(fileFieldData, withName: "file", fileName: fileURL.lastPathComponent)
+//            }
+            mpFD.append(fileData, withName: "file", fileName: fileURL.lastPathComponent)
         }, to: "\(Self.baseURL)/reports", method: .post)
             .validate(statusCode: 201..<300)
             .serializingData().value
