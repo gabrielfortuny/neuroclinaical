@@ -52,7 +52,7 @@ class SessionManager: ObservableObject {
         return decodedPatients
     }
     
-    func createPatientServer(name: String, dob: String? = nil) async throws {
+    func createPatientServer(name: String/*, dob: String? = nil*/) async throws {
         guard let url = URL(string: "\(Self.baseURL)/patients") else {
             throw URLError(.badURL)
         }
@@ -64,7 +64,7 @@ class SessionManager: ObservableObject {
         // If dob is nil, you can include it as null or simply omit it if your server supports that.
         let body: [String: Any] = [
             "name": name,
-            "dob": dob as Any  // if dob is nil, JSONSerialization will encode it as null.
+//            "dob": dob as Any  // if dob is nil, JSONSerialization will encode it as null.
         ]
         
         let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])

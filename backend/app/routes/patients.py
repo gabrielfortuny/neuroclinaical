@@ -14,7 +14,7 @@ patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 def get_all_patients():
     patients = Patient.query.all()
     data = [
-        {"id": p.id, "name": p.name, "dob": p.dob.isoformat() if p.dob else None}
+        {"id": p.id, "name": p.name}
         for p in patients
     ]
     return jsonify(data), 200
