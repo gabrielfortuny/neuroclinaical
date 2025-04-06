@@ -1,6 +1,7 @@
 """Drug administration model."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+from datetime import time
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from app import db
@@ -25,6 +26,7 @@ class DrugAdministration(BaseModel):
     drug_name: Mapped[str] = mapped_column(db.Text, nullable=False, index=True)
     day: Mapped[int] = mapped_column(db.Integer, nullable=False)
     dosage: Mapped[int] = mapped_column(db.Integer, nullable=False)
+    administration_time: Mapped[Optional[time]] = mapped_column(db.Time)
 
     report: Mapped["Report"] = relationship(
         "Report", back_populates="drug_administrations"
