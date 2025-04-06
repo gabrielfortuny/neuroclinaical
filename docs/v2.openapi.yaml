@@ -1,0 +1,238 @@
+openapi: 3.1.1
+info:
+  title: NeuroClinAIcal API
+  version: 2.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: Flask development
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token obtained from the /auth/login endpoint"
+  schemas:
+    BaseModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Primary key using UUID version 4 format string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the record was created
+          example: "2025-04-05T10:15:30Z"
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the record was last updated
+          example: "2025-04-05T14:30:00Z"
+          readOnly: true
+      required:
+        - id
+        - created_at
+        - updated_at
+
+    FileMixin:
+      type: object
+      properties:
+        file_name:
+          type: string
+          description: The original filename of the uploaded file
+        content_type:
+          type: string
+          description: MIME type derived from the file extension
+          example: "application/pdf"
+          readOnly: true
+
+    User:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - type: object
+          properties:
+            username:
+              type: string
+              description: Unique username for the user
+              example: alicebob
+            name:
+              type: string
+              description: User's name
+              example: Alice Bob
+            email:
+              type: string
+              format: email
+              description: User's email
+              example: alicebob@umich.edu
+            password:
+              type: string
+              format: password
+              description: User's password
+              writeOnly: true
+          required:
+            - username
+            - name
+            - email
+
+    Patient:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - type: object
+          properties:
+            name:
+              type: string
+              description: Patient's name
+              example: Alice Bob
+          required:
+            - name
+
+    Report:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - $ref: "#/components/schemas/FileMixin"
+        - type: object
+          properties:
+            patient_id:
+              type: string
+              format: uuid
+              description: Primary key for the patient this report belongs to
+              example: "550e8400-e29b-41d4-a716-446655440000"
+              readOnly: true
+            summary:
+              type: string
+              description: Text summary of the report
+              readOnly: true
+          required:
+            - patient_id
+
+    ExtractedImage:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - $ref: "#/components/schemas/FileMixin"
+        - type: object
+          properties:
+            report_id:
+              type: string
+              format: uuid
+              description: Primary key for the report this image was extracted from
+              example: "550e8400-e29b-41d4-a716-446655440000"
+              readOnly: true
+          required:
+            - report_id
+
+    SupplementalMaterial:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - $ref: "#/components/schemas/FileMixin"
+        - type: object
+          properties:
+            patient_id:
+              type: string
+              format: uuid
+              description: Primary key for the patient this report belongs to
+              example: "550e8400-e29b-41d4-a716-446655440000"
+              readOnly: true
+          required:
+            - patient_id
+
+    Seizure:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - type: object
+          properties:
+            patient_id:
+              type: string
+              format: uuid
+              description: Primary key for the patient the seizure belongs to
+              readOnly: true
+            day:
+              type: integer
+              description: Day in the report on which the seizure took place
+              example: 2
+              readOnly: true
+            start_time:
+              type: string
+              format: time
+              description: Time when the seizure started in HH:MM:SS format
+              example: "14:30:05"
+              readOnly: true
+            duration:
+              type: string
+              description: Duration of the seizure in HH:MM:SS format
+              example: "00:02:30" # 2 minutes, 30 seconds
+              readOnly: true
+            electrodes:
+              type: array
+              description: List of electrodes involved in the seizure
+              items:
+                $ref: "#/components/schemas/Electrode"
+              readOnly: true
+      required:
+        - patient_id
+        - day
+
+    Electrode:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the electrode
+          example: "F4"
+          readOnly: true
+      required:
+        - name
+
+    DrugAdministration:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BaseModel"
+        - type: object
+          properties:
+            patient_id:
+              type: string
+              format: uuid
+              description: Reference to the patient who was administered the drug
+              example: "550e8400-e29b-41d4-a716-446655440000"
+              readOnly: true
+            drug_name:
+              type: string
+              description: Name of the administered drug
+              example: "Advil"
+              readOnly: true
+            day:
+              type: integer
+              description: Day of monitoring when the drug was administered
+              example: 3
+              readOnly: true
+            time:
+              type: string
+              format: time
+              description: Time of day the drug was administered at
+              readOnly: true
+            dosage:
+              type: integer
+              description: Dosage of the drug in mg
+              example: 500
+              minimum: 0
+              readOnly: true
+          required:
+            - patient_id
+            - drug_name
+            - day
+            - dosage
