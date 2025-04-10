@@ -30,6 +30,7 @@ class pdf_upload_handler:
         """Extract text from a PDF file."""
         current_app.logger.info(f"Extracting text from PDF: {file_path}")
         text = self.extract_text_from_pdf(file_path)
+        self.extract_image_from_pdf(file_path, storage_path, report_id)
         current_app.logger.info(f"Extracted {len(text)} characters from PDF")
         return text
 
@@ -108,7 +109,7 @@ class docx_upload_handler:
         """Extract text from a DOCX file."""
         current_app.logger.info(f"Extracting text from DOCX: {file_path}")
         text = self.extract_text_from_docx(file_path)
-        self.extract_image_from_docx()
+        self.extract_image_from_docx(file_path, storage_path, report_id)
         current_app.logger.info(f"Extracted {len(text)} characters from DOCX")
         return text
 
