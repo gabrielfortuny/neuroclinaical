@@ -1,10 +1,11 @@
 import os
 import fitz
 import traceback
+import zipfile
 from docx import Document
 from flask import current_app
 from app.__init__ import db
-from app.models import Report
+from app.models import Report, ExtractedImage
 from app.services.data_upload.uploadUtilities import (
     store_drugs_array,
     store_seizures_array,
@@ -25,15 +26,38 @@ class pdf_upload_handler:
             current_app.logger.error(f"Error extracting text from PDF: {str(e)}")
             raise Exception(f"PDF extraction failed: {str(e)}")
 
-    def __call__(self, file_path: str) -> str:
+    def __call__(self, file_path: str, storage_path: str, report_id: int) -> str:
         """Extract text from a PDF file."""
         current_app.logger.info(f"Extracting text from PDF: {file_path}")
         text = self.extract_text_from_pdf(file_path)
         current_app.logger.info(f"Extracted {len(text)} characters from PDF")
         return text
 
-
+    def extract_image_from_pdf(self, filepath:str, storage_path:str, report_id: int):
+        try:
+            doc = fitz.open(filepath)
+            image_num = 0
+            for page in range(len(doc)):
+                images = doc[page].get_images()
+                for _, image in images:
+                    im = ExtractedImage(report_id=report_id)
+                    db.session.add(im)
+                    xref = image[0] 
+                    base_image = doc.extract_image(xref)
+                    image_bytes = image["image"]
+                    ext = image["ext"]
+                    final_path = f"{storage_path}/{report_id}_image{image_num}.{ext}"
+                    im.file_path = final_path
+                    image_num += 1
+                    with open(final_path, "wb") as f:
+                        f.write(image_bytes)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(f"Error extracting images from PDF: {str(e)}")
+            raise Exception(f"PDF extraction failed: {str(e)}")
+        
 class docx_upload_handler:
+
     def extract_text_from_docx(self, file_path: str) -> str:
         try:
             doc = Document(file_path)
@@ -57,10 +81,34 @@ class docx_upload_handler:
             current_app.logger.error(f"Error extracting text from DOCX: {str(e)}")
             raise Exception(f"DOCX extraction failed: {str(e)}")
 
-    def __call__(self, file_path: str) -> str:
+    def extract_image_from_docx(self, filepath:str, storage_path:str, report_id: int):
+        try:
+            with zipfile.Zipfile(filepath, 'r') as docx:
+                image_num = 0
+                for item in docx.namelist():
+                    if item.startswith("word/media/"):
+                        image = ExtractedImage(report_id=report_id)
+                        db.session.add(image)
+                        #If failing: Commit to db needed?
+                        image_data = docx.read(item)
+                        ext = os.path.splitext(item)[1]
+                        final_path = f"{storage_path}/{report_id}_image{image_num}.{ext}"
+                        image.file_path = final_path
+                        image_num += 1
+                        with open(final_path, 'wb') as f:
+                            f.write(image_data)
+                db.session.commit()
+                        
+        except Exception as e:
+            current_app.logger.error(f"Error extracting images from DOCX: {str(e)}")
+            raise Exception(f"DOCX extraction failed: {str(e)}")
+
+
+    def __call__(self, file_path: str, storage_path: str, report_id: int) -> str:
         """Extract text from a DOCX file."""
         current_app.logger.info(f"Extracting text from DOCX: {file_path}")
         text = self.extract_text_from_docx(file_path)
+        self.extract_image_from_docx()
         current_app.logger.info(f"Extracted {len(text)} characters from DOCX")
         return text
 
