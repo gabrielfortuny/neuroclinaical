@@ -40,13 +40,13 @@ class pdf_upload_handler:
             image_num = 0
             for page in range(len(doc)):
                 images = doc[page].get_images()
-                for _, image in images:
+                for image in images:
                     im = ExtractedImage(report_id=report_id)
                     db.session.add(im)
                     xref = image[0] 
                     base_image = doc.extract_image(xref)
-                    image_bytes = image["image"]
-                    ext = image["ext"]
+                    image_bytes = base_image["image"]
+                    ext = base_image["ext"]
                     final_path = f"{storage_path}/{report_id}_image{image_num}.{ext}"
                     im.file_path = final_path
                     image_num += 1
@@ -84,7 +84,7 @@ class docx_upload_handler:
 
     def extract_image_from_docx(self, filepath:str, storage_path:str, report_id: int):
         try:
-            with zipfile.Zipfile(filepath, 'r') as docx:
+            with zipfile.ZipFile(filepath, 'r') as docx:
                 image_num = 0
                 for item in docx.namelist():
                     if item.startswith("word/media/"):
