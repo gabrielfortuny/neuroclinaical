@@ -121,7 +121,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     
     return drugs
 
-def handle_question_request():
+def handle_chat_request():
     pass
 
 def send_request_to_model(payload: Dict[str, Any]) -> str:

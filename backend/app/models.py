@@ -89,7 +89,7 @@ class ExtractedImage(db.Model):
     report_id = db.Column(
         db.Integer, db.ForeignKey("reports.id", ondelete="CASCADE"), nullable=False
     )
-    file_path = db.Column(db.Text, nullable=False)
+    file_path = db.Column(db.Text, nullable=True)
 
     report = db.relationship("Report", back_populates="extracted_images")
 
