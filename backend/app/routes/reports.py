@@ -72,8 +72,8 @@ def upload_report():
             file_name=filename
         )
 
-        if not upload_controller(filetype, file_path, patient_id, new_report):
-            raise Exception
+        #if not upload_controller(filetype, file_path, patient_id, new_report):
+        #    raise Exception
 
         db.session.add(new_report)
 
