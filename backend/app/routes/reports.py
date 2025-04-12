@@ -145,7 +145,7 @@ def delete_report(report_id):
     try:
         # First fetch the report details to get the filepath
         result = db.session.execute(
-            text("SELECT filepath FROM reports WHERE id = :report_id"),
+            text("SELECT file_path FROM reports WHERE id = :report_id"),
             {"report_id": report_id},
         )
 
@@ -155,7 +155,7 @@ def delete_report(report_id):
             return jsonify({"error": "Report not found"}), 404
 
         # Store filepath for later deletion
-        filepath = report.filepath
+        filepath = report.file_path
 
         # Ensure we're using absolute path
         if not os.path.isabs(filepath):
