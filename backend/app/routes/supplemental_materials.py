@@ -9,7 +9,7 @@ from app import db
 supplemental_materials_bp = Blueprint("suppleMat", __name__)
 
 @supplemental_materials_bp.route("", methods=["POST"])
-@jwt_required()
+# @jwt_required()
 def upload_supplemental_material():
     # Verify multipart/form-data request
     if not request.files or 'file' not in request.files:
