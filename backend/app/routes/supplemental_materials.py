@@ -60,15 +60,13 @@ def upload_supplemental_material():
         result = db.session.execute(
             text("""
                 INSERT INTO supplemental_materials 
-                (patient_id, filepath, created_at, modified_at)
-                VALUES (:patient_id, :filepath, :created_at, :modified_at)
+                (patient_id, file_path)
+                VALUES (:patient_id, :file_path)
                 RETURNING id
             """),
             {
                 "patient_id": patient_id,
-                "filepath": file_path,
-                "created_at": datetime.now(),
-                "modified_at": datetime.now()
+                "file_path": file_path,
             }
         )
         
@@ -79,7 +77,7 @@ def upload_supplemental_material():
             "message": "Supplemental material uploaded successfully",
             "material_id": material_id,
             "patient_id": patient_id,
-            "filepath": file_path
+            "file_path": file_path
         }), 201
         
     except Exception as e:
@@ -141,7 +139,7 @@ def download_supplemental_material(id):
         return jsonify({"error": "Failed to download supplemental material"}), 500
 
 @supplemental_materials_bp.route("/<int:id>", methods=["DELETE"])
-@jwt_required()
+# @jwt_required()
 def delete_supplemental_material(id):
     # Import required modules
     from sqlalchemy import text
@@ -152,7 +150,7 @@ def delete_supplemental_material(id):
     try:
         # First fetch the supplemental material details to get the filepath
         result = db.session.execute(
-            text("SELECT filepath FROM supplemental_materials WHERE id = :id"),
+            text("SELECT file_path FROM supplemental_materials WHERE id = :id"),
             {"id": id}
         )
         
@@ -162,7 +160,7 @@ def delete_supplemental_material(id):
             return jsonify({"error": "Supplemental material not found"}), 404
             
         # Store filepath for later deletion
-        filepath = material.filepath
+        filepath = material.file_path
         
         # Delete the supplemental material from the database
         db.session.execute(

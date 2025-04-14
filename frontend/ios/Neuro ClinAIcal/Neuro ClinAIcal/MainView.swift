@@ -15,7 +15,6 @@ enum PatientOption {
 
 struct MainView: View {
     @EnvironmentObject private var sessionManager: SessionManager
-//    @StateObject private var viewModel = PatientViewModel()
     
     @State private var patients: [Patient] = []
     @State private var expandedPatientID: Int? = nil

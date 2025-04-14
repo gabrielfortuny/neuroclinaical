@@ -193,10 +193,7 @@ def get_patient_supplemental_materials(patient_id):
     data = [
         {
             "id": material.id,
-            "filepath": material.filepath,
-            "created_at": (
-                material.created_at.isoformat() if material.created_at else None
-            ),
+            "file_path": material.file_path,
         }
         for material in patient.supplemental_materials
     ]

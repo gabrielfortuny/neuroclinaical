@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Session: Identifiable, Codable {
-    let id: Int?
+    let id: Int
     var ltmFile: LTMFile? = nil
-//    var supplementaryFiles: [File] = []
+    var supplementaryFiles: [SupplementaryFile] = []
 }

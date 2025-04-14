@@ -180,4 +180,86 @@ class SessionManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
     }
+    
+    func fetchSupplementalMaterials(forPatientId patientId: Int) async throws -> [SupplementaryFile] {
+        // Construct the URL.
+        guard let url = URL(string: "\(Self.baseURL)/patients/\(patientId)/supplemental_materials") else {
+            throw URLError(.badURL)
+        }
+        
+        // Create the GET request and set the Accept header.
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        // Fetch the data.
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        // Ensure we have a valid HTTP response with status code 200.
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        // Decode the JSON into an array of SupplementalMaterial.
+        let decoder = JSONDecoder()
+        // Use the ISO8601 strategy if your dates follow ISO8601 format.
+        decoder.dateDecodingStrategy = .iso8601
+        guard let supplementalMaterials = try? decoder.decode([SupplementaryFile].self, from: data) else {
+            throw URLError(.cannotParseResponse)
+        }
+        
+        return supplementalMaterials
+    }
+    
+    func uploadSupplementaryFile(forPatientId patientId: Int, fileURL: URL) async throws {
+        // Read the raw file data.
+        let fileData = try Data(contentsOf: fileURL)
+        
+        // Use Alamofire's multipart upload.
+        let responseData = try await AF.upload(multipartFormData: { mpFD in
+            // Append patient_id field.
+            if let patientIdData = "\(patientId)".data(using: .utf8) {
+                mpFD.append(patientIdData, withName: "patient_id")
+            }
+            // Append file field with raw binary data.
+            mpFD.append(fileData, withName: "file", fileName: fileURL.lastPathComponent)
+        }, to: "\(Self.baseURL)/supplemental_materials", method: .post)
+        .validate(statusCode: 201..<300)
+        .serializingData().value
+        
+        print("Supplementary file uploaded successfully, response data: \(responseData)")
+    }
+    
+    func deleteSupplementaryFile(fileID: Int) async throws {
+        // Construct the full URL using the provided material ID.
+        guard let url = URL(string: "\(Self.baseURL)/supplemental_materials/\(fileID)") else {
+            throw URLError(.badURL)
+        }
+        
+        // Create a URLRequest and set the HTTP method to DELETE.
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        // Execute the request.
+        let (_, response) = try await URLSession.shared.data(for: request)
+        
+        // Ensure we have a valid HTTP response.
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        
+        // Check the status code to determine whether the deletion was successful.
+        switch httpResponse.statusCode {
+        case 204:
+            print("Supplemental material deleted successfully")
+        case 404:
+            // You can throw a URLError for a not-found case.
+            throw URLError(.fileDoesNotExist)
+        case 401:
+            // Unauthorized error.
+            throw URLError(.userAuthenticationRequired)
+        default:
+            throw URLError(.badServerResponse)
+        }
+    }
 }

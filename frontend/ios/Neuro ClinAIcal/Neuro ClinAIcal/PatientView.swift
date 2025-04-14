@@ -24,6 +24,11 @@ enum InfoOption: Equatable {
     }
 }
 
+enum FileType: Equatable {
+    case report
+    case supplemental
+}
+
 struct PatientView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     var patient: Patient
@@ -31,10 +36,10 @@ struct PatientView: View {
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
-    @State private var expandedSessionID: Int? = nil
+    @State private var expandedSessionID: Int? = 0
     
-    @State private var importedFileURL: URL? = nil
-    @State private var isImportingLTMFile = false
+    @State private var importedReportURL: URL? = nil
+    @State private var importedSupplementalURL: URL? = nil
     var allowedTypes: [UTType] {
         var types: [UTType] = [.pdf]
         // For DOC files:
@@ -49,7 +54,7 @@ struct PatientView: View {
     }
     @State private var isImportingSupplementary = false
     
-    @State private var sessions: [Session] = [Session(id: 0)]
+    @State private var session: Session = Session(id: 0)
     @State private var summary: String? = nil
 
     // Function for bottom navigation buttons
@@ -108,28 +113,6 @@ struct PatientView: View {
         }
     }
     
-    private func importFileButton() -> some View {
-        Button("Import File") {
-            isImportingLTMFile = true
-        }
-        .foregroundColor(.blue)
-        .fileImporter(
-            isPresented: $isImportingLTMFile,
-            allowedContentTypes: allowedTypes,
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    importedFileURL = url
-                    print("Imported file: \(url.absoluteString)")
-                }
-            case .failure(let error):
-                print("File import error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
     private func renderLTMFile(_ session: Session) -> some View {
         VStack {
             HStack {
@@ -164,20 +147,11 @@ struct PatientView: View {
                     Text("No LTM added")
                         .foregroundColor(.gray)
                     Spacer()
-                    importFileButton()
-                    .onChange(of: importedFileURL) { oldValue, newValue in
-                        if let newValue = newValue {
-                            Task {
-                                do {
-                                    print("Uploading LTM Report: \(newValue)")
-                                    try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: newValue)
-                                    try await refresh()
-                                } catch {
-                                    print("Error uploading report: \(error)")
-                                }
-                            }
-                            importedFileURL = nil
-                        }
+                    FileImporterView(importedFileURL: $importedReportURL,
+                                   allowedTypes: allowedTypes,
+                                   buttonTitle: "Import LTM") { fileURL in
+                        try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: fileURL)
+                        try await refresh()
                     }
                 }
             } // HStack 2
@@ -185,7 +159,7 @@ struct PatientView: View {
         .padding()
     }
     
-    /*private func renderSupplementaryFiles(_ session: Session) -> some View {
+    private func renderSupplementaryFiles(_ session: Session) -> some View {
         // Start Supplementary File Code
         VStack (alignment: .leading, spacing: 8) {
             HStack {
@@ -197,9 +171,9 @@ struct PatientView: View {
             Divider()
                 .background(Color.gray)
             
-            ForEach(supplementaryFiles, id: \.id) { file in
+            /*ForEach(session.supplementaryFiles) { file in
                 HStack {
-                    Text(file.url.lastPathComponent)
+                    Text(file.filepath)
                         .foregroundColor(.blue)
                         .underline()
                     Spacer()
@@ -212,38 +186,44 @@ struct PatientView: View {
                             .foregroundColor(.red)
                     }
                 }
+            }*/
+            
+            ForEach(session.supplementaryFiles) { file in
+                HStack {
+                    Text(file.filepath)
+                        .foregroundColor(.blue)
+                        .underline()
+                    Spacer()
+                    Button {
+                        Task {
+                            do {
+                                try await sessionManager.deleteSupplementaryFile(fileID: file.id)
+                                try await refresh()
+                            } catch {
+                                print("Error deleting report: \(error)")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
             }
             
-            Button("Add New File") {
-                isImportingSupplementary = true
-            }
-            .foregroundColor(.blue)
-            .fileImporter(
-                isPresented: $isImportingSupplementary,
-                allowedContentTypes: allowedTypes,
-                allowsMultipleSelection: false
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    if let url = urls.first {
-//                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-//                            patient.sessions[index].supplementaryFiles.append(File(id: /* provide an id */, url: url))
-//                        }
-                        print("Upload Supplementary File Success: \(url.absoluteString)")
-                    }
-                case .failure(let error):
-                    print("Supplementary file import error: \(error.localizedDescription)")
-                }
+            FileImporterView(importedFileURL: $importedSupplementalURL,
+               allowedTypes: allowedTypes,
+               buttonTitle: "Add New File") { fileURL in
+                try await sessionManager.uploadSupplementaryFile(forPatientId: patient.id, fileURL: fileURL)
+                try await refresh()
             }
         }
         .padding()
         // End Supplementary File Code
-    }*/
+    }
     
     @ViewBuilder
     private func viewFileContent() -> some View {
-        ForEach (Array(sessions)) {
-            session in ScrollView {
+        ScrollView {
                 /*HStack {
                     Text("Session \(index + 1)")
                         .foregroundColor(.black)
@@ -254,11 +234,10 @@ struct PatientView: View {
                 .padding(.horizontal, 10)
                 .font(.title2)*/
                 
-                // Supossed to be expandedSessionID == session.id
-                if session.id == session.id {
+                 if expandedSessionID == session.id {
                     renderLTMFile(session)
-//                        renderSupplementaryFiles(session)
-//                    Spacer()
+                    renderSupplementaryFiles(session)
+                    // Spacer()
                            
                     /*Button("Delete Session") {
                         patient.deleteSession(withId: session.id)
@@ -270,7 +249,7 @@ struct PatientView: View {
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(5)
                     .frame(alignment: .center)*/
-                }
+                 }
             } // ScrollView
             .background(Color.white)
             /*.onTapGesture {
@@ -280,7 +259,6 @@ struct PatientView: View {
                     expandedSessionID = session.id
                 }
             }*/
-        } // ForEach
 
         /*Button(action: {
             patient.sessions.append(Session())
@@ -295,8 +273,9 @@ struct PatientView: View {
     } // viewFileContet()
     
     private func refresh() async throws {
-        sessions[0].ltmFile = try await sessionManager.fetchFirstReportID(forPatientId: patient.id)
-        print("LTM File Location (refresh): \(sessions[0].ltmFile?.filePath ?? "Not Found")")
+        session.ltmFile = try await sessionManager.fetchFirstReportID(forPatientId: patient.id)
+        session.supplementaryFiles = try await sessionManager.fetchSupplementalMaterials(forPatientId: patient.id)
+        print("Ran Refresh")
     }
     
     var body: some View {
