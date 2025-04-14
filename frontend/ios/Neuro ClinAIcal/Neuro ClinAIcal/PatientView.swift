@@ -36,7 +36,6 @@ struct PatientView: View {
     let backgroundColor = Color(red: 80/255, green: 134/255, blue: 98/255)
     @State private var selectedTab: InfoOption = .viewFile
     @Environment(\.presentationMode) var presentationMode
-    @State private var expandedSessionID: Int? = 0
     
     @State private var importedReportURL: URL? = nil
     @State private var importedSupplementalURL: URL? = nil
@@ -55,7 +54,6 @@ struct PatientView: View {
     @State private var isImportingSupplementary = false
     
     @State private var session: Session = Session(id: 0)
-    @State private var summary: String? = nil
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -171,23 +169,6 @@ struct PatientView: View {
             Divider()
                 .background(Color.gray)
             
-            /*ForEach(session.supplementaryFiles) { file in
-                HStack {
-                    Text(file.filepath)
-                        .foregroundColor(.blue)
-                        .underline()
-                    Spacer()
-                    Button {
-                        if let index = patient.sessions.firstIndex(where: { $0.id == session.id }) {
-                            patient.sessions[index].supplementaryFiles.removeAll(where: { $0.id == file.id })
-                        }
-                    } label: {
-                        Image(systemName: "trash")
-                            .foregroundColor(.red)
-                    }
-                }
-            }*/
-            
             ForEach(session.supplementaryFiles) { file in
                 HStack {
                     Text(file.filepath)
@@ -224,52 +205,10 @@ struct PatientView: View {
     @ViewBuilder
     private func viewFileContent() -> some View {
         ScrollView {
-                /*HStack {
-                    Text("Session \(index + 1)")
-                        .foregroundColor(.black)
-                    Spacer()
-                    Image(systemName: expandedSessionID == session.id ? "minus.circle" : "plus.circle")
-                        .foregroundColor(.black)
-                }
-                .padding(.horizontal, 10)
-                .font(.title2)*/
-                
-                 if expandedSessionID == session.id {
-                    renderLTMFile(session)
-                    renderSupplementaryFiles(session)
-                    // Spacer()
-                           
-                    /*Button("Delete Session") {
-                        patient.deleteSession(withId: session.id)
-                        expandedSessionID = nil
-                    }
-                    .font(.headline)
-                    .padding(10)
-                    .foregroundColor(.red)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(5)
-                    .frame(alignment: .center)*/
-                 }
+                renderLTMFile(session)
+                renderSupplementaryFiles(session)
             } // ScrollView
             .background(Color.white)
-            /*.onTapGesture {
-                if expandedSessionID == session.id {
-                    expandedSessionID = nil
-                } else {
-                    expandedSessionID = session.id
-                }
-            }*/
-
-        /*Button(action: {
-            patient.sessions.append(Session())
-        }) {
-            Text("Add Session")
-                .font(.headline)
-                .foregroundColor(.black)
-                .frame(maxWidth: 150, minHeight: 50)
-                .background(Color.white)
-                .cornerRadius(8)
-        }*/
     } // viewFileContet()
     
     private func refresh() async throws {
