@@ -125,6 +125,30 @@ class SessionManager: ObservableObject {
         return decodedLTMFiles.first
     }
     
+    func downloadReport(reportId: Int) async throws -> Data {
+        guard let url = URL(string: "\(Self.baseURL)/reports/\(reportId)/download") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        
+        switch httpResponse.statusCode {
+        case 200:
+            return data
+        case 404:
+            throw URLError(.fileDoesNotExist)
+        default:
+            throw URLError(.badServerResponse)
+        }
+    }
+    
     func uploadReport(forPatientId patientId: Int, fileURL: URL) async throws {
         let fileType = fileURL.pathExtension.lowercased()
         
@@ -209,6 +233,30 @@ class SessionManager: ObservableObject {
         }
         
         return supplementalMaterials
+    }
+    
+    func downloadSupplementalMaterial(materialId: Int) async throws -> Data {
+        guard let url = URL(string: "\(Self.baseURL)/supplemental_materials/\(materialId)/download") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            return data
+        case 404:
+            throw URLError(.fileDoesNotExist)
+        default:
+            throw URLError(.badServerResponse)
+        }
     }
     
     func uploadSupplementaryFile(forPatientId patientId: Int, fileURL: URL) async throws {
