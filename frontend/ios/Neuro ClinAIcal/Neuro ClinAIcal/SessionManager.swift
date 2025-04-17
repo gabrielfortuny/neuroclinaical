@@ -310,4 +310,48 @@ class SessionManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
     }
+    
+    func fetchSeizures(forPatientId patientId: Int) async throws -> [Seizure] {
+        guard let url = URL(string: "\(Self.baseURL)/patients/\(patientId)/seizures") else {
+            throw URLError(.badURL)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let seizures = try? decoder.decode([Seizure].self, from: data) else {
+            throw URLError(.cannotParseResponse)
+        }
+        return seizures
+    }
+    
+    func fetchDrugAdministration(forPatientId patientId: Int) async throws -> [DrugAdministration] {
+        guard let url = URL(string: "\(Self.baseURL)/patients/\(patientId)/drug_administration") else {
+            throw URLError(.badURL)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+
+        let decoder = JSONDecoder()
+        guard let history = try? decoder.decode([DrugAdministration].self, from: data) else {
+            throw URLError(.cannotParseResponse)
+        }
+
+        return history
+    }
 }
