@@ -97,7 +97,7 @@ def download_supplemental_material(id):
     try:
         # Query the database to get the supplemental material
         result = db.session.execute(
-            text("SELECT filepath FROM supplemental_materials WHERE id = :id"),
+            text("SELECT file_path FROM supplemental_materials WHERE id = :id"),
             {"id": id}
         )
         
@@ -107,7 +107,7 @@ def download_supplemental_material(id):
         #    return jsonify({"error": "Supplemental material not found"}), 404
             
         # Fix path resolution - ensure we're using absolute path
-        file_path = material.filepath
+        file_path = material.file_path
         if not file_path.startswith('/'):
             # If we need to construct a full path
             file_path = os.path.join('/workspaces/project/backend', file_path)
