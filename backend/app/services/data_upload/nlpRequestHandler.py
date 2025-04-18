@@ -19,7 +19,7 @@ def handle_summary_request(data: str) -> str:
     try:
         payload = {
             "model": MODEL_NAME,
-            "prompt": f"Give a summary of the report: {data}",
+            "prompt": f"Give a summary of the report: {data}. Do NOT ask any followup questions. Be analytical and professional. Simply give a summary",
             "stream": False,
         }
         current_app.logger.info("Sending summary request to model")

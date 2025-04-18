@@ -77,19 +77,23 @@ def upload_report():
 
         db.session.add(new_report)
 
-        print(f"reports_dir: {reports_dir}")
-        db.session.commit()
+        db.session.flush()                  #  ↶ gets new_report.id without final commit
 
-        return (
-            jsonify(
-                {
-                    "message": "Report uploaded successfully",
-                    "report_id": new_report.id,
-                    "patient_id": patient_id,
-                }
-            ),
-            201,
+        success = upload_controller(
+            filetype,          # "docx" / "pdf"
+            file_path,         # absolute path on disk
+            patient_id,        # p_id
+            new_report         # the ORM object we just created
         )
+
+        if not success:
+            db.session.rollback()
+            return jsonify({"error": "File processing error"}), 500
+
+        db.session.commit()                 # finalise insert + summary update
+        return jsonify({"message": "Report uploaded successfully",
+                        "report_id": new_report.id,
+                        "patient_id": patient_id}), 201
 
     except Exception as e:
         db.session.rollback()
