@@ -101,7 +101,11 @@ struct PatientView: View {
     
     private func summaryContent() -> some View {
         ScrollView {
-            Text("Summary")
+            if let ltmFile = session.ltmFile {
+                Text(ltmFile.summary)
+            } else {
+                Text("No Long Term Monitoring Report")
+            }
         }
     }
     
