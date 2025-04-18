@@ -53,6 +53,10 @@ struct PatientView: View {
     }
     @State private var isImportingSupplementary = false
     
+    @State private var documentToExport: DataFileDocument? = nil
+    @State private var exportFilename: String = ""
+    @State private var showingExporter = false
+    
     @State private var session: Session = Session(id: 0)
 
     // Function for bottom navigation buttons
@@ -97,22 +101,25 @@ struct PatientView: View {
         ScrollView {
             Text("Ask Question MVP")
         }
+        .padding()
     }
     
     private func summaryContent() -> some View {
         ScrollView {
             if let ltmFile = session.ltmFile {
-                Text(ltmFile.summary)
+                Text(.init(ltmFile.summary))
             } else {
                 Text("No Long Term Monitoring Report")
             }
         }
+        .padding()
     }
     
     private func dataContent() -> some View {
         ScrollView {
             Text("Data")
         }
+        .padding()
     }
     
     private func renderLTMFile(_ session: Session) -> some View {
@@ -128,9 +135,24 @@ struct PatientView: View {
             
             HStack {
                 if let file = session.ltmFile {
-                    Text(file.filePath)
-                        .foregroundColor(.blue)
-                        .underline()
+                    if let fileName = file.filePath.split(separator: "/").last {
+                        Text(fileName)
+                            .foregroundColor(.blue)
+                            .underline()
+                            .onTapGesture {
+                                print("Tapped LTM File")
+                                Task {
+                                    do {
+                                        let data = try await sessionManager.downloadReport(reportId: file.reportId)
+                                        exportFilename = String(fileName)
+                                        documentToExport = DataFileDocument(data: data)
+                                        showingExporter = true
+                                    } catch {
+                                        print("Error downloading report: \(error)")
+                                    }
+                                }
+                            }
+                    }
                     Spacer()
                     Button {
                         Task {
@@ -175,9 +197,24 @@ struct PatientView: View {
             
             ForEach(session.supplementaryFiles) { file in
                 HStack {
-                    Text(file.filepath)
-                        .foregroundColor(.blue)
-                        .underline()
+                    if let fileName = file.filepath.split(separator: "/").last {
+                        Text(fileName)
+                            .foregroundColor(.blue)
+                            .underline()
+                            .onTapGesture {
+                                print("Tapped LTM File")
+                                Task {
+                                    do {
+                                        let data = try await sessionManager.downloadSupplementalMaterial(materialId: file.id)
+                                        exportFilename = String(fileName)
+                                        documentToExport = DataFileDocument(data: data)
+                                        showingExporter = true
+                                    } catch {
+                                        print("Error downloading report: \(error)")
+                                    }
+                                }
+                            }
+                    }
                     Spacer()
                     Button {
                         Task {
@@ -266,6 +303,19 @@ struct PatientView: View {
             } catch {
                 print("Error fetching report: \(error)")
             }
+        }
+        .fileExporter(
+          isPresented: $showingExporter,
+          document: documentToExport,
+          contentType: .data,
+          defaultFilename: exportFilename
+        ) { result in
+          switch result {
+          case .success:
+            print("User chose a location and saved the file.")
+          case .failure(let err):
+            print("Export failed:", err)
+          }
         }
     }
 }
