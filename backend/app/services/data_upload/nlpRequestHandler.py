@@ -3,7 +3,6 @@ import urllib
 import json
 import traceback
 from typing import List, Dict, Any
-from backend.app.services.data_upload.uploadUtilities import find_top_k_similar
 from flask import current_app
 
 # Import validation functions from the module
@@ -122,31 +121,8 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     
     return drugs
 
-def handle_chat_request(text):
-    question = "What does a type 3 seizure look like?"
-    k = 5  # Reduced for more focused results
-
-    # Get and display results
-    top_paragraphs = find_top_k_similar(text, question, k)
-    query = ""
-
-    query = query + f"\nQuestion: '{question}'\n"
-    query = query + f"Top {k} Most Relevant Answers:"
-    query = query + '='*50
-    for idx, result in enumerate(top_paragraphs, 1):
-        query = query + f"\nMatch #{idx} (Similarity: {result['similarity']:.3f}):"
-        query = query + '-'*50 
-        query = query + result["paragraph"]
-
-    payload = {
-                "model": MODEL_NAME,
-                "prompt": query,
-                "stream": False,
-            }
-    
-    response = send_request_to_model(payload=payload)
-
-    return response
+def handle_chat_request():
+    pass
 
 def send_request_to_model(payload: Dict[str, Any]) -> str:
     """Send a request to the Ollama model and return the response."""
