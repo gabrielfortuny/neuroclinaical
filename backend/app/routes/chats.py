@@ -20,7 +20,7 @@ def send_message(report_id):
         report = db.session.get( Report, report_id)
         if not report:
             current_app.logger.error(f"Error uploading report")
-            return 404
+            return jsonify({"error": "Report not found"}), 404
         _, content_ext = os.path.splitext(report.file_name)
         current_app.logger.error(f"{content_ext}")
         # Extract text from file
