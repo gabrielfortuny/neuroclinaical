@@ -7,8 +7,9 @@ from flask import current_app
 #from app.__init__ import db
 from app import db
 from app.models import Report, ExtractedImage
-from app.services.data_upload.nlpRequestHandler import handle_summary_request
+from app.services.data_upload.nlpRequestHandler import handle_drugadmin_request, handle_seizure_request, handle_summary_request
 from app.services.data_upload.uploadUtilities import (
+    extract_days_from_text,
     store_drugs_array,
     store_seizures_array,
 )
@@ -161,6 +162,11 @@ def upload_controller(content_ext: str,
     # ---- 3.  persist -------------------------------------------------------
     try:
         report.summary = summary.strip()
+        days = extract_days_from_text(extracted_text)
+        seizures = handle_seizure_request(days)
+        store_seizures_array(seizures, p_id)
+        drug_admin = handle_drugadmin_request(days)
+        store_drugs_array(drug_admin, p_id)
         db.session.commit()
         current_app.logger.info("Report summary saved")
         return True
