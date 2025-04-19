@@ -934,7 +934,7 @@ paths:
         "500":
           description: Server error.
 
-  /chat/{report_id}/messages:
+  /chat/{patient_id}/messages:
     post:
       summary: Send a message to the AI (conversation auto-created if needed)
       description: Sends a message from the authenticated user regarding a patient. If a conversation doesn’t already exist for the user–patient pair, one is created automatically.
@@ -944,12 +944,12 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - name: report_id
+        - name: patient_id
           in: path
           required: true
           schema:
             type: integer
-          description: The report ID the conversation is about.
+          description: The patient ID the conversation is about.
       requestBody:
         required: true
         content:
@@ -970,9 +970,15 @@ paths:
               schema:
                 type: object
                 properties:
+                  message_id:
+                    type: integer
+                    example: 87
                   response:
                     type: string
                     example: "The patient is prescribed 200mg Carbamazepine daily for 5 days."
+                  created_at:
+                    type: string
+                    format: date-time
         "400":
           description: Invalid input.
         "401":

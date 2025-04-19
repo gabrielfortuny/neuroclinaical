@@ -69,26 +69,31 @@ def upload_report():
             patient_id=patient_id,
             summary=f"Report uploaded for patient {patient_id}",
             file_path=file_path,
+            file_name=filename
         )
 
-        if not upload_controller(filetype, file_path, patient_id, new_report):
-            raise Exception
+        #if not upload_controller(filetype, file_path, patient_id, new_report):
+        #    raise Exception
 
         db.session.add(new_report)
 
-        print(f"reports_dir: {reports_dir}")
-        db.session.commit()
+        db.session.flush()                  #  ↶ gets new_report.id without final commit
 
-        return (
-            jsonify(
-                {
-                    "message": "Report uploaded successfully",
-                    "report_id": new_report.id,
-                    "patient_id": patient_id,
-                }
-            ),
-            201,
+        success = upload_controller(
+            filetype,          # "docx" / "pdf"
+            file_path,         # absolute path on disk
+            patient_id,        # p_id
+            new_report         # the ORM object we just created
         )
+
+        if not success:
+            db.session.rollback()
+            return jsonify({"error": "File processing error"}), 500
+
+        db.session.commit()                 # finalise insert + summary update
+        return jsonify({"message": "Report uploaded successfully",
+                        "report_id": new_report.id,
+                        "patient_id": patient_id}), 201
 
     except Exception as e:
         db.session.rollback()
@@ -144,7 +149,7 @@ def delete_report(report_id):
     try:
         # First fetch the report details to get the filepath
         result = db.session.execute(
-            text("SELECT filepath FROM reports WHERE id = :report_id"),
+            text("SELECT file_path FROM reports WHERE id = :report_id"),
             {"report_id": report_id},
         )
 
@@ -154,7 +159,7 @@ def delete_report(report_id):
             return jsonify({"error": "Report not found"}), 404
 
         # Store filepath for later deletion
-        filepath = report.filepath
+        filepath = report.file_path
 
         # Ensure we're using absolute path
         if not os.path.isabs(filepath):
@@ -201,17 +206,17 @@ def download_report(report_id):
     try:
         # Query the database to get the report
         result = db.session.execute(
-            text("SELECT filepath, filetype FROM reports WHERE id = :report_id"),
+            text("SELECT file_path, file_name FROM reports WHERE id = :report_id"),
             {"report_id": report_id},
         )
 
         report = result.fetchone()
 
-        if not report or not report.filepath:
+        if not report or not report.file_path:
             return jsonify({"error": "Report not found"}), 404
 
         # Ensure we're using absolute path
-        file_path = report.filepath
+        file_path = report.file_path
         if not os.path.isabs(file_path):
             file_path = os.path.abspath(file_path)
 
@@ -223,35 +228,38 @@ def download_report(report_id):
             return jsonify({"error": "Report file not found on server"}), 404
 
         # Determine content type based on file extension
+        '''
         content_type = None
-        if report.filetype:
-            if report.filetype.lower() == "pdf":
-                content_type = "application/pdf"
-            elif report.filetype.lower() in ["docx", "doc"]:
-                content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            elif report.filetype.lower() == "txt":
-                content_type = "text/plain"
-            elif report.filetype.lower() in ["odt"]:
-                content_type = "application/vnd.oasis.opendocument.text"
-            elif report.filetype.lower() in ["mp4"]:
-                content_type = "video/mp4"
 
+        if report.file_type:
+            if report.file_type.lower() == "pdf":
+                content_type = "application/pdf"
+            elif report.file_type.lower() in ["docx", "doc"]:
+                content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            elif report.file_type.lower() == "txt":
+                content_type = "text/plain"
+            elif report.file_type.lower() in ["odt"]:
+                content_type = "application/vnd.oasis.opendocument.text"
+            elif report.file_type.lower() in ["mp4"]:
+                content_type = "video/mp4"
+        '''
         # If we couldn't determine the content type from our mapping, try to guess it
+        '''
         if not content_type:
             content_type = (
                 mimetypes.guess_type(file_path)[0] or "application/octet-stream"
             )
-
+        '''
         # Get the filename from the path
         filename = os.path.basename(file_path)
 
-        current_app.logger.info(
-            f"Sending file: {filename} with content type: {content_type}"
-        )
+        #current_app.logger.info(
+            #f"Sending file: {filename} with content type: {content_type}"
+        #)
 
         # Send the file with appropriate headers
         return send_file(
-            file_path, mimetype=content_type, as_attachment=True, download_name=filename
+            file_path, mimetype="document", as_attachment=True, download_name=filename
         )
 
     except Exception as e:

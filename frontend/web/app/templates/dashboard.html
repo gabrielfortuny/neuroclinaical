@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <h1>Patient Dashboard</h1>
+  {% if patients %}
+    <ul>
+      {% for patient in patients %}
+        <li>
+          <a href="#">{{ patient.name }}</a>
+          <!-- In the future: link to detail route -->
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No patients available.</p>
+  {% endif %}
+{% endblock %}

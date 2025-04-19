@@ -1,0 +1,130 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/static/fonts/Inter-4.1/web/Inter-Regular.woff2") format("woff2"), url("/static/fonts/Inter-4.1/web/Inter-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/static/fonts/Inter-4.1/web/Inter-Bold.woff2") format("woff2"), url("/static/fonts/Inter-4.1/web/Inter-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Default (light mode) */
+:root {
+  --primary: #1c5532;
+  --background: #f9f9f9;
+  --footer: #e6e6e6;
+  --text: #000000;
+  --links: #1c5532;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #1c5532;
+    --background: #1f2937;
+    --footer: #171e29;
+    --text: #e0e0e0;
+    --links: #508662;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: var(--background);
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+}
+
+p {
+  font-weight: 400;
+}
+
+a {
+  color: var(--links);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+header {
+  background-color: var(--primary);
+  padding: 0.5em 1em;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header nav .nav-home {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+header nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1em;
+  font-size: 1em;
+}
+
+header nav a {
+  color: white;
+  text-decoration: none;
+}
+
+header nav a:hover {
+  text-decoration: underline;
+}
+
+main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 20px 20px 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+footer {
+  background-color: var(--footer);
+  padding: 0.25em;
+  font-size: 0.75em;
+  text-align: center;
+}
+
+footer a {
+  text-decoration: none;
+  color: var(--footer-link);
+}
+
+footer a:hover {
+  text-decoration: underline;
+}

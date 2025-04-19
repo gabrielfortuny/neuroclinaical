@@ -55,6 +55,19 @@ services:
       - ollama-external
     restart: unless-stopped
 
+  web:
+    build: ./frontend/web
+    environment:
+      - BACKEND_API=http://flask:5000
+    depends_on:
+      - flask
+    networks:
+      - public-network
+    ports:
+      - "8001:5001"
+    volumes:
+      - ./frontend/web:/app
+
 volumes:
   postgres_data:
   ollama_data:

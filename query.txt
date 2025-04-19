@@ -1,0 +1,195 @@
+Repository structure:
+```
+.
+├── .gitignore
+├── README.md
+├── backend
+│   ├── .dockerignore
+│   ├── Dockerfile
+│   ├── NeuroClin
+│   │   ├── reports
+│   │   │   └── 1
+│   │   │       ├── 20250323230950_SamplePolo.mp4
+│   │   │       ├── 20250323231045_SamplePolo.mp4
+│   │   │       ├── 20250323231114_SamplePolo.mp4
+│   │   │       ├── 20250323231234_SamplePolo.mp4
+│   │   │       ├── 20250323231236_SamplePolo.mp4
+│   │   │       ├── 20250323231244_SamplePolo.mp4
+│   │   │       ├── 20250323231348_SamplePolo.mp4
+│   │   │       ├── 20250323231459_SamplePolo.mp4
+│   │   │       ├── 20250323231510_SamplePolo.mp4
+│   │   │       ├── 20250323231652_SamplePolo.mp4
+│   │   │       ├── 20250323231703_SamplePolo.mp4
+│   │   │       ├── 20250323231737_SamplePolo.mp4
+│   │   │       ├── 20250323231917_SamplePolo.mp4
+│   │   │       ├── 20250323232000_SamplePolo.mp4
+│   │   │       ├── 20250323232042_SamplePolo.mp4
+│   │   │       ├── 20250323232225_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323232237_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323232239_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323232344_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323233423_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323233424_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323233629_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323233744_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323234027_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323234214_20250323163228_ndhB726_E2_2.docx
+│   │   │       ├── 20250323234923_testDoc.docx
+│   │   │       ├── 20250324000335_testDoc.docx
+│   │   │       ├── 20250324000929_testDoc.docx
+│   │   │       ├── 20250324001307_testDoc.docx
+│   │   │       ├── 20250324002031_testDoc.pdf
+│   │   │       ├── 20250324002609_testDoc.pdf
+│   │   │       ├── 20250324003728_testDoc.pdf
+│   │   │       ├── 20250324011355_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324011553_testDoc.docx
+│   │   │       ├── 20250324011613_testDoc.pdf
+│   │   │       ├── 20250324011938_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324012253_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324012742_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324013702_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324015424_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324015815_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324020815_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324020818_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324021340_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324021528_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324021613_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324021633_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324021752_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324023426_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324023539_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324023832_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324025631_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324025734_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324025905_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324032432_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324032525_UMHS-0123.LTM.docx
+│   │   │       ├── 20250324033551_UMHS-0123.LTM.docx
+│   │   │       ├── 20250329194557_UMHS-0123.LTM.docx
+│   │   │       ├── 20250329194851_UMHS-0123.LTM.docx
+│   │   │       ├── 20250329194903_UMHS-0123.LTM.docx
+│   │   │       ├── 20250329194912_UMHS-0123.LTM.docx
+│   │   │       └── 20250329194925_UMHS-0123.LTM.docx
+│   │   └── supplemental_materials
+│   │       └── 2
+│   ├── api
+│   │   └── authentication
+│   ├── app
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── db_utils.py
+│   │   ├── main.py
+│   │   ├── models
+│   │   ├── models.py
+│   │   ├── routes
+│   │   │   ├── __init__.py
+│   │   │   ├── chats.py
+│   │   │   ├── patients.py
+│   │   │   ├── process.py
+│   │   │   ├── reports.py
+│   │   │   ├── seizures.py
+│   │   │   ├── supplemental_materials.py
+│   │   │   └── users.py
+│   │   ├── services
+│   │   │   ├── __init__.py
+│   │   │   ├── create_graphs
+│   │   │   │   └── create_graphs.py
+│   │   │   └── data_upload
+│   │   │       ├── __init__.py
+│   │   │       ├── conversationHandlers.py
+│   │   │       ├── nlpRequestHandler.py
+│   │   │       ├── nlpValidationHandlers.py
+│   │   │       ├── uploadHandlers.py
+│   │   │       └── uploadUtilities.py
+│   │   └── utils
+│   │       ├── __init__.py
+│   │       └── authentication
+│   │           ├── __init__.py
+│   │           ├── authtokenHandler.py
+│   │           ├── jwtConfiguration.py
+│   │           └── passwordHandler.py
+│   ├── ollama
+│   │   ├── Dockerfile
+│   │   ├── Modelfile
+│   │   └── entrypoint.sh
+│   ├── requirements.txt
+│   └── uploads
+├── bin
+│   ├── make_query.sh
+│   └── nuke_docker.sh
+├── docker-compose.yml
+├── docs
+│   └── openapi.yaml
+└── frontend
+    ├── ios
+    │   └── Neuro ClinAIcal
+    │       ├── Neuro ClinAIcal
+    │       │   ├── Assets.xcassets
+    │       │   │   ├── AccentColor.colorset
+    │       │   │   │   └── Contents.json
+    │       │   │   ├── AppIcon.appiconset
+    │       │   │   │   └── Contents.json
+    │       │   │   └── Contents.json
+    │       │   ├── DrugAdministration.swift
+    │       │   ├── FileImporterView.swift
+    │       │   ├── LTMFile.swift
+    │       │   ├── MainView.swift
+    │       │   ├── Neuro_ClinAIcalApp.swift
+    │       │   ├── Patient.swift
+    │       │   ├── PatientView.swift
+    │       │   ├── Preview Content
+    │       │   │   └── Preview Assets.xcassets
+    │       │   │       └── Contents.json
+    │       │   ├── Seizure.swift
+    │       │   ├── Session.swift
+    │       │   ├── SessionManager.swift
+    │       │   ├── SettingsView.swift
+    │       │   ├── SignInView.swift
+    │       │   ├── SupplementaryFile.swift
+    │       │   └── User.swift
+    │       ├── Neuro ClinAIcal.xcodeproj
+    │       │   ├── project.pbxproj
+    │       │   └── project.xcworkspace
+    │       │       ├── contents.xcworkspacedata
+    │       │       └── xcshareddata
+    │       │           └── swiftpm
+    │       │               └── Package.resolved
+    │       ├── Neuro ClinAIcalTests
+    │       │   └── Neuro_ClinAIcalTests.swift
+    │       └── Neuro ClinAIcalUITests
+    │           ├── Neuro_ClinAIcalUITests.swift
+    │           └── Neuro_ClinAIcalUITestsLaunchTests.swift
+    └── web
+        ├── Dockerfile
+        ├── app
+        │   ├── __init__.py
+        │   ├── config.py
+        │   ├── routes
+        │   │   ├── __init__.py
+        │   │   ├── auth.py
+        │   │   ├── dashboard.py
+        │   │   └── patient.py
+        │   ├── static
+        │   │   └── css
+        │   │       └── style.css
+        │   ├── templates
+        │   │   ├── auth
+        │   │   │   ├── login.html
+        │   │   │   └── signup.html
+        │   │   ├── base.html
+        │   │   ├── dashboard.html
+        │   │   ├── partials
+        │   │   │   └── navbar.html
+        │   │   └── patient
+        │   │       └── detail.html
+        │   └── utils
+        │       └── api_client.py
+        ├── bin
+        │   ├── install
+        │   └── run
+        ├── requirements.txt
+        └── run.py
+
+47 directories, 143 files
+```

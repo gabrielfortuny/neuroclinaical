@@ -120,7 +120,7 @@ def get_patient_reports(patient_id):
         # Execute raw SQL query to get reports for the patient
         result = db.session.execute(
             text(
-                "SELECT id, patient_id, summary, filepath, created_at, modified_at, filetype FROM reports WHERE patient_id = :patient_id"
+                "SELECT id, patient_id, summary, file_path, file_name FROM reports WHERE patient_id = :patient_id"
             ),
             {"patient_id": patient_id},
         )
@@ -132,10 +132,8 @@ def get_patient_reports(patient_id):
                 "report_id": row.id,
                 "patient_id": row.patient_id,
                 "summary": row.summary,
-                "filepath": row.filepath,
-                "created_at": row.created_at.isoformat() if row.created_at else None,
-                "modified_at": row.modified_at.isoformat() if row.modified_at else None,
-                "filetype": row.filetype,
+                "file_path": row.file_path,
+                "file_name": row.file_name
             }
             data.append(report_dict)
 
@@ -195,10 +193,7 @@ def get_patient_supplemental_materials(patient_id):
     data = [
         {
             "id": material.id,
-            "filepath": material.filepath,
-            "created_at": (
-                material.created_at.isoformat() if material.created_at else None
-            ),
+            "file_path": material.file_path,
         }
         for material in patient.supplemental_materials
     ]

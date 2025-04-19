@@ -4,8 +4,10 @@ import traceback
 import zipfile
 from docx import Document
 from flask import current_app
-from app.__init__ import db
+#from app.__init__ import db
+from app import db
 from app.models import Report, ExtractedImage
+from app.services.data_upload.nlpRequestHandler import handle_summary_request
 from app.services.data_upload.uploadUtilities import (
     store_drugs_array,
     store_seizures_array,
@@ -122,56 +124,48 @@ supported_file_types = {
 # DIRECTLY USABLE UPLOAD HANDLERS:
 
 
-def upload_controller(
-    content_ext: str, file_path: str, p_id: int, report: Report
-) -> bool:
+def upload_controller(content_ext: str,
+                      file_path: str,
+                      p_id: int,
+                      report: Report) -> bool:
     """
-    Extract text from a document and set a basic summary.
-    This simplified version just extracts text and sets a basic summary.
-    
-    Args:
-        content_ext: File extension (pdf, docx)
-        file_path: Path to the uploaded file
-        p_id: The patient ID this report belongs to
-        report: The Report object to update
+    • extracts text (pdf / docx)
+    • asks Ollama for a summary
+    • writes the summary back to the Report row
+    """
+    current_app.logger.info(f"Starting upload_controller for {content_ext}: {file_path}")
 
-    Returns:
-        True if successful, False otherwise
-    """
-    current_app.logger.info(f"Starting upload_controller for {content_ext} file: {file_path}")
-    
+    # ---- 1.  scrape --------------------------------------------------------
+    storage_path = os.path.dirname(file_path)          # …reports/<patient_id>
+    extractor     = supported_file_types.get(content_ext)
+    if extractor is None:
+        current_app.logger.warning(f"Unsupported file type: {content_ext}")
+        return False
+
     try:
-        # Extract text from file
-        if content_ext not in supported_file_types:
-            current_app.logger.warning(f"Unsupported file type: {content_ext}")
-            return False
+        # NB: docx handler needs storage_path & report.id to pull out images
+        extracted_text = extractor(file_path, storage_path, report.id)
+    except Exception:
+        current_app.logger.error("Text extraction failed", exc_info=True)
+        return False
 
-        extracted_text = supported_file_types[content_ext](file_path)
-        if not extracted_text:
-            current_app.logger.warning("No text extracted from file")
-            return False
+    if not extracted_text:
+        current_app.logger.warning("No text extracted")
+        return False
 
-        current_app.logger.info(
-            f"Text extracted successfully, length: {len(extracted_text)}"
-        )
+    # ---- 2.  summarise -----------------------------------------------------
+    summary = handle_summary_request(extracted_text)
+    if not summary:                                   # model may time‑out
+        summary = extracted_text[:400] + "…"          # cheap fall‑back
 
-        # Save a basic summary
-        basic_summary = f"Document uploaded for patient {p_id}. File type: {content_ext.upper()}. Size: {len(extracted_text)} characters."
-        report.summary = basic_summary
-        
-        try:
-            db.session.commit()
-            current_app.logger.info("Updated report with basic summary")
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"Error updating summary: {str(e)}")
-            current_app.logger.error(traceback.format_exc())
-            return False
-
-        current_app.logger.info("Upload controller completed successfully")
+    # ---- 3.  persist -------------------------------------------------------
+    try:
+        report.summary = summary.strip()
+        db.session.commit()
+        current_app.logger.info("Report summary saved")
         return True
 
-    except Exception as e:
-        current_app.logger.error(f"Error in upload_controller: {str(e)}")
-        current_app.logger.error(traceback.format_exc())
+    except Exception:
+        db.session.rollback()
+        current_app.logger.error("DB commit failed", exc_info=True)
         return False

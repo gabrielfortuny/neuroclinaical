@@ -146,7 +146,7 @@ def handle_chat_request(text):
     
     response = send_request_to_model(payload=payload)
 
-    return response
+    return response;
 
 def send_request_to_model(payload: Dict[str, Any]) -> str:
     """Send a request to the Ollama model and return the response."""
