@@ -3,7 +3,7 @@ import urllib
 import json
 import traceback
 from typing import List, Dict, Any
-from backend.app.services.data_upload.uploadUtilities import find_top_k_similar
+from app.services.data_upload.uploadUtilities import find_top_k_similar
 from flask import current_app
 
 # Import validation functions from the module

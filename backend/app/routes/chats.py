@@ -1,4 +1,4 @@
-from backend.app.services.data_upload.nlpRequestHandler import handle_chat_request
+from app.services.data_upload.nlpRequestHandler import handle_chat_request
 from flask import Blueprint, request, jsonify, send_file
 from flask_restful import Api, Resource
 from app.models import Patient, Report
