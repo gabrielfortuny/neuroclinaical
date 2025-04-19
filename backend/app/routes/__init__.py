@@ -15,5 +15,5 @@ def register_routes(app):
     app.register_blueprint(
         supplemental_materials_bp, url_prefix="/supplemental_materials"
     )
-    app.register_blueprint(chats_bp, url_prefix="/chats")
+    app.register_blueprint(chats_bp, url_prefix="/chat")
     app.register_blueprint(process_bp)
