@@ -1002,6 +1002,7 @@ paths:
           schema:
             type: integer
           description: The report ID the conversation is about.
+          
       requestBody:
         required: true
         content:
