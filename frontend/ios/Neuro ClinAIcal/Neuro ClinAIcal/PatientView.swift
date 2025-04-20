@@ -113,11 +113,11 @@ struct PatientView: View {
                         query = ""
                         Task {
                             do {
-                                question = userText
                                 response = try await sessionManager.sendMessage(
                                     toReportId: file.reportId,
                                     query: userText
                                 )
+                                question = userText
                             } catch {
                                 print("Error sending message:", error)
                             }

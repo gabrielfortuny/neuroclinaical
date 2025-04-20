@@ -415,4 +415,28 @@ class SessionManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
     }
+    
+    func fetchPatientGraph(forPatientId patientId: Int, graphNumber: Int) async throws -> Data {
+        guard let url = URL(string: "\(Self.baseURL)/patients/\(patientId)/graph/\(graphNumber)") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let http = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        
+        switch http.statusCode {
+        case 200:
+            return data
+        case 404:
+            throw URLError(.fileDoesNotExist)
+        default:
+            throw URLError(.badServerResponse)
+        }
+    }
 }
