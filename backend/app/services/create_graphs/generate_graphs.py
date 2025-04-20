@@ -1267,9 +1267,9 @@ def fetch_graph_data(patient_id):
     # Get database connection parameters from the environment
     host = "db"  # Container name from docker-compose
     port = 5432  # Default PostgreSQL port
-    user = "admin"
-    password = "dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U"
-    database = "database"
+    user = "postgres"
+    password = "password"
+    database = "neuroclinaical"
 
     # Create direct connection to PostgreSQL
     conn = psycopg2.connect(
@@ -1283,17 +1283,12 @@ def fetch_graph_data(patient_id):
         SELECT
             da.id, 
             da.drug_id, 
-            d.name AS drug_name, 
-            d.drug_class, 
+            da.name,
             da.day, 
             da.dosage,
-            da.time
+            da.time,
         FROM 
             drug_administration da
-        JOIN 
-            drugs d ON da.drug_id = d.id
-        WHERE 
-            da.patient_id = %s
         ORDER BY 
             da.day ASC
     """,
