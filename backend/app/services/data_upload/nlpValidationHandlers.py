@@ -3,6 +3,21 @@ import re
 from typing import List, Dict, Union, Any
 from datetime import datetime, timedelta
 
+def normalize_time_string(t):
+    try:
+        # Try known formats
+        for fmt in ["%H:%M:%S", "%H:%M", "%I%p", "%I:%M%p"]:
+            try:
+                return datetime.strptime(t.strip().lower(), fmt).strftime("%H:%M:%S")
+            except:
+                continue
+        # Try if it's just a number like "8" or "22"
+        if re.match(r'^\d{1,2}$', t.strip()):
+            return datetime.strptime(t.strip(), "%H").strftime("%H:00:00")
+    except:
+        pass
+    return ""  # fallback default
+
 def clean_drug_name(name: str) -> str:
     # Remove common dosage forms, routes, and release types
     name = name.lower()
@@ -203,7 +218,7 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
             json_content = input_json[start_index:end_index + 1]
             data = json.loads(json_content)
         except:
-            return json.dumps([], indent=2)
+            return []
 
         updated_data = []
 
@@ -213,6 +228,7 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
                 drug_name = clean_drug_name(drug_name)
                 doses = drug.get("dose_mg", [])
                 times = drug.get("time_of_administration", "n/a")
+                times = [normalize_time_string(t) for t in times if normalize_time_string(t)]
                 freq_code = drug.get("frequency_code", "n/a").upper()
 
                 # Normalize dose list
@@ -258,7 +274,7 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
             except:
                 continue  # skip broken entry
 
-            return updated_data
+                return updated_data
 
     except Exception as err:
         print(f"Validation error in validate_drug: {err}")
