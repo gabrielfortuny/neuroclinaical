@@ -1079,3 +1079,74 @@ paths:
           description: Unauthorized.
         "500":
           description: Server error.
+  
+  /reports/{report_id}/image_ids:
+    get:
+      summary: Get image IDs for a report
+      description: Retrieve all image IDs associated with a specific report.
+      parameters:
+        - name: report_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the report to fetch images for.
+      responses:
+        '200':
+          description: List of image IDs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  indexes:
+                    type: array
+                    items:
+                      type: integer
+                    example: [12, 15, 18]
+        '500':
+          description: Error retrieving images
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /reports/{image_id}/image:
+    get:
+      summary: Retrieve a specific image
+      description: Returns the actual image file associated with the given image ID.
+      parameters:
+        - name: image_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the image to fetch.
+      responses:
+        '200':
+          description: Image file
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Error retrieving the image
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
