@@ -59,6 +59,12 @@ class Patient(db.Model):
     conversations = db.relationship(
         "Conversation", back_populates="patient", cascade="all, delete"
     )
+    seizures = db.relationship(
+        "Seizure", back_populates="patient", cascade="all, delete"
+    )
+    drug_administrations = db.relationship(
+        "DrugAdministration", back_populates="patient", cascade="all, delete"
+    )
 
 
 class Report(db.Model):
@@ -75,12 +81,7 @@ class Report(db.Model):
     extracted_images = db.relationship(
         "ExtractedImage", back_populates="report", cascade="all, delete"
     )
-    seizures = db.relationship(
-        "Seizure", back_populates="report", cascade="all, delete"
-    )
-    drug_administrations = db.relationship(
-        "DrugAdministration", back_populates="report", cascade="all, delete"
-    )
+    
 
 
 class ExtractedImage(db.Model):
@@ -97,14 +98,14 @@ class ExtractedImage(db.Model):
 class Seizure(db.Model):
     __tablename__ = "seizures"
     id = db.Column(db.Integer, primary_key=True)
-    report_id = db.Column(
-        db.Integer, db.ForeignKey("reports.id", ondelete="CASCADE"), nullable=False
+    patient_id = db.Column(
+        db.Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
     day = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.Time)
     duration = db.Column(INTERVAL)
 
-    report = db.relationship("Report", back_populates="seizures")
+    patient = db.relationship("Patient", back_populates="seizures")
     electrodes = db.relationship(
         "Electrode", secondary=seizures_electrodes, back_populates="seizures"
     )
@@ -123,14 +124,14 @@ class Electrode(db.Model):
 class DrugAdministration(db.Model):
     __tablename__ = "drug_administration"
     id = db.Column(db.Integer, primary_key=True)
-    report_id = db.Column(
-        db.Integer, db.ForeignKey("reports.id", ondelete="CASCADE"), nullable=False
+    patient_id = db.Column(
+        db.Integer, db.ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
     )
     drug_name = db.Column(db.Text, nullable=False)
     day = db.Column(db.Integer, nullable=False)
     dosage = db.Column(db.Integer, nullable=False)
 
-    report = db.relationship("Report", back_populates="drug_administrations")
+    patient = db.relationship("Patient", back_populates="drug_administrations")
 
 
 class SupplementalMaterial(db.Model):
