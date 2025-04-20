@@ -40,13 +40,13 @@ def send_message(report_id):
             return jsonify({"error": "Failed to retrieve reports"}), 500
         
     except Exception as e:
-        return jsonify({"error": "Failed to retrieve reports"})# User input
+        return jsonify({"error": "Failed to retrieve reports"}), 500# User input
     
     try:
-        response = handle_chat_request(extracted_text, query_data.query)
+        response = handle_chat_request(extracted_text, query_data["query"])
         return jsonify({"response": response}), 200
     except Exception as e:
-           return jsonify({"error": "Error Processing Report"})# User input
+           return jsonify({"error": "Error Processing Report"}), 500# User input
 
     
 

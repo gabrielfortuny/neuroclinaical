@@ -122,8 +122,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     
     return drugs
 
-def handle_chat_request(text):
-    question = "What does a type 3 seizure look like?"
+def handle_chat_request(text, question):
     k = 5  # Reduced for more focused results
 
     # Get and display results
