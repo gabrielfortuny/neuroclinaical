@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+//import Charts
 
 enum InfoOption: Equatable {
     case viewFile
@@ -28,6 +29,13 @@ enum FileType: Equatable {
     case report
     case supplemental
 }
+
+/* SHUS CODE NOT WORKING
+ struct SeizureDayGroup: Identifiable {
+    let id: Int
+    let day: Int
+    let count: Int
+}*/
 
 struct PatientView: View {
     @EnvironmentObject private var sessionManager: SessionManager
@@ -57,6 +65,10 @@ struct PatientView: View {
     @State private var exportFilename: String = ""
     @State private var showingExporter = false
     
+    @State private var query: String = ""
+    @State private var question: String = ""
+    @State private var response: String = ""
+    
     @State private var session: Session = Session(id: 0)
 
     // Function for bottom navigation buttons
@@ -83,6 +95,16 @@ struct PatientView: View {
         .frame(maxWidth: .infinity)
     }
     
+    /* SHUS CODE
+     private func groupSeizuresByDay() -> [SeizureDayGroup] {
+        var counts: [Int: Int] = [:]
+        for seizure in session.seizures {
+            counts[seizure.day, default: 0] += 1
+        }
+        return counts.map { SeizureDayGroup(id: $0.key, day: $0.key, count: $0.value) }
+            .sorted { $0.day < $1.day }
+    }*/
+    
     @ViewBuilder
     private func renderOption(_ option: InfoOption) -> some View {
         switch option {
@@ -99,7 +121,44 @@ struct PatientView: View {
     
     private func askQuestionContent() -> some View {
         ScrollView {
-            Text("Ask Question MVP")
+            if let file = session.ltmFile {
+                HStack {
+                    TextField("Type your question…", text: $query)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    Button("Send") {
+                        let userText = query.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !userText.isEmpty else { return }
+                        query = ""
+                        Task {
+                            do {
+                                question = userText
+                                response = try await sessionManager.sendMessage(
+                                    toReportId: file.reportId,
+                                    query: userText
+                                )
+                            } catch {
+                                print("Error sending message:", error)
+                            }
+                        } // Task
+                    } // Button
+                    .disabled(query.isEmpty)
+                } // HStack
+                
+                Divider()
+                
+                if response.isEmpty {
+                    Text("Ask a question...").foregroundColor(.gray)
+                } else {
+                    Text("Question:")
+                        .font(.title)
+                    Text(question)
+                    Text("Answer:")
+                        .font(.title)
+                    Text("\(.init(response))")
+                }
+            } else {
+                Text("No Long Term Monitoring Report")
+            }
         }
         .padding()
     }
@@ -117,7 +176,33 @@ struct PatientView: View {
     
     private func dataContent() -> some View {
         ScrollView {
-            Text("Data")
+            if let _ = session.ltmFile {
+                /* SHUS CODE (NOT WORKING)
+                 Text("SEIZURE GRAPHICS")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(backgroundColor)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                
+                Chart {
+                    // Group seizures by day and show a simple count using BarMark.
+                    ForEach(groupSeizuresByDay()) { group in
+                        BarMark(
+                            x: .value("Day", group.day),
+                            y: .value("Seizure Count", group.count)
+                        )
+                        .foregroundStyle(.blue)
+                    }
+                }
+                .frame(height: 200)
+                .padding(.horizontal)
+                
+                // Example Toggles – replace with your actual state variables as needed.
+                Toggle("Seizure Length", isOn: .constant(false))
+                Toggle("Drug Administration", isOn: .constant(false))*/
+            } else {
+                Text("No Long Term Monitoring Report")
+            }
         }
         .padding()
     }
@@ -158,7 +243,7 @@ struct PatientView: View {
                         Task {
                             do {
                                 try await sessionManager.deleteReport(reportId: file.reportId)
-                                try await refresh()
+                                await refresh()
                             } catch {
                                 print("Error deleting report: \(error)")
                             }
@@ -175,7 +260,7 @@ struct PatientView: View {
                                    allowedTypes: allowedTypes,
                                    buttonTitle: "Import LTM") { fileURL in
                         try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: fileURL)
-                        try await refresh()
+                        await refresh()
                     }
                 }
             } // HStack 2
@@ -220,7 +305,7 @@ struct PatientView: View {
                         Task {
                             do {
                                 try await sessionManager.deleteSupplementaryFile(fileID: file.id)
-                                try await refresh()
+                                await refresh()
                             } catch {
                                 print("Error deleting report: \(error)")
                             }
@@ -236,7 +321,7 @@ struct PatientView: View {
                allowedTypes: allowedTypes,
                buttonTitle: "Add New File") { fileURL in
                 try await sessionManager.uploadSupplementaryFile(forPatientId: patient.id, fileURL: fileURL)
-                try await refresh()
+                await refresh()
             }
         }
         .padding()
@@ -252,10 +337,36 @@ struct PatientView: View {
             .background(Color.white)
     } // viewFileContet()
     
-    private func refresh() async throws {
-        session.ltmFile = try await sessionManager.fetchFirstReportID(forPatientId: patient.id)
-        session.supplementaryFiles = try await sessionManager.fetchSupplementalMaterials(forPatientId: patient.id)
+    private func refresh() async {
+        do {
+            session.ltmFile = try await sessionManager.fetchFirstReportID(forPatientId: patient.id)
+        } catch {
+            print("Failed to fetch LTM file:", error)
+        }
+        do {
+            session.supplementaryFiles = try await sessionManager.fetchSupplementalMaterials(forPatientId: patient.id)
+        } catch {
+            print("Failed to fetch supplementary materials:", error)
+        }
+        do {
+            session.seizures = try await sessionManager.fetchSeizures(forPatientId: patient.id)
+        } catch {
+            print("Failed to fetch seizures:", error)
+        }
+        do {
+            session.drugAdministrations = try await sessionManager.fetchDrugAdministration(forPatientId: patient.id)
+        } catch {
+            print("Failed to fetch drug administrations:", error)
+        }
+        /*if let reportID = session.ltmFile?.reportId {
+            do {
+                session.chatMessages = try await sessionManager.fetchConversationMessages(forReportId: reportID)
+            } catch {
+                print("Failed to fetch chat messages:", error)
+            }
+        }*/
         print("Ran Refresh")
+        print("LTM ID: \(session.ltmFile!.reportId)")
     }
     
     var body: some View {
@@ -298,11 +409,7 @@ struct PatientView: View {
         }
         .toolbarBackground(.hidden, for: .navigationBar)
         .task {
-            do {
-                try await refresh()
-            } catch {
-                print("Error fetching report: \(error)")
-            }
+            await refresh()
         }
         .fileExporter(
           isPresented: $showingExporter,

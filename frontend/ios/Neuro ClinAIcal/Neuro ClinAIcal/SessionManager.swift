@@ -354,4 +354,70 @@ class SessionManager: ObservableObject {
 
         return history
     }
+    
+    // UNUSED NO API ENDPOINT
+    func fetchConversationMessages(forReportId reportId: Int) async throws -> [ChatMessage] {
+        guard let url = URL(string: "\(Self.baseURL)/chat/\(reportId)/messages") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        switch http.statusCode {
+        case 200:
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let root = try decoder.decode([String: [ChatMessage]].self, from: data)
+            return root["messages"] ?? []
+        case 401:
+            throw URLError(.userAuthenticationRequired)
+        case 404:
+            throw URLError(.fileDoesNotExist)
+        default:
+            throw URLError(.badServerResponse)
+        }
+    }
+    
+    func sendMessage(toReportId reportId: Int, query: String) async throws -> String {
+        guard let url = URL(string: "\(Self.baseURL)/chat/\(reportId)/messages") else {
+            throw URLError(.badURL)
+        }
+
+        let body = ["query": query]
+        let json = try JSONSerialization.data(withJSONObject: body, options: [])
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = json
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        switch http.statusCode {
+        case 200:
+            let wrapper = try JSONDecoder().decode([String: String].self, from: data)
+            guard let resp = wrapper["response"] else {
+                throw URLError(.cannotParseResponse)
+            }
+            return resp
+
+        case 400:
+            throw URLError(.cannotParseResponse)
+        case 401:
+            throw URLError(.userAuthenticationRequired)
+        default:
+            throw URLError(.badServerResponse)
+        }
+    }
 }
