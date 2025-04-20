@@ -172,7 +172,6 @@ class SessionManager: ObservableObject {
     }
     
     func deleteReport(reportId: Int) async throws {
-        // Construct the URL for the DELETE request.
         guard let url = URL(string: "\(Self.baseURL)/reports/\(reportId)") else {
             throw URLError(.badURL)
         }

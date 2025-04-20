@@ -324,7 +324,9 @@ struct PatientView: View {
             }
         }*/
         print("Ran Refresh")
-        print("LTM ID: \(session.ltmFile?.reportId)")
+        if let file = session.ltmFile {
+            print("LTM ID: \(file.reportId)")
+        }
     }
     
     var body: some View {
