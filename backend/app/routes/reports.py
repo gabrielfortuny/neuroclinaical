@@ -1,9 +1,10 @@
+import mimetypes
 from app.services.data_upload.uploadHandlers import upload_controller
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, send_file
 from flask_jwt_extended import current_user, jwt_required, get_jwt_identity
 from flask_restful import Api, Resource
-from app.__init__ import db
-from app.models import Report, Patient
+from app import db
+from app.models import ExtractedImage, Report, Patient
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -268,3 +269,31 @@ def download_report(report_id):
 
         current_app.logger.error(traceback.format_exc())
         return jsonify({"error": f"Failed to download report: {str(e)}"}), 500
+
+@reports_bp.route("/<int:report_id>/image_ids", methods=["GET"])
+def get_image_ids(report_id):
+    try:
+        report = db.session.get(Report, report_id)
+        images = report.extracted_images
+        image_indexes = []
+        for image in images:
+            image_indexes.append(image.id)
+        return jsonify({"indexes": image_indexes}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to grab images: {str(e)}"}), 500
+
+@reports_bp.route("/<int:image_id>/image", methods=["GET"])
+def get_image(image_id):
+    try:
+        image = db.session.get(ExtractedImage, image_id)
+        mime_type, _ = mimetypes.guess_type(image.file_path)
+        return send_file(image.file_path, mimetype=mime_type or "application/octet-stream", as_attachment=False)
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to grab image: {str(e)}"}), 500
+
+    
+
+
+
