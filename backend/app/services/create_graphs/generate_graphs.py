@@ -8,6 +8,7 @@ Original file is located at
 
 from PIL import Image
 from datetime import datetime
+from app.models import Patient
 
 # Define the electrode to region mapping (same as before)
 electrode_to_region = {
