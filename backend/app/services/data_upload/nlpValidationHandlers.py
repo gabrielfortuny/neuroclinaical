@@ -1,7 +1,49 @@
 import json
 import re
 from typing import List, Dict, Union, Any
+from datetime import datetime, timedelta
 
+def clean_drug_name(name: str) -> str:
+    # Remove common dosage forms, routes, and release types
+    name = name.lower()
+
+    # Regex patterns to remove (expandable)
+    patterns = [
+        r'\b(?:standard|extended|delayed|immediate)\s*release\b',
+        r'\b(?:xr|er|sr|dr|ir|cr)\b',
+        r'\b(?:oral|tablet|capsule|solution|suspension|chewable|liquid|dose|form)\b',
+        r'\b(?:tab|cap|pill|vial|ampoule|injection|syrup)\b',
+        r'\b(?:mg|mcg|g|ml|units|iu)\b',
+        r'\b\d+(\.\d+)?\s*(mg|mcg|g|ml|units|iu)?\b',  # e.g. 100mg, 0.5 g
+        r'[^\w\s]',  # remove punctuation
+        r'\s{2,}',  # collapse multiple spaces
+    ]
+
+    for pattern in patterns:
+        name = re.sub(pattern, '', name)
+
+    return name.strip().title()
+
+
+def interpolate_times(n, start="08:00:00", end="22:00:00"):
+    start_dt = datetime.strptime(start, "%H:%M:%S")
+    end_dt = datetime.strptime(end, "%H:%M:%S")
+    if n == 1:
+        return [start_dt.strftime("%H:%M:%S")]
+    step = (end_dt - start_dt).seconds // (n - 1)
+    return [(start_dt + timedelta(seconds=step * i)).strftime("%H:%M:%S") for i in range(n)]
+
+def times_from_qxh(code):
+    match = re.match(r"Q(\d+)H", code)
+    if match:
+        try:
+            hours = int(match.group(1))
+            if hours > 0:
+                num_times = 24 // hours
+                return [(datetime(1900,1,1,0,0,0) + timedelta(hours=i*hours)).strftime("%H:%M:%S") for i in range(num_times)]
+        except:
+            pass
+    return []
 
 def extract_json_content(text):
     """Extract JSON content from text, finding the outermost array."""
@@ -139,79 +181,84 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
     Returns:
         List of processed drug dictionaries or empty list on error
     """
+    CODE_TO_TIME = {
+        "QD": ["08:00:00"],
+        "BID": ["08:00:00", "20:00:00"],
+        "TID": ["08:00:00", "14:00:00", "20:00:00"],
+        "QID": ["06:00:00", "12:00:00", "18:00:00", "00:00:00"],
+        "QHS": ["22:00:00"],
+        "PRN": [],
+        "QAM": ["08:00:00"],
+        "QPM": ["20:00:00"],
+        "STAT": ["00:00:00"],
+        "mg/mg": ["08:00:00", "20:00:00"],
+        "AC": ["07:00:00", "12:00:00", "18:00:00"],
+        "PC": ["08:00:00", "13:00:00", "19:00:00"],
+        "HS": ["22:00:00"]
+    }
     try:
-        # Define the mapping of codes to average time(s) in "hour:minute:second" format
-        CODE_TO_TIME = {
-            "QD": ["08:00:00"],  # Once daily (e.g., 8:00 AM)
-            "BID": ["08:00:00", "20:00:00"],  # Twice daily (e.g., 8:00 AM and 8:00 PM)
-            "TID": ["08:00:00", "14:00:00", "20:00:00"],  # Three times daily
-            "QID": ["06:00:00", "12:00:00", "18:00:00", "00:00:00"],  # Four times daily
-            "QHS": ["22:00:00"],  # Every night at bedtime (e.g., 10:00 PM)
-            "PRN": None,  # As needed (no fixed interval)
-            "QxH": None,  # Every x hours (requires additional parsing)
-            "AC": ["07:00:00", "12:00:00", "18:00:00"],  # Before meals (example times)
-            "PC": ["08:00:00", "13:00:00", "19:00:00"],  # After meals (example times)
-            "HS": ["22:00:00"],  # At bedtime (e.g., 10:00 PM)
-            "STAT": ["00:00:00"],  # Immediately (e.g., 12:00 AM)
-            "AM": ["08:00:00"],  # Every morning (e.g., 8:00 AM)
-            "QAM": ["08:00:00"],  # Every morning (e.g., 8:00 AM)
-            "QPM": ["20:00:00"],  # Every evening (e.g., 8:00 PM)
-            "mg/mg": [
-                "08:00:00",
-                "20:00:00",
-            ],  # Twice a day (e.g., 8:00 AM and 8:00 PM)
-        }
+        try:
+            start_index = input_json.find('[')
+            end_index = input_json.rfind(']')
+            json_content = input_json[start_index:end_index + 1]
+            data = json.loads(json_content)
+        except:
+            return json.dumps([], indent=2)
 
-        # Parse the input JSON string: Extract content between the first '[' and the last ']'
-        start_index = input_json.find("[")  # Find the index of the first '['
-        end_index = input_json.rfind("]")  # Find the index of the last ']'
-
-        if start_index == -1 or end_index == -1:
-            return []  # Return empty list if no JSON array found
-
-        # Extract the JSON content between the first '[' and the last ']'
-        json_content = input_json[start_index : end_index + 1]
-
-        # Load the extracted JSON content
-        data = json.loads(json_content)
-
-        # Process each drug entry
         updated_data = []
+
         for drug in data:
             try:
-                if not all(
-                    field in drug for field in ["name", "code", "mg_administered"]
-                ):
-                    continue
+                drug_name = drug.get("name", "").lower()
+                drug_name = clean_drug_name(drug_name)
+                doses = drug.get("dose_mg", [])
+                times = drug.get("time_of_administration", "n/a")
+                freq_code = drug.get("frequency_code", "n/a").upper()
 
-                drug_name = drug["name"].lower()
-                code = drug.pop("code") if "code" in drug else "QD"
-                times = CODE_TO_TIME.get(code, None)
+                # Normalize dose list
+                if isinstance(doses, (int, float)) or doses == "n/a":
+                    doses = [doses]
+                if not isinstance(doses, list):
+                    doses = []
 
-                if times:
-                    for time in times:
-                        updated_data.append(
-                            {
-                                "name": drug_name,
-                                "time": time,
-                                "day": day,
-                                "mg_administered": drug.get("mg_administered", "0"),
-                            }
-                        )
+                # Determine time list
+                if isinstance(times, list):
+                    # If times and doses match 1-to-1
+                    if len(times) == len(doses):
+                        time_list = times
+                    # If dose is scalar, repeat it to match time length
+                    elif len(doses) == 1:
+                        doses = [doses[0]] * len(times)
+                        time_list = times
+                    else:
+                        # mismatch → fall back to times as master
+                        doses = [doses[0] if doses else "n/a"] * len(times)
+                        time_list = times
                 else:
-                    updated_data.append(
-                        {
-                            "name": drug_name,
-                            "time": None,
-                            "day": day,
-                            "mg_administered": drug.get("mg_administered", "0"),
-                        }
-                    )
-            except Exception as e:
-                print(f"Error processing drug: {e}")
-                continue
+                    # If no usable times, use code or interpolation
+                    if freq_code in CODE_TO_TIME:
+                        time_list = CODE_TO_TIME[freq_code]
+                    elif "Q" in freq_code and "H" in freq_code:
+                        time_list = times_from_qxh(freq_code)
+                    else:
+                        time_list = interpolate_times(len(doses))
+                    # Match dose length
+                    if len(time_list) < len(doses):
+                        time_list += [time_list[-1]] * (len(doses) - len(time_list))
+                    elif len(time_list) > len(doses):
+                        doses += [doses[-1]] * (len(time_list) - len(doses))
 
-        return updated_data
+                for dose, time in zip(doses, time_list):
+                    updated_data.append({
+                        "name": drug_name,
+                        "time": time,
+                        "day": day,
+                        "mg_administered": dose if dose != "n/a" else None
+                    })
+            except:
+                continue  # skip broken entry
+
+            return updated_data
 
     except Exception as err:
         print(f"Validation error in validate_drug: {err}")
