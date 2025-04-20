@@ -130,6 +130,7 @@ class DrugAdministration(db.Model):
     drug_name = db.Column(db.Text, nullable=False)
     day = db.Column(db.Integer, nullable=False)
     dosage = db.Column(db.Integer, nullable=False)
+    time = db.Column(db.Time, nullable=True)
 
     patient = db.relationship("Patient", back_populates="drug_administrations")
 
