@@ -151,28 +151,24 @@ class SessionManager: ObservableObject {
     
     func uploadReport(forPatientId patientId: Int, fileURL: URL) async throws {
         let fileType = fileURL.pathExtension.lowercased()
-        
         let fileData = try Data(contentsOf: fileURL)
-        // Base64‑encode the file data.
-//        let base64EncodedFile = fileData.base64EncodedString()
+
+        guard let url = URL(string: "\(Self.baseURL)/reports") else {
+            throw URLError(.badURL)
+        }
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.timeoutInterval = 1000000
         
-        // Use Alamofire's multipart upload.
         let responseData = try await AF.upload(multipartFormData: { mpFD in
-            if let patientIdData = "\(patientId)".data(using: .utf8) {
-                mpFD.append(patientIdData, withName: "patient_id")
-            }
-            if let fileTypeData = fileType.data(using: .utf8) {
-                mpFD.append(fileTypeData, withName: "file_type")
-            }
-//            if let fileFieldData = base64EncodedFile.data(using: .utf8) {
-//                mpFD.append(fileFieldData, withName: "file", fileName: fileURL.lastPathComponent)
-//            }
+            mpFD.append(Data("\(patientId)".utf8), withName: "patient_id")
+            mpFD.append(Data(fileType.utf8), withName: "file_type")
             mpFD.append(fileData, withName: "file", fileName: fileURL.lastPathComponent)
-        }, to: "\(Self.baseURL)/reports", method: .post)
-            .validate(statusCode: 201..<300)
-            .serializingData().value
-        
-        print("Report uploaded successfully, response data: \(responseData)")
+        }, with: urlRequest)
+          .validate(statusCode: 201..<300)
+          .serializingData().value
+
+        print("Report uploaded, response:", responseData)
     }
     
     func deleteReport(reportId: Int) async throws {
