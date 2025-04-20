@@ -7,7 +7,6 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
-//import Charts
 
 enum InfoOption: Equatable {
     case viewFile
@@ -29,13 +28,6 @@ enum FileType: Equatable {
     case report
     case supplemental
 }
-
-/* SHUS CODE NOT WORKING
- struct SeizureDayGroup: Identifiable {
-    let id: Int
-    let day: Int
-    let count: Int
-}*/
 
 struct PatientView: View {
     @EnvironmentObject private var sessionManager: SessionManager
@@ -94,16 +86,6 @@ struct PatientView: View {
         }
         .frame(maxWidth: .infinity)
     }
-    
-    /* SHUS CODE
-     private func groupSeizuresByDay() -> [SeizureDayGroup] {
-        var counts: [Int: Int] = [:]
-        for seizure in session.seizures {
-            counts[seizure.day, default: 0] += 1
-        }
-        return counts.map { SeizureDayGroup(id: $0.key, day: $0.key, count: $0.value) }
-            .sorted { $0.day < $1.day }
-    }*/
     
     @ViewBuilder
     private func renderOption(_ option: InfoOption) -> some View {
@@ -177,29 +159,7 @@ struct PatientView: View {
     private func dataContent() -> some View {
         ScrollView {
             if let _ = session.ltmFile {
-                /* SHUS CODE (NOT WORKING)
-                 Text("SEIZURE GRAPHICS")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(backgroundColor)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                
-                Chart {
-                    // Group seizures by day and show a simple count using BarMark.
-                    ForEach(groupSeizuresByDay()) { group in
-                        BarMark(
-                            x: .value("Day", group.day),
-                            y: .value("Seizure Count", group.count)
-                        )
-                        .foregroundStyle(.blue)
-                    }
-                }
-                .frame(height: 200)
-                .padding(.horizontal)
-                
-                // Example Toggles – replace with your actual state variables as needed.
-                Toggle("Seizure Length", isOn: .constant(false))
-                Toggle("Drug Administration", isOn: .constant(false))*/
+                Text("Show graphs here")
             } else {
                 Text("No Long Term Monitoring Report")
             }
@@ -269,7 +229,6 @@ struct PatientView: View {
     }
     
     private func renderSupplementaryFiles(_ session: Session) -> some View {
-        // Start Supplementary File Code
         VStack (alignment: .leading, spacing: 8) {
             HStack {
                 Text("Supplementary Files")
@@ -325,7 +284,6 @@ struct PatientView: View {
             }
         }
         .padding()
-        // End Supplementary File Code
     }
     
     @ViewBuilder
@@ -348,7 +306,7 @@ struct PatientView: View {
         } catch {
             print("Failed to fetch supplementary materials:", error)
         }
-        do {
+        /*do {
             session.seizures = try await sessionManager.fetchSeizures(forPatientId: patient.id)
         } catch {
             print("Failed to fetch seizures:", error)
@@ -358,7 +316,7 @@ struct PatientView: View {
         } catch {
             print("Failed to fetch drug administrations:", error)
         }
-        /*if let reportID = session.ltmFile?.reportId {
+        if let reportID = session.ltmFile?.reportId {
             do {
                 session.chatMessages = try await sessionManager.fetchConversationMessages(forReportId: reportID)
             } catch {
