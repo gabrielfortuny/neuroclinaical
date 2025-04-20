@@ -17,6 +17,13 @@ def send_message(report_id):
     ".docx": docx_upload_handler().extract_text_from_docx,
 }
     try:
+        query_data = request.get_json()
+        if not query_data:
+            return (
+                jsonify({"error": "Invalid Request Format"}),
+                401,
+            )  # Format is not json readable
+
         report = db.session.get( Report, report_id)
         if not report:
             current_app.logger.error(f"Error uploading report")
@@ -36,7 +43,7 @@ def send_message(report_id):
         return jsonify({"error": "Failed to retrieve reports"})# User input
     
     try:
-        response = handle_chat_request(extracted_text)
+        response = handle_chat_request(extracted_text, query_data.query)
         return jsonify({"response": response}), 200
     except Exception as e:
            return jsonify({"error": "Error Processing Report"})# User input
