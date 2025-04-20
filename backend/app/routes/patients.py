@@ -5,6 +5,7 @@ from app import db
 from app.services.create_graphs.create_graphs import make_plot2
 from io import BytesIO
 from PIL import Image
+from app.services.create_graphs.generate_graphs import get_graphs
 
 
 patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
@@ -13,10 +14,7 @@ patients_bp = Blueprint("patients", __name__, url_prefix="/patients")
 @patients_bp.route("", methods=["GET"])
 def get_all_patients():
     patients = Patient.query.all()
-    data = [
-        {"id": p.id, "name": p.name}
-        for p in patients
-    ]
+    data = [{"id": p.id, "name": p.name} for p in patients]
     return jsonify(data), 200
 
 
@@ -27,7 +25,6 @@ def create_patient():
 
     if not name:
         return jsonify({"error": "Invalid input: 'name' is required."}), 400
-
 
     patient = Patient(name=name)
     db.session.add(patient)
@@ -76,7 +73,10 @@ def update_patient(patient_id):
         try:
             patient.dob = datetime.strptime(data["dob"], "%Y-%m-%d").date()
         except ValueError:
-            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
+            return (
+                jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}),
+                400,
+            )
 
     db.session.commit()
 
@@ -133,7 +133,7 @@ def get_patient_reports(patient_id):
                 "patient_id": row.patient_id,
                 "summary": row.summary,
                 "file_path": row.file_path,
-                "file_name": row.file_name
+                "file_name": row.file_name,
             }
             data.append(report_dict)
 
@@ -159,21 +159,29 @@ def get_seizures_by_patient(patient_id):
             "id": seizure.id,
             "day": seizure.day,
             "start_time": (
-                seizure.start_time.strftime("%H:%M:%S") if seizure.start_time else None
+                seizure.start_time.strftime("%H:%M:%S")
+                if seizure.start_time
+                else None
             ),
             "duration": seizure.duration,  # Already in ISO 8601 format
             "created_at": (
                 seizure.created_at.isoformat() if seizure.created_at else None
             ),
             "modified_at": (
-                seizure.modified_at.isoformat() if seizure.modified_at else None
+                seizure.modified_at.isoformat()
+                if seizure.modified_at
+                else None
             ),
             "electrodes": [
                 {
                     "id": e.id,
                     "name": e.name,
-                    "created_at": e.created_at.isoformat() if e.created_at else None,
-                    "modified_at": e.modified_at.isoformat() if e.modified_at else None,
+                    "created_at": (
+                        e.created_at.isoformat() if e.created_at else None
+                    ),
+                    "modified_at": (
+                        e.modified_at.isoformat() if e.modified_at else None
+                    ),
                 }
                 for e in seizure.electrodes
             ],
@@ -201,16 +209,12 @@ def get_patient_supplemental_materials(patient_id):
 
 
 @patients_bp.route(
-    "/<int:patient_id>/graph/<int:screen>/<int:view_seizure_length>/<int:view_soz_heatmap>/<int:view_drug_admin>",
-    methods=["GET"],
+    "/<int:patient_id>/graph/<int:graph_number>", methods=["GET"]
 )
-def get_patient_graph(
-    patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin
-):
+def get_patient_graph(patient_id, graph_number):
+    """Graph number is 0 - 8"""
     try:
-        graph_image: Image.Image = make_plot2(
-            patient_id, screen, view_seizure_length, view_soz_heatmap, view_drug_admin
-        )
+        graph_image = get_graphs(patient_id, graph_number)
 
         # Save to in-memory buffer
         img_io = BytesIO()
@@ -243,7 +247,11 @@ def get_patient_drug_administration(patient_id):
 
         # Create direct connection to PostgreSQL
         conn = psycopg2.connect(
-            host=host, port=port, user=user, password=password, database=database
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
         )
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -299,4 +307,7 @@ def get_patient_drug_administration(patient_id):
         import traceback
 
         # current_app.logger.error(traceback.format_exc())
-        return jsonify({"error": "Failed to retrieve drug administrations"}), 500
+        return (
+            jsonify({"error": "Failed to retrieve drug administrations"}),
+            500,
+        )
