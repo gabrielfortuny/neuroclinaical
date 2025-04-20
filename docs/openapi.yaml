@@ -419,6 +419,58 @@ paths:
         "500":
           description: Server error.
 
+  /patients/{id}/graph/{graph_number}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 101
+        description: The patient ID
+      - name: graph_number
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 3
+        description: The graph number (0-8)
+
+    get:
+      summary: Get a graph
+      description: Retrieves graphs associated with a patient
+      operationId: get_graph
+      tags:
+        - Patients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+          description: The ID of the patient to retrieve.
+        - name: graph_number
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 3
+          description: The graph number (0-8)
+
+      responses:
+        "200":
+          description: Graph retrieved successfully.
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Patient not found.
+        "500":
+          description: Server error.
+
   /reports:
     post:
       summary: Upload a report file
@@ -577,8 +629,8 @@ paths:
               schema:
                 type: string
                 format: binary
-            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
-              schema:
+            ? application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            : schema:
                 type: string
                 format: binary
             text/plain:
@@ -621,136 +673,136 @@ paths:
         "500":
           description: Error processing report
 
-  /patients/{id}/seizures:
-    get:
-      summary: Get all seizures for a patient
-      description: Retrieves a list of all seizures associated with a specific patient, including related electrodes.
-      operationId: get_seizures_by_patient
-      tags:
-        - Patients
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The ID of the patient whose seizures are being retrieved.
-      responses:
-        "200":
-          description: List of seizures retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    day:
-                      type: integer
-                      example: 3
-                    start_time:
-                      type: string
-                      format: time
-                      example: "14:30:00"
-                    duration:
-                      type: string
-                      description: SQL interval (e.g. PostgreSQL INTERVAL format like `HH:MM:SS`)
-                      example: "00:02:30"
-                    created_at:
-                      type: string
-                      format: date-time
-                    modified_at:
-                      type: string
-                      format: date-time
-                    electrodes:
-                      type: array
-                      description: Electrodes associated with this seizure.
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 10
-                          name:
-                            type: string
-                            example: "Frontal-L"
-                          created_at:
-                            type: string
-                            format: date-time
-                          modified_at:
-                            type: string
-                            format: date-time
-        "404":
-          description: Patient not found.
+  # /patients/{id}/seizures:
+  #   get:
+  #     summary: Get all seizures for a patient
+  #     description: Retrieves a list of all seizures associated with a specific patient, including related electrodes.
+  #     operationId: get_seizures_by_patient
+  #     tags:
+  #       - Patients
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: integer
+  #         description: The ID of the patient whose seizures are being retrieved.
+  #     responses:
+  #       "200":
+  #         description: List of seizures retrieved successfully.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 type: object
+  #                 properties:
+  #                   id:
+  #                     type: integer
+  #                     example: 1
+  #                   day:
+  #                     type: integer
+  #                     example: 3
+  #                   start_time:
+  #                     type: string
+  #                     format: time
+  #                     example: "14:30:00"
+  #                   duration:
+  #                     type: string
+  #                     description: SQL interval (e.g. PostgreSQL INTERVAL format like `HH:MM:SS`)
+  #                     example: "00:02:30"
+  #                   created_at:
+  #                     type: string
+  #                     format: date-time
+  #                   modified_at:
+  #                     type: string
+  #                     format: date-time
+  #                   electrodes:
+  #                     type: array
+  #                     description: Electrodes associated with this seizure.
+  #                     items:
+  #                       type: object
+  #                       properties:
+  #                         id:
+  #                           type: integer
+  #                           example: 10
+  #                         name:
+  #                           type: string
+  #                           example: "Frontal-L"
+  #                         created_at:
+  #                           type: string
+  #                           format: date-time
+  #                         modified_at:
+  #                           type: string
+  #                           format: date-time
+  #       "404":
+  #         description: Patient not found.
 
-  /seizures/{id}:
-    get:
-      summary: Get details of a seizure
-      description: Retrieves detailed information about a specific seizure by ID, including related electrodes.
-      operationId: get_seizure_by_id
-      tags:
-        - Seizures
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The ID of the seizure to retrieve.
-      responses:
-        "200":
-          description: Seizure details retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 42
-                  patient_id:
-                    type: integer
-                    example: 101
-                  day:
-                    type: integer
-                    example: 3
-                  start_time:
-                    type: string
-                    format: time
-                    example: "15:07:23"
-                  duration:
-                    type: integer
-                    example: 90
-                    description: Duration in seconds.
-                  created_at:
-                    type: string
-                    format: date-time
-                  modified_at:
-                    type: string
-                    format: date-time
-                  electrodes:
-                    type: array
-                    description: Electrodes associated with this seizure.
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          example: 5
-                        name:
-                          type: string
-                          example: "Temporal-R"
-                        created_at:
-                          type: string
-                          format: date-time
-                        modified_at:
-                          type: string
-                          format: date-time
-        "404":
-          description: Seizure not found.
+  # /seizures/{id}:
+  #   get:
+  #     summary: Get details of a seizure
+  #     description: Retrieves detailed information about a specific seizure by ID, including related electrodes.
+  #     operationId: get_seizure_by_id
+  #     tags:
+  #       - Seizures
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: integer
+  #         description: The ID of the seizure to retrieve.
+  #     responses:
+  #       "200":
+  #         description: Seizure details retrieved successfully.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 id:
+  #                   type: integer
+  #                   example: 42
+  #                 patient_id:
+  #                   type: integer
+  #                   example: 101
+  #                 day:
+  #                   type: integer
+  #                   example: 3
+  #                 start_time:
+  #                   type: string
+  #                   format: time
+  #                   example: "15:07:23"
+  #                 duration:
+  #                   type: integer
+  #                   example: 90
+  #                   description: Duration in seconds.
+  #                 created_at:
+  #                   type: string
+  #                   format: date-time
+  #                 modified_at:
+  #                   type: string
+  #                   format: date-time
+  #                 electrodes:
+  #                   type: array
+  #                   description: Electrodes associated with this seizure.
+  #                   items:
+  #                     type: object
+  #                     properties:
+  #                       id:
+  #                         type: integer
+  #                         example: 5
+  #                       name:
+  #                         type: string
+  #                         example: "Temporal-R"
+  #                       created_at:
+  #                         type: string
+  #                         format: date-time
+  #                       modified_at:
+  #                         type: string
+  #                         format: date-time
+  #       "404":
+  #         description: Seizure not found.
 
   /supplemental_materials:
     post:
@@ -881,58 +933,58 @@ paths:
         "500":
           description: Server error.
 
-  /patients/{id}/drug_administration:
-    get:
-      summary: Get full drug administration history for a patient
-      description: Retrieves a list of all drug administrations recorded for a specific patient.
-      operationId: get_patient_drug_administration
-      tags:
-        - Patients
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The ID of the patient whose drug administration history is being retrieved.
-      responses:
-        "200":
-          description: List of drug administrations retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 10
-                    drug_id:
-                      type: integer
-                      example: 3
-                    drug_name:
-                      type: string
-                      example: "Carbamazepine"
-                    drug_class:
-                      type: string
-                      example: "Anticonvulsant"
-                    day:
-                      type: integer
-                      example: 2
-                    dosage:
-                      type: integer
-                      example: 200
-                      description: Dosage in milligrams
-                    time:
-                      type: string
-                      format: time
-                      example: "08:45:00"
-                      description: Time of drug administration in HH:MM:SS 24-hour format
-        "404":
-          description: Patient not found.
-        "500":
-          description: Server error.
+  # /patients/{id}/drug_administration:
+  #   get:
+  #     summary: Get full drug administration history for a patient
+  #     description: Retrieves a list of all drug administrations recorded for a specific patient.
+  #     operationId: get_patient_drug_administration
+  #     tags:
+  #       - Patients
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: integer
+  #         description: The ID of the patient whose drug administration history is being retrieved.
+  #     responses:
+  #       "200":
+  #         description: List of drug administrations retrieved successfully.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 type: object
+  #                 properties:
+  #                   id:
+  #                     type: integer
+  #                     example: 10
+  #                   drug_id:
+  #                     type: integer
+  #                     example: 3
+  #                   drug_name:
+  #                     type: string
+  #                     example: "Carbamazepine"
+  #                   drug_class:
+  #                     type: string
+  #                     example: "Anticonvulsant"
+  #                   day:
+  #                     type: integer
+  #                     example: 2
+  #                   dosage:
+  #                     type: integer
+  #                     example: 200
+  #                     description: Dosage in milligrams
+  #                   time:
+  #                     type: string
+  #                     format: time
+  #                     example: "08:45:00"
+  #                     description: Time of drug administration in HH:MM:SS 24-hour format
+  #       "404":
+  #         description: Patient not found.
+  #       "500":
+  #         description: Server error.
 
   /chat/{report_id}/messages:
     post:
