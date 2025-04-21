@@ -244,6 +244,19 @@ struct PatientView: View {
                     .frame(height: 200)
                     .cornerRadius(8)
                     .shadow(radius: 2)
+                    .onTapGesture {
+                        Task {
+                            do {
+                                let (data, mime) = try await sessionManager.fetchReportImage(imageId: imageId)
+                                let ext = fileExtension(for: mime)
+                                exportFilename = "image_\(imageId).\(ext)"
+                                documentToExport = DataFileDocument(data: data)
+                                showingExporter = true
+                            } catch {
+                                print("Error downloading image \(imageId):", error)
+                            }
+                        }
+                    }
             }
         }
         .padding()
@@ -316,6 +329,19 @@ struct PatientView: View {
             } // ScrollView
             .background(Color.white)
     } // viewFileContet()
+    
+    private func fileExtension(for mimeType: String) -> String {
+        switch mimeType.lowercased() {
+        case "image/jpeg", "image/jpg":
+            return "jpg"
+        case "image/png":
+            return "png"
+        case "image/webp":
+            return "webp"
+        default:
+            return "bin"
+        }
+    }
     
     private func refresh() async {
         do {
