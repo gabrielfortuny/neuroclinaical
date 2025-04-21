@@ -306,7 +306,7 @@ def make_plot2(
 
     # Extract seizure onset electrodes from data1
     seizure_onset_electrodes = set()
-    for seizure in data1:
+    for seizure in seizures:
         seizure_onset_electrodes.update(seizure["seizure_onset_electrodes"])
 
     drugs = drug_data
@@ -1282,11 +1282,10 @@ def fetch_graph_data(patient_id):
         """
         SELECT
             da.id, 
-            da.drug_id, 
-            da.name,
+            da.drug_name,
             da.day, 
             da.dosage,
-            da.time,
+            da.time
         FROM 
             drug_administration da
         ORDER BY 
