@@ -129,7 +129,7 @@ def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
         json_data = extract_json_content(json_text)
         data = json.loads(json_data)
         seizure_list = []
-        current_app.logger.info(f"Sending seizure extraction request for day {day}")
+        current_app.logger.info(f"{json_data}")
 
 
         # Process each seizure entry
@@ -220,6 +220,7 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
             end_index = input_json.rfind(']')
             json_content = input_json[start_index:end_index + 1]
             data = json.loads(json_content)
+            current_app.logger.info(f"{json_content}")
         except:
             return []
 
