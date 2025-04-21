@@ -50,6 +50,7 @@ services:
     container_name: neuroclinaical-ollama
     volumes:
       - ollama_data:/root/.ollama
+      - ./backend/ollama/models:/root/.ollama/models
     networks:
       - backend-network
       - ollama-external

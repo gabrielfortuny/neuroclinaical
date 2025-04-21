@@ -182,7 +182,27 @@
 │   ├── ollama
 │   │   ├── Dockerfile
 │   │   ├── Modelfile
-│   │   └── entrypoint.sh
+│   │   ├── entrypoint.sh
+│   │   ├── models
+│   │   │   ├── blobs
+│   │   │   │   ├── sha256-120007c81bf8b4eb54e896a4a3e5ff9949f124b0ea42295277c8523f7fa9c7f6
+│   │   │   │   ├── sha256-3116c52250752e00dd06b16382e952bd33c34fd79fc4fe3a5d2c77cf7de1b14b
+│   │   │   │   ├── sha256-4ac50fae127692ecb0839b4e0c6229d8ada0f082ccf449e3c7557d7905f30781
+│   │   │   │   ├── sha256-7cd4618c1faf8b7233c6c906dac1694b6a47684b37b8895d470ac688520b9c01
+│   │   │   │   ├── sha256-be1359f240d4981f52402fc25ee5d7dafcbfbbc77f7d03d488aba74784de8ef2
+│   │   │   │   ├── sha256-dd084c7d92a3c1c14cc09ae77153b903fd2024b64a100a0cc8ec9316063d2dbc
+│   │   │   │   └── sha256-e0a42594d802e5d31cdc786deb4823edb8adff66094d49de8fffe976d753e348
+│   │   │   ├── manifests
+│   │   │   │   └── registry.ollama.ai
+│   │   │   │       └── library
+│   │   │   │           ├── gemma3
+│   │   │   │           │   └── 1b
+│   │   │   │           ├── mymodel
+│   │   │   │           │   └── latest
+│   │   │   │           └── newModel
+│   │   │   │               └── latest
+│   │   │   └── newModel.gguf
+│   │   └── newModelfile
 │   ├── requirements.txt
 │   ├── tests
 │   │   ├── __init__.py
@@ -447,7 +467,8 @@
 │       │   └── run
 │       ├── requirements.txt
 │       └── run.py
+├── out
 ├── out.txt
 └── query.txt
 
-69 directories, 382 files
+77 directories, 395 files
