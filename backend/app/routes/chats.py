@@ -16,30 +16,38 @@ def send_message(report_id):
     ".pdf": pdf_upload_handler().extract_text_from_pdf,
     ".docx": docx_upload_handler().extract_text_from_docx,
 }
+    current_app.logger.error(f"Working0")
     try:
         query_data = request.get_json()
+        current_app.logger.error(f"Working0.5")
         if not query_data:
+            
             return (
                 jsonify({"error": "Invalid Request Format"}),
                 401,
             )  # Format is not json readable
 
         report = db.session.get( Report, report_id)
+        current_app.logger.error(f"Working1")
         if not report:
             current_app.logger.error(f"Error uploading report")
             return jsonify({"error": "Report not found"}), 404
+        current_app.logger.error(f"Working2")
         _, content_ext = os.path.splitext(report.file_name)
+        current_app.logger.error(f"Working3")
         current_app.logger.error(f"{content_ext}")
         # Extract text from file
         if content_ext not in supported_file_types:
-            return jsonify({"error": "Failed to retrieve reports"}), 500
+            return jsonify({"error": "Failed to match extension"}), 500
 
+        current_app.logger.error(f"Working4")
         extracted_text = supported_file_types[content_ext](report.file_path)
         current_app.logger.error(f"{extracted_text}")
         if not extracted_text:
             return jsonify({"error": "Failed to retrieve reports"}), 500
         
     except Exception as e:
+        current_app.logger.error(f"Exception")
         return jsonify({"error": "Failed to retrieve reports"}), 500# User input
     
     try:

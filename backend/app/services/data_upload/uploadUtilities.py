@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 from typing import List, Dict
 from flask import current_app
-from app.__init__ import db
+from app import db
 
 from app.models import Seizure, DrugAdministration, Electrode
 
@@ -242,7 +242,7 @@ def store_drugs_array(drugs: List[Dict], p_id: int) -> bool:
             day = drug.get("day", 1)
 
             # Find or create drug record
-            db_drug = Drug.query.filter_by(name=drug_name).first()
+            db_drug = DrugAdministration.query.filter_by(name=drug_name).first()
             if not db_drug:
                 db_drug = Drug(name=drug_name)
                 db.session.add(db_drug)
