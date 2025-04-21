@@ -60,9 +60,7 @@ struct PatientView: View {
     @State private var query: String = ""
     @State private var question: String = ""
     @State private var response: String = ""
-    
-    @State private var graphImages: [Int: UIImage] = [:]
-    
+        
     @State private var session: Session = Session(id: 0)
 
     // Function for bottom navigation buttons
@@ -161,38 +159,21 @@ struct PatientView: View {
     private func dataContent() -> some View {
         ScrollView {
             if let _ = session.ltmFile {
-                ForEach(0...8, id: \.self) { index in
-                    VStack(alignment: .leading) {
-                        Text("Graph \(index)")
-                            .font(.title)
-                        
-                        if let image = graphImages[index] {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .cornerRadius(8)
-                        } else {
-                            Text("No image available")
-                                .foregroundColor(.gray)
-                        }
-                    }
+                ForEach(session.graphImageIDs, id: \.self) { index in
+                    Text("Graph \(index)")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    GraphImageView(
+                        patientId: patient.id,
+                        graphNumber: index
+                    )
+                    .frame(height: 200)
+                    .cornerRadius(8)
+                    .shadow(radius: 2)
                 }
             } else {
                 Text("No Long Term Monitoring Report")
-            }
-        }
-        .onAppear {
-            for i in 0...8 {
-                Task {
-                    do {
-                        let data = try await  sessionManager.fetchPatientGraph(forPatientId: patient.id, graphNumber: i)
-                        if let image = UIImage(data: data) {
-                            graphImages[i] = image
-                        }
-                    } catch {
-                        print("Failed to fetch graph \(i):", error)
-                    }
-                }
             }
         }
         .padding()
@@ -271,7 +252,7 @@ struct PatientView: View {
                 .background(Color.gray)
             
             if let _ = session.ltmFile {
-                ForEach(session.images, id: \.self) { imageId in
+                ForEach(session.ltmImageIDs, id: \.self) { imageId in
                     ImageView(imageId: imageId)
                         .frame(height: 200)
                         .cornerRadius(8)
@@ -392,7 +373,7 @@ struct PatientView: View {
         }
         if let file = session.ltmFile {
             do {
-                session.images = try await sessionManager.fetchReportImageIDs(forReportId: file.reportId)
+                session.ltmImageIDs = try await sessionManager.fetchReportImageIDs(forReportId: file.reportId)
             } catch {
                 print("Failed to fetch image ids for LTM file:", error)
             }
@@ -401,7 +382,7 @@ struct PatientView: View {
         print("Ran Refresh")
         if let file = session.ltmFile {
             print("LTM ID: \(file.reportId)")
-            print("Image IDs: \(session.images)")
+            print("Image IDs: \(session.ltmImageIDs)")
         }
     }
     
