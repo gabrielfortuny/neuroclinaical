@@ -55,6 +55,13 @@ services:
       - backend-network
       - ollama-external
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   web:
     build: ./frontend/web
