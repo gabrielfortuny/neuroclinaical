@@ -239,24 +239,29 @@ struct PatientView: View {
             Divider()
                 .background(Color.gray)
             
-            ForEach(session.images, id: \.self) { imageId in
-                ImageView(imageId: imageId)
-                    .frame(height: 200)
-                    .cornerRadius(8)
-                    .shadow(radius: 2)
-                    .onTapGesture {
-                        Task {
-                            do {
-                                let (data, mime) = try await sessionManager.fetchReportImage(imageId: imageId)
-                                let ext = fileExtension(for: mime)
-                                exportFilename = "image_\(imageId).\(ext)"
-                                documentToExport = DataFileDocument(data: data)
-                                showingExporter = true
-                            } catch {
-                                print("Error downloading image \(imageId):", error)
+            if let _ = session.ltmFile {
+                ForEach(session.images, id: \.self) { imageId in
+                    ImageView(imageId: imageId)
+                        .frame(height: 200)
+                        .cornerRadius(8)
+                        .shadow(radius: 2)
+                        .onTapGesture {
+                            Task {
+                                do {
+                                    let (data, mime) = try await sessionManager.fetchReportImage(imageId: imageId)
+                                    let ext = fileExtension(for: mime)
+                                    exportFilename = "image_\(imageId).\(ext)"
+                                    documentToExport = DataFileDocument(data: data)
+                                    showingExporter = true
+                                } catch {
+                                    print("Error downloading image \(imageId):", error)
+                                }
                             }
                         }
-                    }
+                }
+            } else {
+                Text("Upload an LTM report to see images")
+                    .foregroundColor(.gray)
             }
         }
         .padding()
