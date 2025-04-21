@@ -4,12 +4,17 @@
 
 {% block content %}
   <h1>Patient Dashboard</h1>
+  
+  <!-- Create Patient Button -->
+  <a href="{{ url_for('patient.create_patient') }}" class="btn btn-primary">Create Patient</a>
+  
   {% if patients %}
     <ul>
       {% for patient in patients %}
         <li>
-          <a href="#">{{ patient.name }}</a>
-          <!-- In the future: link to detail route -->
+          <a href="{{ url_for('patient.patient_detail', patient_id=patient.id) }}">
+            {{ patient.name }}
+          </a>
         </li>
       {% endfor %}
     </ul>
