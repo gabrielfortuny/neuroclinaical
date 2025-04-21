@@ -61,6 +61,8 @@ struct PatientView: View {
     @State private var question: String = ""
     @State private var response: String = ""
     
+    @State private var graphImages: [Int: UIImage] = [:]
+    
     @State private var session: Session = Session(id: 0)
 
     // Function for bottom navigation buttons
@@ -159,9 +161,38 @@ struct PatientView: View {
     private func dataContent() -> some View {
         ScrollView {
             if let _ = session.ltmFile {
-                Text("Show graphs here")
+                ForEach(0...8, id: \.self) { index in
+                    VStack(alignment: .leading) {
+                        Text("Graph \(index)")
+                            .font(.title)
+                        
+                        if let image = graphImages[index] {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .cornerRadius(8)
+                        } else {
+                            Text("No image available")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
             } else {
                 Text("No Long Term Monitoring Report")
+            }
+        }
+        .onAppear {
+            for i in 0...8 {
+                Task {
+                    do {
+                        let data = try await  sessionManager.fetchPatientGraph(forPatientId: patient.id, graphNumber: i)
+                        if let image = UIImage(data: data) {
+                            graphImages[i] = image
+                        }
+                    } catch {
+                        print("Failed to fetch graph \(i):", error)
+                    }
+                }
             }
         }
         .padding()
