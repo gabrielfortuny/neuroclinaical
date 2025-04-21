@@ -103,7 +103,7 @@ class Seizure(db.Model):
     )
     day = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.Time)
-    duration = db.Column(INTERVAL)
+    duration = db.Column(Integer)
 
     patient = db.relationship("Patient", back_populates="seizures")
     electrodes = db.relationship(
