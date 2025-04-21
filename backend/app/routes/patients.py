@@ -52,7 +52,7 @@ def get_patient(patient_id):
             {
                 "id": patient.id,
                 "name": patient.name,
-                "dob": patient.dob.isoformat() if patient.dob else None,
+                # "dob": patient.dob.isoformat() if patient.dob else None,
             }
         ),
         200,

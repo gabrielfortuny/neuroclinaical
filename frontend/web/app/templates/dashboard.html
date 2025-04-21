@@ -4,21 +4,26 @@
 
 {% block content %}
   <h1>Patient Dashboard</h1>
-  
+
   <!-- Create Patient Button -->
-  <a href="{{ url_for('patient.create_patient') }}" class="btn btn-primary">Create Patient</a>
-  
+  <div class="action-bar">
+    <a href="{{ url_for('patient.create_patient') }}" class="btn btn-primary">+ Create New Patient</a>
+  </div>
+
   {% if patients %}
-    <ul>
+    <ul class="patient-list">
       {% for patient in patients %}
-        <li>
-          <a href="{{ url_for('patient.patient_detail', patient_id=patient.id) }}">
-            {{ patient.name }}
+        <li class="patient-item">
+          <a href="{{ url_for('patient.patient_detail', patient_id=patient.id) }}" class="patient-link">
+            <div class="patient-card">
+              <h3>{{ patient.name }}</h3>
+              <p>ID: {{ patient.id }}</p>
+            </div>
           </a>
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>No patients available.</p>
+    <p class="no-patients">No patients available.</p>
   {% endif %}
 {% endblock %}

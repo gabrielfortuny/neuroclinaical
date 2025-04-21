@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 from typing import List, Dict
 from flask import current_app
-from app.__init__ import db
+from app import db
 
 from app.models import Seizure, DrugAdministration, Electrode
 
@@ -232,6 +232,12 @@ def store_drugs_array(drugs: List[Dict], p_id: int) -> bool:
             if not drug_name:
                 continue
 
+            drug_time = drug.get("time", "").lower()
+            if not drug_name:
+                continue
+
+            real_time = extract_time_for_DB(drug_time)
+
             # Get dosage with fallback
             try:
                 dosage = int(drug.get("mg_administered", 0))
@@ -242,15 +248,15 @@ def store_drugs_array(drugs: List[Dict], p_id: int) -> bool:
             day = drug.get("day", 1)
 
             # Find or create drug record
-            db_drug = Drug.query.filter_by(name=drug_name).first()
+            db_drug = DrugAdministration.query.filter_by(drug_name=drug_name).first()
             if not db_drug:
-                db_drug = Drug(name=drug_name)
+                db_drug = DrugAdministration(name=drug_name)
                 db.session.add(db_drug)
                 db.session.flush()
 
             # Create administration record
             admin = DrugAdministration(
-                patient_id=p_id, drug_id=db_drug.id, day=day, dosage=dosage
+                patient_id=p_id, day=day, dosage=dosage, drug_name=drug_name, time=real_time
             )
 
             db.session.add(admin)

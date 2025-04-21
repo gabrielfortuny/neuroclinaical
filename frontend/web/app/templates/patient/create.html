@@ -3,10 +3,14 @@
 {% block title %}Create Patient{% endblock %}
 
 {% block content %}
-  <h1>Create a New Patient</h1>
-  <form method="POST">
-    <label for="name">Patient Name:</label>
-    <input type="text" id="name" name="name" required>
-    <button type="submit" class="btn btn-primary">Create</button>
-  </form>
+  <div class="form-container">
+    <h1>Create a New Patient</h1>
+    <form method="POST" class="form">
+      <div class="form-group">
+        <label for="name">Patient Name:</label>
+        <input type="text" id="name" name="name" class="form-input" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+  </div>
 {% endblock %}

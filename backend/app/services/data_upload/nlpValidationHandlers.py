@@ -126,6 +126,7 @@ def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
         List of processed seizure dictionaries or empty list on error
     """
     try:
+        current_app.logger.info(f"{json_text}")
         json_data = extract_json_content(json_text)
         data = json.loads(json_data)
         seizure_list = []
@@ -216,6 +217,7 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
     }
     try:
         try:
+            current_app.logger.info(f"{input_json}")
             start_index = input_json.find('[')
             end_index = input_json.rfind(']')
             json_content = input_json[start_index:end_index + 1]
@@ -278,7 +280,7 @@ def validate_drug(day: int, input_json: str) -> List[Dict[str, Any]]:
             except:
                 continue  # skip broken entry
 
-                return updated_data
+        return updated_data
 
     except Exception as err:
         print(f"Validation error in validate_drug: {err}")
