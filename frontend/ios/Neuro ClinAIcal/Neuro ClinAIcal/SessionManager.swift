@@ -439,4 +439,51 @@ class SessionManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
     }
+    
+    func fetchReportImageIDs(forReportId reportId: Int) async throws -> [Int] {
+        guard let url = URL(string: "\(Self.baseURL)/reports/\(reportId)/image_ids") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let decoded = try JSONDecoder().decode([String: [Int]].self, from: data)
+        return decoded["indexes"] ?? []
+    }
+    
+    func fetchReportImage(imageId: Int) async throws -> (Data, String) {
+        guard let url = URL(string: "\(Self.baseURL)/reports/\(imageId)/image") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("image/jpeg, image/png, image/webp, */*", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let http = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        switch http.statusCode {
+        case 200:
+            let mime = response.mimeType
+                ?? http.value(forHTTPHeaderField: "Content-Type")?
+                    .split(separator: ";", maxSplits: 1)
+                    .first
+                    .map(String.init)
+                ?? "application/octet-stream"
+            return (data, mime)
+        default:
+            throw URLError(.badServerResponse)
+        }
+    }
 }

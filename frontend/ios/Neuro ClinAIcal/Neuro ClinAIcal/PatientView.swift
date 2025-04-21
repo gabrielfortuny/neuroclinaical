@@ -228,6 +228,27 @@ struct PatientView: View {
         .padding()
     }
     
+    private func renderLTMImages(_ session: Session) -> some View {
+        VStack (alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Extracted Images")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                Spacer()
+            }
+            Divider()
+                .background(Color.gray)
+            
+            ForEach(session.images, id: \.self) { imageId in
+                ImageView(imageId: imageId)
+                    .frame(height: 200)
+                    .cornerRadius(8)
+                    .shadow(radius: 2)
+            }
+        }
+        .padding()
+    }
+    
     private func renderSupplementaryFiles(_ session: Session) -> some View {
         VStack (alignment: .leading, spacing: 8) {
             HStack {
@@ -290,6 +311,7 @@ struct PatientView: View {
     private func viewFileContent() -> some View {
         ScrollView {
                 renderLTMFile(session)
+                renderLTMImages(session)
                 renderSupplementaryFiles(session)
             } // ScrollView
             .background(Color.white)
@@ -306,26 +328,18 @@ struct PatientView: View {
         } catch {
             print("Failed to fetch supplementary materials:", error)
         }
-        /*do {
-            session.seizures = try await sessionManager.fetchSeizures(forPatientId: patient.id)
-        } catch {
-            print("Failed to fetch seizures:", error)
-        }
-        do {
-            session.drugAdministrations = try await sessionManager.fetchDrugAdministration(forPatientId: patient.id)
-        } catch {
-            print("Failed to fetch drug administrations:", error)
-        }
-        if let reportID = session.ltmFile?.reportId {
+        if let file = session.ltmFile {
             do {
-                session.chatMessages = try await sessionManager.fetchConversationMessages(forReportId: reportID)
+                session.images = try await sessionManager.fetchReportImageIDs(forReportId: file.reportId)
             } catch {
-                print("Failed to fetch chat messages:", error)
+                print("Failed to fetch image ids for LTM file:", error)
             }
-        }*/
+        }
+
         print("Ran Refresh")
         if let file = session.ltmFile {
             print("LTM ID: \(file.reportId)")
+            print("Image IDs: \(session.images)")
         }
     }
     
