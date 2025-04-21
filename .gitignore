@@ -579,3 +579,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,linux,git,visualstudiocode,xcode,pycharm,python,flask,swift
 
 backend/NeuroClin
+out
+out.txt
+query.txt
