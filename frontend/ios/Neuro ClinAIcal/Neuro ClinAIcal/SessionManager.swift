@@ -10,8 +10,8 @@ import Alamofire
 
 class SessionManager: ObservableObject {
     @Published var currentUser: User? = nil
-    static var baseURL: String = "http://localhost:8000"
-    //static var baseURL: String = "http://100.91.43.47:8000"
+//    static var baseURL: String = "http://localhost:8000"
+    static var baseURL: String = "http://100.91.43.47:8000"
     var users: [User] = [
         User(id: 0, username: "Demo", email: "Demo@example.com")
     ]

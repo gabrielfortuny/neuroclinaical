@@ -33,22 +33,9 @@
 		66281DB52D779CD60023826D /* Neuro ClinAIcalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Neuro ClinAIcalUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		66A9F2672DB627A800444A18 /* Exceptions for "Neuro ClinAIcal" folder in "Neuro ClinAIcal" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"Neuro-ClinAIcal-Info.plist",
-			);
-			target = 66281D9A2D779CD50023826D /* Neuro ClinAIcal */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		66281D9D2D779CD50023826D /* Neuro ClinAIcal */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				66A9F2672DB627A800444A18 /* Exceptions for "Neuro ClinAIcal" folder in "Neuro ClinAIcal" target */,
-			);
 			path = "Neuro ClinAIcal";
 			sourceTree = "<group>";
 		};

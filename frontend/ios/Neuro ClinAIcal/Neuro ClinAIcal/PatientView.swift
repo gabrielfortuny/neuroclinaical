@@ -53,6 +53,8 @@ struct PatientView: View {
     }
     @State private var isImportingSupplementary = false
     
+    @State private var showingLTMImport = false
+    
     @State private var documentToExport: DataFileDocument? = nil
     @State private var exportFilename: String = ""
     @State private var showingExporter = false
@@ -228,11 +230,29 @@ struct PatientView: View {
                     Text("No LTM added")
                         .foregroundColor(.gray)
                     Spacer()
-                    FileImporterView(importedFileURL: $importedReportURL,
-                                   allowedTypes: allowedTypes,
-                                   buttonTitle: "Import LTM") { fileURL in
-                        try await sessionManager.uploadReport(forPatientId: patient.id, fileURL: fileURL)
-                        await refresh()
+                    Button("Import LTM") {
+                               showingLTMImport = true
+                              }
+                    .sheet(isPresented: $showingLTMImport) {
+                        DocumentPicker(
+                            allowedTypes: allowedTypes,
+                            asCopy: false
+                        ) { urls in
+                            guard let url = urls.first else { return }
+                            Task {
+                                defer { url.stopAccessingSecurityScopedResource() }
+                                do {
+                                    try await sessionManager.uploadReport(
+                                        forPatientId: patient.id,
+                                        fileURL: url
+                                    )
+                                    await refresh()
+                                } catch {
+                                    print("Import/upload failed:", error)
+                                }
+                            }
+                            showingLTMImport = false
+                        }
                     }
                 }
             } // HStack 2
@@ -252,24 +272,29 @@ struct PatientView: View {
                 .background(Color.gray)
             
             if let _ = session.ltmFile {
-                ForEach(session.ltmImageIDs, id: \.self) { imageId in
-                    ImageView(imageId: imageId)
-                        .frame(height: 200)
-                        .cornerRadius(8)
-                        .shadow(radius: 2)
-                        .onTapGesture {
-                            Task {
-                                do {
-                                    let (data, mime) = try await sessionManager.fetchReportImage(imageId: imageId)
-                                    let ext = fileExtension(for: mime)
-                                    exportFilename = "image_\(imageId).\(ext)"
-                                    documentToExport = DataFileDocument(data: data)
-                                    showingExporter = true
-                                } catch {
-                                    print("Error downloading image \(imageId):", error)
+                if session.ltmImageIDs.isEmpty {
+                    Text("No images to extract.")
+                        
+                } else {
+                    ForEach(session.ltmImageIDs, id: \.self) { imageId in
+                        ImageView(imageId: imageId)
+                            .frame(height: 200)
+                            .cornerRadius(8)
+                            .shadow(radius: 2)
+                            .onTapGesture {
+                                Task {
+                                    do {
+                                        let (data, mime) = try await sessionManager.fetchReportImage(imageId: imageId)
+                                        let ext = fileExtension(for: mime)
+                                        exportFilename = "image_\(imageId).\(ext)"
+                                        documentToExport = DataFileDocument(data: data)
+                                        showingExporter = true
+                                    } catch {
+                                        print("Error downloading image \(imageId):", error)
+                                    }
                                 }
                             }
-                        }
+                    }
                 }
             } else {
                 Text("Upload an LTM report to see images")
@@ -327,11 +352,29 @@ struct PatientView: View {
                 }
             }
             
-            FileImporterView(importedFileURL: $importedSupplementalURL,
-               allowedTypes: allowedTypes,
-               buttonTitle: "Add New File") { fileURL in
-                try await sessionManager.uploadSupplementaryFile(forPatientId: patient.id, fileURL: fileURL)
-                await refresh()
+            Button("Add New File") {
+                       showingLTMImport = true
+                      }
+            .sheet(isPresented: $showingLTMImport) {
+                DocumentPicker(
+                    allowedTypes: allowedTypes,
+                    asCopy: false
+                ) { urls in
+                    guard let url = urls.first else { return }
+                    Task {
+                        defer { url.stopAccessingSecurityScopedResource() }
+                        do {
+                            try await sessionManager.uploadSupplementaryFile(
+                                forPatientId: patient.id,
+                                fileURL: url
+                            )
+                            await refresh()
+                        } catch {
+                            print("Import/upload failed:", error)
+                        }
+                    }
+                    showingLTMImport = false
+                }
             }
         }
         .padding()
