@@ -579,3 +579,4 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,linux,git,visualstudiocode,xcode,pycharm,python,flask,swift
 
 backend/NeuroClin
+backend/ollama/models/blobs/sha256-f35effb13a87143a48d9ab3afc07fbe47f5a876398485517c2954670033ee000
