@@ -42,11 +42,16 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
                 
             payload = {
                 "model": MODEL_NAME,
-                "prompt": f"Extract all seizure events from the provided medical report and return them in a JSON list. Each seizure event should include the following fields:\
-                1. **start_time**: The start time of the seizure in the format `HH:MM:SS` (e.g., `06:32:06`).\
-                2. **electrodes_involved**: A list of electrodes involved at seizure onset, separated by commas (e.g., `['RMH1', 'RMH2']`).\
-                3. **duration**: The duration of the seizure in a human-readable format (e.g., `1 min 30 sec`).\
-                Return only the JSON list and nothing else. Here is the medical report:: {content}",
+                "prompt": f"""Extract all seizure events from the provided medical report and return them in a JSON list. Each seizure event should include the following fields:
+
+                1. **start_time**: The start time of the seizure in the format `HH:MM:SS` (e.g., `06:32:06`). If no start time is given, return ‘n/a’
+                2. **electrodes_involved**: A list of electrodes involved at seizure onset, separated by commas (e.g., `["RMH1", "RMH2"]`). Give only the electrode name and nothing else. Regions like ‘cingulate’ are not electrodes. Electrodes are abbreviated. 
+                3. **duration**: The duration of the seizure in a human-readable format (e.g., `1 min 30 sec`). If a range is given, only give the start of the range. If no duration is specified, give ‘n/a’
+                5. **Clinical/Subclinical**: Whether the seizure was clinical or subclinical. If not specified, assume the seizure is clinical. 
+                4. **Type x**: If applicable, the type of seizure listed (e.g., ‘type 1, type 2). Only valid types are numerical types. Ie type 1, type 2, type x. If no type is specified, return ‘n/a’
+
+                Return only the JSON list and nothing else. Here is the medical report:
+                {content}""",
                 "stream": False,
             }
             current_app.logger.info(f"Sending seizure extraction request for day {day}")
@@ -88,11 +93,60 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
                 
             payload = {
                 "model": MODEL_NAME,
-                "prompt": f"Extract all drug administration details from the following medical report and return them in a JSON list. Each drug administration should include the following fields:\
-                1. `name`: The name of the drug (e.g., Lamotrigine).\
-                2. `mg_administered`: The amount of drug administered in milligrams (e.g., '1000').\
-                3. `code`: The clinical code associated with the administration frequency (e.g., 'BID', 'QD', 'QHS', 'mg/mg').\
-                Return only valid JSON and nothing else. Here is the medical report: {content}",
+                "prompt": f"""Extract all active drug administration details from the following medical report and return them as a structured JSON list. Each entry should include:  
+
+                Required Fields:  
+                1. `name` *(string)*: The name of the drug (e.g., "Lamotrigine").  
+                2. `dose_mg` *(list of numbers)*: The administered dose(s) in milligrams (e.g., `[1000]` or `[50, 25]` for multiple doses).  If no dose can be specified put “n/a”
+                3. `frequency_code` *(string)*: The clinical frequency code (e.g., "BID", "QD", "QHS").  
+                - Exclude "TDD" (total daily dose) as it is not a frequency code.  If no explicit code is given input ‘n/a’
+                4. `time_of_administration` *(list of strings or "n/a")*:  
+                - Convert vague terms (e.g., "morning" → "08:00", "PM" → "18:00", "noon" → "12:00").  
+                - If a time range is given (e.g., "8AM-10AM"), pick the midpoint (e.g., "09:00").  
+                - If no time is specified, return `"n/a"`.  
+
+                Clinical Frequency Codes & Definitions:  
+                | Code  | Meaning                     | Example Usage          |  
+                |-------|-----------------------------|------------------------|  
+                | QD    | Once daily                  | "100mg QD" → 100mg once daily |  
+                | BID   | Twice daily                 | "50mg BID" → 50mg at 8AM & 6PM |  
+                | TID   | Three times daily           | "200mg TID" → 200mg at 8AM, 2PM, 8PM |  
+                | QID   | Four times daily            | "100mg QID" → 100mg every 6 hours |  
+                | QHS   | At bedtime                  | "25mg QHS" → 25mg at 10PM |  
+                | PRN   | As needed                   | "10mg PRN" → only if required |  
+                | QxH   | Every *x* hours (e.g., Q4H) | "500mg Q6H" → every 6 hours |  
+                | AC/PC | Before/after meals          | "250mg AC" → before breakfast |  
+                | STAT  | Immediately                 | "100mg STAT" → given once now |  
+                | QAM   | Every morning               | "75mg QAM" → 75mg at 7AM |  
+                | QPM   | Every evening               | "75mg QPM" → 75mg at 7PM |  
+                | mg/mg | Twice daily (AM/PM)         | "200mg/mg" → 200mg AM & 200mg PM |  
+
+                Special Cases & Examples:  
+                - Dose Variations:  
+                - `"Vimpat 50,25 BID"` → `"dose_mg": [50, 25]`, `"frequency_code": "BID"`  
+                - `"Keppra 200/400/600"` → `"dose_mg": [200, 400, 600]`, `"frequency_code": "TID"`  
+                - `"Lacosamide 200/250 mg AM/PM"` → `"dose_mg": [200, 250]`, `"time_of_administration": ["08:00", "18:00"]`  
+                - ‘“Valproic acid 500 mg BID, 250 BID starting tonight”’ → `"dose_mg": [500, 250]`, `"time_of_administration": ["08:00", "18:00"]`  
+
+                - Ignore Discontinued Drugs:  
+                - If a drug is marked as "stopped" or "0mg", exclude it.  
+                - Partial Doses:  
+                - `"Clobazam 10/15 mg QHS"` → `"dose_mg": [10, 15]`, `"frequency_code": "QHS"`  
+                - `"Eslicarbazepine 400 → 200mg QHS"` → Only extract the current dose (`200mg`).  
+
+                Output Format:  
+                ```json
+                [
+                {
+                    "name": "DrugName",
+                    "dose_mg": [100, 200],
+                    "frequency_code": "BID",
+                    "time_of_administration": ["08:00", "20:00"]
+                }
+                ]
+
+                Here is the medical report: 
+                {content}""",
                 "stream": False,
             }
             current_app.logger.info(f"Sending drug extraction request for day {day}")
