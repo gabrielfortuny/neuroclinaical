@@ -45,7 +45,7 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
                 "prompt": f"""Extract all seizure events from the provided medical report and return them in a JSON list. Each seizure event should include the following fields:
 
                 1. **start_time**: The start time of the seizure in the format `HH:MM:SS` (e.g., `06:32:06`). If no start time is given, return ‘n/a’
-                2. **electrodes_involved**: A list of electrodes involved at seizure onset, separated by commas (e.g., `["RMH1", "RMH2"]`). Give only the electrode name and nothing else. Regions like ‘cingulate’ are not electrodes. Electrodes are abbreviated. 
+                2. **electrodes_involved**: A list of electrodes involved at seizure onset, separated by commas (e.g., `["RMH1", "RMH2"]` or ["RAH 1-4", "RAM 1-2", "RMH 1-2", "RPH 1-2"]). Give only the electrode name and nothing else. Regions like ‘cingulate’ are not electrodes. Electrodes are abbreviated. 
                 3. **duration**: The duration of the seizure in a human-readable format (e.g., `1 min 30 sec`). If a range is given, only give the start of the range. If no duration is specified, give ‘n/a’
                 5. **Clinical/Subclinical**: Whether the seizure was clinical or subclinical. If not specified, assume the seizure is clinical. 
                 4. **Type x**: If applicable, the type of seizure listed (e.g., ‘type 1, type 2). Only valid types are numerical types. Ie type 1, type 2, type x. If no type is specified, return ‘n/a’
@@ -59,15 +59,17 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             
             # Try to validate, with a maximum of 3 retries
             current_app.logger.info("Validating seizure data")
-            finalized_jsons = validate_seizure(day_int, response)
-            retry_count = 0
-            max_retries = 3
-            
-            while not finalized_jsons and retry_count < max_retries:
-                current_app.logger.info(f"Seizure validation retry {retry_count+1}/{max_retries}")
-                response = send_request_to_model(payload)
+            finalized_jsons = []
+            if response:
                 finalized_jsons = validate_seizure(day_int, response)
-                retry_count += 1
+                retry_count = 0
+                max_retries = 1
+                
+                while not finalized_jsons and retry_count < max_retries:
+                    current_app.logger.info(f"Seizure validation retry {retry_count+1}/{max_retries}")
+                    response = send_request_to_model(payload)
+                    finalized_jsons = validate_seizure(day_int, response)
+                    retry_count += 1
             
             # Only extend if we have valid seizures
             if finalized_jsons:
@@ -93,7 +95,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
                 
             payload = {
                 "model": MODEL_NAME,
-                "prompt": f"""Extract all active drug administration details from the following medical report and return them as a structured JSON list. Each entry should include:  
+                "prompt": """Extract all active drug administration details from the following medical report and return them as a structured JSON list. Each entry should include:  
 
                 Required Fields:  
                 1. `name` *(string)*: The name of the drug (e.g., "Lamotrigine").  
@@ -146,7 +148,7 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
                 ]
 
                 Here is the medical report: 
-                {content}""",
+                """ + content,
                 "stream": False,
             }
             current_app.logger.info(f"Sending drug extraction request for day {day}")
