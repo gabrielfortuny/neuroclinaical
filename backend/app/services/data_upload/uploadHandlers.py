@@ -162,6 +162,7 @@ def upload_controller(content_ext: str,
     # ---- 3.  persist -------------------------------------------------------
     try:
         report.summary = summary.strip()
+        db.session.commit()
         days = extract_days_from_text(extracted_text)
         seizures = handle_seizure_request(days)
         store_seizures_array(seizures, p_id)

@@ -164,24 +164,10 @@ def get_seizures_by_patient(patient_id):
                 else None
             ),
             "duration": seizure.duration,  # Already in ISO 8601 format
-            "created_at": (
-                seizure.created_at.isoformat() if seizure.created_at else None
-            ),
-            "modified_at": (
-                seizure.modified_at.isoformat()
-                if seizure.modified_at
-                else None
-            ),
             "electrodes": [
                 {
                     "id": e.id,
-                    "name": e.name,
-                    "created_at": (
-                        e.created_at.isoformat() if e.created_at else None
-                    ),
-                    "modified_at": (
-                        e.modified_at.isoformat() if e.modified_at else None
-                    ),
+                    "name": e.name
                 }
                 for e in seizure.electrodes
             ],
@@ -241,9 +227,9 @@ def get_patient_drug_administration(patient_id):
         # Get database connection parameters from the environment
         host = "db"  # Container name from docker-compose
         port = 5432  # Default PostgreSQL port
-        user = "admin"
-        password = "dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U"
-        database = "database"
+        user = "postgres"
+        password = "password"
+        database = "neuroclinaical"
 
         # Create direct connection to PostgreSQL
         conn = psycopg2.connect(
@@ -260,15 +246,12 @@ def get_patient_drug_administration(patient_id):
             """
             SELECT 
                 da.id, 
-                da.drug_id, 
                 d.name AS drug_name, 
-                d.drug_class, 
                 da.day, 
-                da.dosage
+                da.dosage,
+                da.time
             FROM 
                 drug_administration da
-            JOIN 
-                drugs d ON da.drug_id = d.id
             WHERE 
                 da.patient_id = %s
             ORDER BY 
@@ -285,7 +268,6 @@ def get_patient_drug_administration(patient_id):
         for drug in drugs:
             drug_data = {
                 "id": drug["id"],
-                "drug_id": drug["drug_id"],
                 "drug_name": drug["drug_name"],
                 "drug_class": drug["drug_class"],
                 "day": drug["day"],

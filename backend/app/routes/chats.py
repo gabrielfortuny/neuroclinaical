@@ -41,6 +41,9 @@ def send_message(report_id):
             return jsonify({"error": "Failed to match extension"}), 500
 
         current_app.logger.error(f"Working4")
+        if not os.path.exists(report.file_path):
+            current_app.logger.error(f"File not found: {report.file_path}")
+            return jsonify({"error": "Report file not found"}), 500
         extracted_text = supported_file_types[content_ext](report.file_path)
         current_app.logger.error(f"{extracted_text}")
         if not extracted_text:

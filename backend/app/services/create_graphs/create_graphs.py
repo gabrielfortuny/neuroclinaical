@@ -37,7 +37,6 @@ def fetch_graph_data(patient_id):
         """
         SELECT
             da.id, 
-            da.drug_id, 
             d.name AS drug_name, 
             d.drug_class, 
             da.day, 
@@ -45,8 +44,6 @@ def fetch_graph_data(patient_id):
             da.time
         FROM 
             drug_administration da
-        JOIN 
-            drugs d ON da.drug_id = d.id
         WHERE 
             da.patient_id = %s
         ORDER BY 
@@ -63,9 +60,7 @@ def fetch_graph_data(patient_id):
     for drug in drugs:
         drug_data = {
             "id": drug["id"],
-            "drug_id": drug["drug_id"],
             "name": drug["drug_name"],
-            "drug_class": drug["drug_class"],
             "day": drug["day"],
             "mg_administered": drug["dosage"],
             "time": drug["time"],
@@ -85,12 +80,6 @@ def fetch_graph_data(patient_id):
                 seizure.start_time.strftime("%H:%M:%S") if seizure.start_time else None
             ),
             "duration": seizure.duration,  # Already in ISO 8601 format
-            "created_at": (
-                seizure.created_at.isoformat() if seizure.created_at else None
-            ),
-            "modified_at": (
-                seizure.modified_at.isoformat() if seizure.modified_at else None
-            ),
             "electrodes": [electrode.name for electrode in seizure.electrodes],
         }
         data.append(seizure_data)
@@ -116,8 +105,10 @@ def make_plot2(
     Returns:
     - Image.Image, the generated plot as an image
     """
-
+    current_app.logger.info(f"data one {data1}")
+    current_app.logger.info(f"data two {data2}")
     data1, data2 = fetch_graph_data(patient_id)
+    
     # TODO: Only do code below this, code above is needed, only replace below
     # Create a blank image
     img = Image.new("RGB", (800, 600), color="white")

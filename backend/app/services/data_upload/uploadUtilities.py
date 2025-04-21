@@ -57,24 +57,38 @@ def chunk_paragraphs_by_word_count(paragraphs, max_words=150, overlap=0):
 
 def find_top_k_similar(text, question, k=3, model_name='all-mpnet-base-v2'):
     """Find top-k paragraphs most similar to the question."""
+    current_app.logger.info("1")
     model = SentenceTransformer(model_name)
+    current_app.logger.info("2")
     paragraphs = split_paragraphs(text)
+    current_app.logger.info("3")
     paragraphs = filter_paragraphs(paragraphs)
+    current_app.logger.info("4")
     paragraphs = chunk_paragraphs_by_word_count(paragraphs)
+    current_app.logger.info("5")
     paragraphs = list(set(paragraphs))
+    current_app.logger.info("6")
     # Generate embeddings
     paragraph_embeddings = model.encode(paragraphs)
+    current_app.logger.info("7")
     question_embedding = model.encode([question])[0]
+    current_app.logger.info("8")
 
     # Calculate similarities
-    similarities = cosine_similarity([question_embedding], paragraph_embeddings)[0]
+    paragraph_embeddings = np.array(paragraph_embeddings)
+    question_embedding = np.array(question_embedding).reshape(1, -1)
+
+    similarities = cosine_similarity(question_embedding, paragraph_embeddings)[0]    
+    current_app.logger.info("9")
 
     # Get top k indices
     top_k_indices = np.argsort(similarities)[-k:][::-1]
+    current_app.logger.info("10")
 
     # Prepare results
     results = []
     for i in top_k_indices:
+        current_app.logger.info("loopedy poop")
         results.append({
             "paragraph": paragraphs[i],
             "similarity": float(similarities[i])  # Convert numpy float to Python float
@@ -167,8 +181,11 @@ def store_seizures_array(seizures: List[Dict], p_id: int) -> bool:
             )
 
             # Add and flush to get ID before adding electrodes
-            db.session.add(db_seizure)
-            db.session.flush()
+            try:
+                db.session.add(db_seizure)
+                db.session.flush()
+            except Exception as e:
+                current_app.logger.info(f"PROP DUPLICATE {e}")
 
             # Process electrodes if present
             electrodes = []
@@ -216,9 +233,6 @@ def store_drugs_array(drugs: List[Dict], p_id: int) -> bool:
     Returns:
         bool: True if successful, False otherwise
     """
-    if not drugs:
-        current_app.logger.info("No drugs to store")
-        return True
 
     try:
         stored_count = 0
@@ -236,7 +250,6 @@ def store_drugs_array(drugs: List[Dict], p_id: int) -> bool:
             if not drug_name:
                 continue
 
-            real_time = extract_time_for_DB(drug_time)
 
             # Get dosage with fallback
             try:
@@ -247,16 +260,11 @@ def store_drugs_array(drugs: List[Dict], p_id: int) -> bool:
             # Get day
             day = drug.get("day", 1)
 
-            # Find or create drug record
-            db_drug = DrugAdministration.query.filter_by(drug_name=drug_name).first()
-            if not db_drug:
-                db_drug = DrugAdministration(name=drug_name)
-                db.session.add(db_drug)
-                db.session.flush()
+            
 
             # Create administration record
             admin = DrugAdministration(
-                patient_id=p_id, day=day, dosage=dosage, drug_name=drug_name, time=real_time
+                patient_id=p_id, day=day, dosage=dosage, drug_name=drug_name, time=drug_time
             )
 
             db.session.add(admin)

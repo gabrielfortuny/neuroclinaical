@@ -25,8 +25,6 @@ def get_seizure(seizure_id: int):
             "day": seizure.day,
             "start_time": seizure.start_time,
             "duration": seizure.duration,
-            "created_at": seizure.created_at,
-            "modified_at": seizure.modified_at,
             "electrodes": [],  # TODO
         }
     )

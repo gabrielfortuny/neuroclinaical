@@ -58,10 +58,12 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             }
             current_app.logger.info(f"Sending seizure extraction request for day {day}")
             response = send_request_to_model(payload)
-            
+            current_app.logger.info(f"response {response}")
             # Try to validate, with a maximum of 3 retries
             current_app.logger.info("Validating seizure data")
+
             finalized_jsons = validate_seizure(day_int, response)
+            current_app.logger.info(f"response json {finalized_jsons}")
             retry_count = 0
             max_retries = 1
             
@@ -153,10 +155,11 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
             }
             current_app.logger.info(f"Sending drug extraction request for day {day}")
             response = send_request_to_model(payload)
-            
+            current_app.logger.info(f"response {response}")
             # Try to validate, with a maximum of 3 retries
             current_app.logger.info("Validating drug data")
             finalized_jsons = validate_drug(day_int, response)
+            current_app.logger.info(f"response final {finalized_jsons}")
             retry_count = 0
             max_retries = 1
             
@@ -180,9 +183,11 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
 
 def handle_chat_request(text, question):
     k = 5  # Reduced for more focused results
-
+    current_app.logger.info("enter")
     # Get and display results
-    top_paragraphs = find_top_k_similar(text, question, k)
+    top_paragraphs = find_top_k_similar(text, question, k, 'all-mpnet-base-v2')
+
+    current_app.logger.info(f"here {top_paragraphs}")
     query = ""
 
     query = query + f"\nQuestion: '{question}'\n"
@@ -201,7 +206,7 @@ def handle_chat_request(text, question):
     
     response = send_request_to_model(payload=payload)
 
-    return response;
+    return response
 
 def send_request_to_model(payload: Dict[str, Any]) -> str:
     """Send a request to the Ollama model and return the response."""

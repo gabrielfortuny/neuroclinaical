@@ -12,9 +12,9 @@ def get_db_connection():
     # In Docker, this will use the container-network connection
     host = "db"  # Container name from docker-compose
     port = 5432  # Default PostgreSQL port
-    user = "admin"
-    password = "dpSVtoZUjmyXAXWo6LfLe3NgzZQHPqvt3POhmMPTU2U"
-    database = "database"
+    user = "postgres"
+    password = "password"
+    database = "neuroclinaical"
     
     # Create and return the connection
     connection = psycopg2.connect(
@@ -84,7 +84,7 @@ def store_seizure(patient_id, day, start_time, duration, electrodes):
         cursor.execute(
             """
             INSERT INTO seizures 
-            (patient_id, day, start_time, duration, created_at, modified_at) 
+            (patient_id, day, start_time, duration) 
             VALUES (%s, %s, %s, %s, NOW(), NOW()) 
             RETURNING id
             """,
@@ -112,7 +112,7 @@ def store_seizure(patient_id, day, start_time, duration, electrodes):
                     cursor.execute(
                         """
                         INSERT INTO electrodes 
-                        (name, created_at, modified_at) 
+                        (name) 
                         VALUES (%s, NOW(), NOW()) 
                         RETURNING id
                         """,
@@ -140,6 +140,7 @@ def store_seizure(patient_id, day, start_time, duration, electrodes):
         close_connection(conn, cursor)
 
 def store_drug(patient_id, drug_name, day, dosage):
+    pass
     """Store a drug administration using direct database access."""
     conn, cursor = get_db_connection()
     try:
@@ -167,7 +168,7 @@ def store_drug(patient_id, drug_name, day, dosage):
             cursor.execute(
                 """
                 INSERT INTO drugs 
-                (name, created_at, modified_at) 
+                (name) 
                 VALUES (%s, NOW(), NOW()) 
                 RETURNING id
                 """,
@@ -179,10 +180,10 @@ def store_drug(patient_id, drug_name, day, dosage):
         cursor.execute(
             """
             INSERT INTO drug_administration 
-            (patient_id, drug_id, day, dosage, created_at, modified_at) 
+            (patient_id, day, dosage) 
             VALUES (%s, %s, %s, %s, NOW(), NOW())
             """,
-            (patient_id, drug_id, day, dosage)
+            (patient_id, day, dosage)
         )
         
         conn.commit()

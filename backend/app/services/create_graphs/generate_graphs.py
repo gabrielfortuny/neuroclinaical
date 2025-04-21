@@ -1254,7 +1254,7 @@ def plot_colors(colors, title):
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import defaultdict
-
+from flask import current_app
 
 def fetch_graph_data(patient_id):
     patient = Patient.query.get(patient_id)
@@ -1264,7 +1264,7 @@ def fetch_graph_data(patient_id):
     # Import psycopg2 for direct database access
     import psycopg2
     import psycopg2.extras
-
+    
     # Get database connection parameters from the environment
     host = "db"  # Container name from docker-compose
     port = 5432  # Default PostgreSQL port
@@ -1303,9 +1303,7 @@ def fetch_graph_data(patient_id):
     for drug in drugs:
         drug_data = {
             "id": drug["id"],
-            "drug_id": drug["drug_id"],
             "name": drug["drug_name"],
-            "drug_class": drug["drug_class"],
             "day": drug["day"],
             "mg_administered": drug["dosage"],
             "time": drug["time"],
@@ -1321,20 +1319,12 @@ def fetch_graph_data(patient_id):
         seizure_data = {
             "id": seizure.id,
             "day": seizure.day,
-            "seizure_time": (
+            "start_time": (
                 seizure.start_time.strftime("%H:%M:%S")
                 if seizure.start_time
                 else None
             ),
             "duration": seizure.duration,  # Already in ISO 8601 format
-            "created_at": (
-                seizure.created_at.isoformat() if seizure.created_at else None
-            ),
-            "modified_at": (
-                seizure.modified_at.isoformat()
-                if seizure.modified_at
-                else None
-            ),
             "electrodes": [electrode.name for electrode in seizure.electrodes],
         }
         data.append(seizure_data)
@@ -1346,6 +1336,10 @@ def get_graphs(patient_id, graph_number):
     data1, data2 = fetch_graph_data(patient_id)
 
     if not data1:
+        image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
+        image = Image.open(image_path)
+        return image
+    if not data2:
         image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
         image = Image.open(image_path)
         return image
