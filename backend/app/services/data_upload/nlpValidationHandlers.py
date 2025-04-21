@@ -1,5 +1,6 @@
 import json
 import re
+from flask import current_app
 from typing import List, Dict, Union, Any
 from datetime import datetime, timedelta
 
@@ -128,6 +129,8 @@ def validate_seizure(day: int, json_text: str) -> List[Dict[str, Any]]:
         json_data = extract_json_content(json_text)
         data = json.loads(json_data)
         seizure_list = []
+        current_app.logger.info(f"Sending seizure extraction request for day {day}")
+
 
         # Process each seizure entry
         for seizure in data:

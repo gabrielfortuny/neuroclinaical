@@ -6,6 +6,7 @@ Original file is located at
     https://colab.research.google.com/drive/10RZQvG8ndF8Jytl7iysfOnX318rQvBKA
 """
 
+import os
 from PIL import Image
 from datetime import datetime
 from app.models import Patient
@@ -1344,6 +1345,11 @@ def get_graphs(patient_id, graph_number):
     # REPLACE WITH PATIENT DATA !!!!!!
     data1, data2 = fetch_graph_data(patient_id)
 
+    if not data1:
+        image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
+        image = Image.open(image_path)
+        return image
+
     match graph_number:
         case 0:
             img = make_plot2(
@@ -1395,6 +1401,10 @@ def get_graphs(patient_id, graph_number):
             ).rotate(270, expand=True)
 
         case 5:
+            if not data2:
+                image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
+                image = Image.open(image_path)
+                return image
             img = make_plot2(
                 screen=2,
                 view_seizure_length=0,
@@ -1415,6 +1425,10 @@ def get_graphs(patient_id, graph_number):
             ).rotate(270, expand=True)
 
         case 7:
+            if not data2:
+                image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
+                image = Image.open(image_path)
+                return image
             img = make_plot2(
                 screen=2,
                 view_seizure_length=0,
