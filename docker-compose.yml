@@ -62,6 +62,8 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    # UNCOMMENT TO LIMIT MEMORY TO DESIRED SIZE
+    # mem_limit: 24g
 
   web:
     build: ./frontend/web
