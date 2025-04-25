@@ -8,4 +8,4 @@
 
 [video]: https://youtu.be/rs7CASWZWRs
 [wiki]: https://github.com/gabrielfortuny/neuroclinaical/wiki
-[agile]: https://trello.com/b/sample/general](https://trello.com/b/zWelVLuE/neuroclinaical-2
+[agile]: https://trello.com/b/zWelVLuE/neuroclinaical-2
