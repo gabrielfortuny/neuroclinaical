@@ -179,6 +179,13 @@ def store_seizures_array(seizures: List[Dict], p_id: int) -> bool:
             db_seizure = Seizure(
                 patient_id=p_id, day=day, start_time=start_time, duration=duration
             )
+            current_app.logger.info("FINAL BEFORE ADDING TO DB")
+            current_app.logger.info(    
+            f"Seizure(patient_id={db_seizure.patient_id}, "
+            f"day={db_seizure.day}, "
+            f"start_time={db_seizure.start_time}, "
+            f"duration={db_seizure.duration})"
+            )
 
             # Add and flush to get ID before adding electrodes
             try:
