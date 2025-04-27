@@ -195,9 +195,12 @@ def store_seizures_array(seizures: List[Dict], p_id: int) -> bool:
                 current_app.logger.info(f"PROP DUPLICATE {e}")
 
             # Process electrodes if present
-            electrodes = []
-            if "electrodes_involved" in seizure and seizure["electrodes_involved"]:
-                electrodes = seizure["electrodes_involved"]
+            try:
+                electrodes = []
+                if "electrodes_involved" in seizure and seizure["electrodes_involved"]:
+                    electrodes = seizure["electrodes_involved"]
+            except Exception as e:
+                        current_app.logger.info(f"error eek{e}")
 
             # Add each electrode
             for electrode_name in electrodes:
@@ -208,12 +211,20 @@ def store_seizures_array(seizures: List[Dict], p_id: int) -> bool:
                 # Find or create electrode
                 electrode = Electrode.query.filter_by(name=electrode_name).first()
                 if not electrode:
-                    electrode = Electrode(name=electrode_name)
-                    db.session.add(electrode)
-                    db.session.flush()
+                    try:
+                        
+                        electrode = Electrode(name=electrode_name)
+                        
+                        db.session.add(electrode)
+                        db.session.flush()
+                    except Exception as e:
+                        current_app.logger.info(f"PROP DUPLICATE 2{e}")
 
                 # Add the association
-                db_seizure.electrodes.append(electrode)
+                try:
+                    db_seizure.electrodes.append(electrode)
+                except Exception as e:
+                        current_app.logger.info(f"error 3{e}")
 
         # Commit all changes
         db.session.commit()
