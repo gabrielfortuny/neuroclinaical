@@ -50,7 +50,10 @@ services:
     container_name: neuroclinaical-ollama
     volumes:
       - ollama_data:/root/.ollama
-      #- ./backend/ollama/models:/root/.ollama/models
+      
+      - ollama_data:/root/.ollama
+      - ollama_models:/root/.ollama/models   # ← mount your .gguf here
+      - ./backend/ollama:/tmp/ollama:ro
     networks:
       - backend-network
       - ollama-external
@@ -82,6 +85,7 @@ volumes:
   postgres_data:
   ollama_data:
   app_uploads:
+  ollama_models:
 
 networks:
   public-network:

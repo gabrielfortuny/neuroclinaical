@@ -308,11 +308,10 @@ def make_plot2(
     # Extract seizure onset electrodes from data1
     seizure_onset_electrodes = set()
     for seizure in seizures:
-        seizure_onset_electrodes.update(seizure["seizure_onset_electrodes"])
+        seizure_onset_electrodes.update(seizure["electrodes"])
 
     drugs = drug_data
-    max_m = max(drugs, key=lambda x: int(x["mg_administered"]))
-    max_mg = int(max_m["mg_administered"])
+    
 
     # Calculate the range of days in the data
     seizure_days = [seizure["day"] for seizure in seizures]
@@ -470,7 +469,7 @@ def make_plot2(
 
                 for j, (seizure, length) in enumerate(zip(seizures, lengths)):
                     involved_electrodes = seizure.get(
-                        "seizure_onset_electrodes", []
+                        "electrodes", []
                     )
 
                     # Calculate position with spacing
@@ -591,7 +590,7 @@ def make_plot2(
 
                 for j, (seizure, length) in enumerate(zip(seizures, lengths)):
                     involved_electrodes = seizure.get(
-                        "seizure_onset_electrodes", []
+                        "electrodes", []
                     )
 
                     # Calculate position with spacing
@@ -712,7 +711,7 @@ def make_plot2(
             day_seizures = day_to_seizures[day]
             for i, seizure in enumerate(day_seizures):
                 seizure_time = datetime.strptime(
-                    seizure["seizure_time"], "%H:%M:%S"
+                    seizure["start_time"], "%H:%M:%S"
                 ).time()
                 x_value = (
                     (day - 1) * 24
@@ -732,7 +731,7 @@ def make_plot2(
                 # start of new code
 
                 involved_electrodes = seizure.get(
-                    "seizure_onset_electrodes", []
+                    "electrodes", []
                 )
 
                 # Calculate position with spacing
@@ -900,10 +899,12 @@ def make_plot2(
         )
 
         if view_drug_admin == 1:
+            max_m = max(drugs, key=lambda x: int(x["dosage"]))
+            max_mg = int(max_m["dosage"])
             # Plot drug administration on a secondary y-axis
             ax2 = plt.twinx()  # Create a secondary y-axis
             unique_drugs = list(
-                set(drug["name"] for drug in drugs)
+                set(drug["drug_name"] for drug in drugs)
             )  # Get unique drug names
             color_map = plt.colormaps.get_cmap(
                 "tab10"
@@ -951,17 +952,17 @@ def make_plot2(
                 # Check if labels are too close (conflict)
 
                 drug_index = unique_drugs.index(
-                    drug["name"]
+                    drug["drug_name"]
                 )  # Get index for color mapping
 
                 # Plot the scatter point
 
                 # Update max_drug if the current dosage is higher
-                if int(drug["mg_administered"]) > max_drug:
-                    max_drug = int(drug["mg_administered"])
+                if int(drug["dosage"]) > max_drug:
+                    max_drug = int(drug["dosage"])
 
                 if (
-                    abs(int(drug["mg_administered"]) - prevYval)
+                    abs(int(drug["dosage"]) - prevYval)
                     < (max_mg / 10)
                 ) and (abs(x_value - prevXval) < max(xticks) / 4):
                     pos = (
@@ -973,13 +974,13 @@ def make_plot2(
                     prevXpos = x_value
                 else:
                     pos = (
-                        int(drug["mg_administered"]) + max_mg / 20
+                        int(drug["dosage"]) + max_mg / 20
                     )  # Default vertical offset
                     prevPos = pos
                     prevXpos = x_value
 
                 prevYval = int(
-                    drug["mg_administered"]
+                    drug["dosage"]
                 )  # Update previous y_value
                 prevXval = (
                     (drug["day"] - 1) * 24
@@ -991,7 +992,7 @@ def make_plot2(
                 # Add drug name as annotation with vertical offset
                 ax2.scatter(
                     x_value,  # X-axis: normalized time across days
-                    int(drug["mg_administered"]),  # Y-axis: drug dosage
+                    int(drug["dosage"]),  # Y-axis: drug dosage
                     color=color_map(
                         drug_index / len(unique_drugs)
                     ),  # Assign unique color
@@ -1046,13 +1047,13 @@ def make_plot2(
         # Screen 3: Seizure onset electrodes by seizure
         electrodes = set()
         for seizure in seizures:
-            electrodes.update(seizure["seizure_onset_electrodes"])
+            electrodes.update(seizure["electrodes"])
         electrodes = sorted(list(electrodes))
 
         # Count the number of seizures per electrode
         electrode_counts = defaultdict(int)
         for seizure in seizures:
-            for electrode in seizure["seizure_onset_electrodes"]:
+            for electrode in seizure["electrodes"]:
                 electrode_counts[electrode] += 1
 
         # Prepare data for the bar graph
@@ -1301,6 +1302,7 @@ def fetch_graph_data(patient_id):
     # Convert to list of dictionaries for JSON response
     result = []
     for drug in drugs:
+        """"
         drug_data = {
             "id": drug["id"],
             "name": drug["drug_name"],
@@ -1308,7 +1310,8 @@ def fetch_graph_data(patient_id):
             "mg_administered": drug["dosage"],
             "time": drug["time"],
         }
-        result.append(drug_data)
+        """
+        result.append(drug)
 
     # Close the database connection
     cursor.close()
@@ -1339,10 +1342,7 @@ def get_graphs(patient_id, graph_number):
         image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
         image = Image.open(image_path)
         return image
-    if not data2:
-        image_path = os.path.join(os.path.dirname(__file__), "insufficientdata.png")
-        image = Image.open(image_path)
-        return image
+    
 
     match graph_number:
         case 0:

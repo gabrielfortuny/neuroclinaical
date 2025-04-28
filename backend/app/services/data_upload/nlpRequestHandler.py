@@ -14,7 +14,8 @@ from app.services.data_upload.nlpValidationHandlers import (
 
 OLLAMA_URL = os.getenv("OLLAMA_HOST")  # This should be just the base URL, like http://ollama:11434
 MODEL_NAME = "mymodel"
-ALT_MODEL_NAME = "mymodel"
+DRUG_MODEL_NAME = "drugmodel"
+SEIZURE_MODEL_NAME = "seizuremodel"
 
 def handle_summary_request(data: str) -> str:
     """Generate a summary of the medical report."""
@@ -87,12 +88,12 @@ def handle_seizure_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     try:
         for day, content in data.items():
             try:
-                day_int = int(day) if day.isdigit() else 1
+                day_int = day
             except ValueError:
                 day_int = 1
                 
             payload = {
-                "model": ALT_MODEL_NAME,
+                "model": SEIZURE_MODEL_NAME,
                 "prompt": f"""Extract all seizure events from the provided medical report and return them in a JSON list. Each seizure event should include the following fields:
 
                 1. **start_time**: The start time of the seizure in the format `HH:MM:SS` (e.g., `06:32:06`). If no start time is given, return ‘n/a’
@@ -139,13 +140,9 @@ def handle_drugadmin_request(data: Dict[str, str]) -> List[Dict[str, str]]:
     drugs = []
     try:
         for day, content in data.items():
-            try:
-                day_int = int(day) if day.isdigit() else 1
-            except ValueError:
-                day_int = 1
-                
+            day_int = day
             payload = {
-                "model": ALT_MODEL_NAME,
+                "model": DRUG_MODEL_NAME,
                 "prompt": """Extract all active drug administration details from the following medical report and return them as a structured JSON list. Each entry should include:  
 
                 Required Fields:  

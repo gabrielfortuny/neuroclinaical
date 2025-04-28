@@ -164,6 +164,8 @@ def upload_controller(content_ext: str,
         report.summary = summary.strip()
         db.session.commit()
         days = extract_days_from_text(extracted_text)
+        current_app.logger.info(f"Checking day error {days}")
+        
         seizures = handle_seizure_request(days)
         store_seizures_array(seizures, p_id)
         drug_admin = handle_drugadmin_request(days)

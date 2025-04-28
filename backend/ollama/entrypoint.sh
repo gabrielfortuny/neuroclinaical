@@ -1,25 +1,29 @@
 #!/bin/bash
 set -e
 
-echo "Starting Ollama server..."
-ollama serve & pid=$!
+echo "⏳  Copying GGUF files into /root/.ollama/models…"
 
+cp /tmp/ollama/models/seizure.gguf        /root/.ollama/models/
+cp /tmp/ollama/models/drug.gguf           /root/.ollama/models/
+cp /tmp/ollama/Modelfile                 /root/.ollama/models/
+cp /tmp/ollama/drug-modelfile            /root/.ollama/models/
+cp /tmp/ollama/seizure-modelfile         /root/.ollama/models/
+
+echo "✅  seizure.gguf & drug.gguf copied."
+
+echo "🚀  Starting Ollama server…"
+ollama serve & 
+pid=$!
+
+# wait a moment for the API to come up
 sleep 5
 
-echo "Creating Ollama model..."
-ollama create mymodel -f Modelfile
-echo "Created model!"
+echo "📦  Creating Ollama models…"
+cd /root/.ollama/models
+ollama create mymodel      -f Modelfile
+ollama create drugmodel    -f drug-modelfile
+ollama create seizuremodel -f seizure-modelfile
+echo "✅  Models registered."
 
-# Create newModelfile in the current directory
-#echo "Creating newModelfile..."
-#cat > /root/newModelfile << EOF
-#FROM /root/.ollama/models/newModel.gguf
-#PARAMETER temperature 0.7
-#PARAMETER num_predict 512
-#EOF
-
-#echo "Registering newModel"
-#ollama create newModel -f /root/newModelfile
-
-# wait for ollama process to finish
+# keep the server alive
 wait $pid

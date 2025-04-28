@@ -1,4 +1,4 @@
 FROM gemma3:4b
-PARAMETER num_ctx 10000
+PARAMETER num_ctx 100000
 PARAMETER temperature 0
 PARAMETER top_p 1

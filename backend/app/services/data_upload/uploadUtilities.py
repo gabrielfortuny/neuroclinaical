@@ -116,20 +116,16 @@ def extract_days_from_text(text: str) -> Dict[str, str]:
         text = text[: match.start()]  # Keep only text before this match
 
     # Regular expression to match "Day X - " or "Day X"
-    day_pattern = re.split(r"(Day\s+\d+)", text)
+    day_pattern = re.split(r"Day\s+\d+", text)
 
     parsed_days = {}
-    current_day = None
+    current_day = 1
 
     # Iterate through the split text
     for segment in day_pattern:
         segment = segment.strip()
-        if re.match(r"Day\s+\d+", segment):  # Identify day headers
-            current_day = segment
-            parsed_days[current_day] = ""
-        elif current_day:
-            parsed_days[current_day] += segment + "\n"
-
+        parsed_days[current_day] = segment
+        current_day += 1
     return parsed_days
 
 
@@ -195,21 +191,28 @@ def store_seizures_array(seizures: List[Dict], p_id: int) -> bool:
                 current_app.logger.info(f"PROP DUPLICATE {e}")
 
             # Process electrodes if present
-            try:
+            #try:
+                """
                 electrodes = []
                 if "electrodes_involved" in seizure and seizure["electrodes_involved"]:
                     electrodes = seizure["electrodes_involved"]
             except Exception as e:
                         current_app.logger.info(f"error eek{e}")
-
+                """
+            raw = seizure.get("electrodes_involved", [])
+            electrodes = list(dict.fromkeys(raw)) 
+            current_app.logger.info(f"print electrodes {electrodes}")
             # Add each electrode
             for electrode_name in electrodes:
+                current_app.logger.info(f"print electrodes name :{electrode_name}")
                 # Skip empty names
                 if not electrode_name:
+                    current_app.logger.info(f"Why")
                     continue
 
                 # Find or create electrode
                 electrode = Electrode.query.filter_by(name=electrode_name).first()
+                current_app.logger.info(f"print electrode after query {electrode}")
                 if not electrode:
                     try:
                         
@@ -227,6 +230,10 @@ def store_seizures_array(seizures: List[Dict], p_id: int) -> bool:
                         current_app.logger.info(f"error 3{e}")
 
         # Commit all changes
+        db.session.query(Seizure).filter(
+            (Seizure.start_time == None) |  (Seizure.duration == 0)
+        ).delete(synchronize_session=False)
+        
         db.session.commit()
         current_app.logger.info(f"Successfully stored {len(seizures)} seizures")
         return True

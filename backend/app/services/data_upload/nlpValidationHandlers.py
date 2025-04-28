@@ -90,27 +90,46 @@ def convert_duration_to_seconds(duration_str):
 
 
 # Function to split electrode ranges into individual electrodes
+# Function to split electrode ranges into individual electrodes
 def split_electrodes(electrode_str):
-    """Split electrode ranges (e.g., 'RPH1-4') into individual electrodes."""
     electrodes = []
-    for part in electrode_str.upper().split():
-        if "-" in part:
-            # Extract prefix (e.g., "RPH" from "RPH1-4")
-            prefix = re.sub(r"[\d-]", "", part)  # Remove digits and hyphens
-            range_part = part[len(prefix) :]  # Extract the range part (e.g., "1-4")
+    # Remove commas and normalize spaces
+    electrode_str = re.sub(r'\s+', '', electrode_str.upper())
 
-            # Validate the range part
-            if not re.match(r"^\d+-\d+$", range_part):
-                raise ValueError(f"Invalid electrode range format: {part}")
+    # Split by commas (no need to split on spaces anymore)
+    parts = electrode_str.split(',')
 
-            # Split range into start and end
-            start, end = map(int, range_part.split("-"))
 
-            # Generate individual electrodes
-            for i in range(start, end + 1):
-                electrodes.append(f"{prefix}{i}")
+    i = 0
+    while i < len(parts):
+        current = parts[i]
+
+        # Try to combine with next parts for cases like "RMH", "1", "-", "4"
+        if i + 2 < len(parts) and parts[i+1] in ('-', '/') and parts[i+2].isdigit():
+            prefix = re.sub(r'\d+', '', current)
+            start = int(re.sub(r'\D+', '', current))
+            end = int(parts[i+2])
+            electrodes.extend([f"{prefix}{j}" for j in range(start, end + 1)])
+            i += 3
+        # Case: "RMH1/4" or "RMH1-4"
+        elif re.match(r'^([A-Z]+)(\d+)[/-](\d+)$', current):
+            match = re.match(r'^([A-Z]+)(\d+)[/-](\d+)$', current)
+            prefix = match.group(1)
+            start = int(match.group(2))
+            end = int(match.group(3))
+            electrodes.extend([f"{prefix}{j}" for j in range(start, end + 1)])
+            i += 1
+        # Case: "RMH", "1/4" or "1-4"
+        elif i + 1 < len(parts) and re.match(r'^\d+[/-]\d+$', parts[i+1]):
+            prefix = current
+            start, end = map(int, re.split(r'[/-]', parts[i+1]))
+            electrodes.extend([f"{prefix}{j}" for j in range(start, end + 1)])
+            i += 2
+        # Case: plain electrode like "RMH1"
         else:
-            electrodes.append(part)
+            electrodes.append(current)
+            i += 1
+
     return electrodes
 
 
