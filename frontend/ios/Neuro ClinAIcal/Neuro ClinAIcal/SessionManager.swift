@@ -421,6 +421,7 @@ class SessionManager: ObservableObject {
         guard let url = URL(string: "\(Self.baseURL)/patients/\(patientId)/graph/\(graphNumber)") else {
             throw URLError(.badURL)
         }
+        print("\(url)")
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

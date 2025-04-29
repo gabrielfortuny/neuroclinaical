@@ -64,6 +64,8 @@ struct PatientView: View {
     @State private var response: String = ""
         
     @State private var session: Session = Session(id: 0)
+    
+    @State private var maxLoadedGraph = 0
 
     // Function for bottom navigation buttons
     func tabButton(icon: String, option: InfoOption, isSelected: Bool) -> some View {
@@ -161,20 +163,29 @@ struct PatientView: View {
     private func dataContent() -> some View {
         ScrollView {
             if session.ltmFile != nil {
-                ForEach(0..<9, id: \.self) { idx in
-                    Text("Graph \(idx)")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Divider()
-                    
-                    GraphImageView(patientId: patient.id, graphNumber: idx)
-                }
-            } else {
+                    ForEach(0...maxLoadedGraph, id: \.self) { idx in
+                      Text("Graph \(idx + 1)")
+                        .font(.title2).fontWeight(.semibold)
+                      Divider()
+                      GraphImageView(
+                        patientId: patient.id,
+                        graphNumber: idx,
+                        onLoad: {
+                          // when graph idx finishes, queue up the next one (if any)
+                          if maxLoadedGraph < 8 {
+                            maxLoadedGraph += 1
+                          }
+                        }
+                      )
+                    }
+                  } else {
                 Text("No Long Term Monitoring Report")
             }
         }
         .padding()
+        .onAppear {
+            maxLoadedGraph = 0
+        }
     }
     
     private func renderLTMFile(_ session: Session) -> some View {
