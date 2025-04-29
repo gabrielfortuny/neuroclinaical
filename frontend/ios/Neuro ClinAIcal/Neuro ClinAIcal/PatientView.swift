@@ -165,7 +165,8 @@ struct PatientView: View {
             if session.ltmFile != nil {
                     ForEach(0...maxLoadedGraph, id: \.self) { idx in
                       Text("Graph \(idx + 1)")
-                        .font(.title2).fontWeight(.semibold)
+                        .font(.title2)
+                        .fontWeight(.semibold)
                       Divider()
                       GraphImageView(
                         patientId: patient.id,
@@ -285,7 +286,7 @@ struct PatientView: View {
                 } else {
                     ForEach(session.ltmImageIDs, id: \.self) { imageId in
                         ImageView(imageId: imageId)
-                            .frame(height: 200)
+//                            .frame(height: 200)
                             .cornerRadius(8)
                             .shadow(radius: 2)
                             .onTapGesture {

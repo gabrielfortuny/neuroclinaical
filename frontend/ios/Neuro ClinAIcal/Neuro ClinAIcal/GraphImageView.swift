@@ -22,8 +22,8 @@ struct GraphImageView: View {
       if let img = uiImage {
         ScrollView(.horizontal) {
           Image(uiImage: img)
-            .interpolation(.high)
-            .antialiased(false)
+                .resizable()
+                .scaledToFit()
         }
         .onAppear {
           // once we actually display it, fire the onLoad exactly once
