@@ -12,15 +12,17 @@ struct GraphImageView: View {
     let patientId: Int
     let graphNumber: Int
 
-    @State private var uiImage: UIImage? = nil
-    @State private var loadError: Error? = nil
+    @State private var uiImage: UIImage?
+    @State private var loadError: Error?
 
     var body: some View {
         Group {
             if let img = uiImage {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFit()
+                ScrollView(.horizontal) {
+                    Image(uiImage: img)
+                        .interpolation(.high)   // keep text crisp; optional
+                        .antialiased(false)     // optional
+                }
             } else if loadError != nil {
                 Text("Failed to load")
                     .foregroundColor(.red)

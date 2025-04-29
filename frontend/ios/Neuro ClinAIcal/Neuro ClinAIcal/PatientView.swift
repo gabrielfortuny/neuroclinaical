@@ -160,19 +160,15 @@ struct PatientView: View {
     
     private func dataContent() -> some View {
         ScrollView {
-            if let _ = session.ltmFile {
-                ForEach(session.graphImageIDs, id: \.self) { index in
-                    Text("Graph \(index)")
+            if session.ltmFile != nil {
+                ForEach(0..<9, id: \.self) { idx in
+                    Text("Graph \(idx)")
                         .font(.title2)
                         .fontWeight(.semibold)
                     
-                    GraphImageView(
-                        patientId: patient.id,
-                        graphNumber: index
-                    )
-                    .frame(height: 200)
-                    .cornerRadius(8)
-                    .shadow(radius: 2)
+                    Divider()
+                    
+                    GraphImageView(patientId: patient.id, graphNumber: idx)
                 }
             } else {
                 Text("No Long Term Monitoring Report")

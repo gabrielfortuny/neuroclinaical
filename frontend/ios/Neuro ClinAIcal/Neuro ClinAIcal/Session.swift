@@ -10,7 +10,7 @@ struct Session: Identifiable, Codable {
     var ltmFile: LTMFile? = nil
     var supplementaryFiles: [SupplementaryFile] = []
     var ltmImageIDs: [Int] = []
-    var graphImageIDs: [Int] = Array(0...8)
+    // var graphImageIDs: [Int] = Array(0...8)
     // var seizures: [Seizure] = []
     // var drugAdministrations: [DrugAdministration] = []
     // var chatMessages: [ChatMessage] = [] // UNUSED NO API ENDPOINT
