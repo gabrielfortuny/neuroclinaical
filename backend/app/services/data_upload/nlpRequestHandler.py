@@ -3,15 +3,18 @@ import urllib
 import json
 import traceback
 from typing import List, Dict, Any
-from app.services.data_upload.uploadUtilities import find_top_k_similar
+from app.services.data_upload.uploadUtilities import filter_paragraphs, find_top_k_similar, split_paragraphs
 from flask import current_app
 
 # Import validation functions from the module
 from app.services.data_upload.nlpValidationHandlers import (
+    extract_after_day_one,
+    extract_after_diagnosis_code,
     validate_drug,
     validate_seizure,
 )
 
+TIMEOUT = 180 #Configured timeout period for any LLM request
 OLLAMA_URL = os.getenv("OLLAMA_HOST")  # This should be just the base URL, like http://ollama:11434
 MODEL_NAME = "mymodel"
 DRUG_MODEL_NAME = "drugmodel"
@@ -19,65 +22,93 @@ SEIZURE_MODEL_NAME = "seizuremodel"
 
 def handle_summary_request(data: str) -> str:
     """Generate a summary of the medical report."""
+
+    llm_prompt_visit_summary = """
+    You are a medical assistant specializing in epilepsy diagnostics.
+
+    From the EEG report below, extract and organize the following information using clinical terminology. Do **not** include any introductory text or explanation — only output the four labeled sections below, with no commentary or headers outside the format provided.
+
+    Required sections:
+
+    **Physical Symptoms:**
+    List observable symptoms (e.g., vomiting, aphasia, automatisms, impaired awareness, etc.).
+
+    **Seizure Description:**
+    Describe how the seizures present — their onset, progression, duration, and behavioral correlates.
+
+    **Seizure Types and Classification:**
+    If present, summarize each seizure type (e.g., Type 1, Type 2), including onset pattern, propagation, and distinguishing EEG or clinical features.
+
+    **Electrographic/EEG Findings:**
+    Report technical findings including spike-wave discharges, rhythmicity, regions involved, frequency evolution, etc.
+
+    --- Begin EEG Report ---
+
+    """
+
+    llm_prompt_history_electrodes = """
+    Extract and return only the following three sections from the provided clinical text, formatted with these exact headings and no additional commentary:
+
+    Clinical History:
+    [Summary of the patient's epilepsy type, cause, and reason for admission.]
+
+    Medications:
+    [List outpatient prescriptions first, then inpatient/clinic-administered medications separately.]
+
+    Electrode Placements:
+    [List each electrode target and number of contacts.]
+
+    This is the medical text:
+
+    """
+
+    first_1000 = data[:1000]
+
     try:
         payload = {
             "model": MODEL_NAME,
-            "prompt": """You are an epilepsy-focused medical assistant summarizing clinical and EEG data. Generate responses with ONLY these five sections:
-EEG findings
-Clinical Correlation
-Key Points
-Additional Notes
-Clinical code (only if explicitly stated at the end)
-Strict Rules
-No recommendations, treatment advice, or prognostic statements.
-Use only the provided patient data. No speculation or external knowledge.
-Adhere to terminology from:
-ACNS 2021 Critical Care EEG Terminology
-ILAE 2017 Epilepsy Classification
-
-
-Key Focus Areas
-Seizure semiology (e.g., aura, automatisms)
-EEG correlates (e.g., rhythmic discharges, Hz, spread)
-Localization (e.g., hippocampal, temporal)
-Clinical codes (if explicitly listed)
-
-
-Standardized Quantifications (Required Use)
-ACNS 2021:
-Voltage: High ≥150 µV, Low <20 µV, Suppressed <10 µV
-Continuity: Continuous (<1%), Discontinuous (10–49%), Burst Suppression (50–99%), Suppressed (>99%)
-Pattern Evolution: Seizures >2.5 Hz & ≥10 sec; BIRDs if <10 sec
-Epileptiform Bursts: ≥2 discharges in ≥50% bursts, ≥1 Hz average
-Identical Bursts: ≥0.5 sec visually similar in ≥90% of bursts
-Discharge Frequency:
-
-
-Abundant ≥1/10s, Frequent ≥1/min, Occasional ≥1/hr, Rare <1/hr
-
-
-Reactivity: Must alter cerebral activity (not muscle/blink); "SIRPIDs-only" if stimulus-induced only
-
-
-ILAE 2017:
-Focal SE with impaired consciousness: ≥10 minutes
-Intermediate EEG pattern: 1–9.9 min
-Long EEG pattern: 10–59 min
-
-
-Never Include:
-Clinical recommendations (e.g., “should consider”, “may help”)
-Non-standard headings or outside context:
-
-
-
-""" + data,
+            "prompt": llm_prompt_history_electrodes + first_1000,
             "stream": False,
         }
-        current_app.logger.info("Sending summary request to model")
-        response = send_request_to_model(payload)
+        current_app.logger.info("Sending summary request 1 to model")
+        response = send_request_to_model(payload) + '\n\n'
         current_app.logger.info(f"Response: {response}")
-        return response
+
+        """
+        paragraphs = split_paragraphs(data)
+        current_app.logger.info("Issue here")
+        current_app.logger.info("Issue not here?")
+        
+        paragraphs = filter_paragraphs(paragraphs)
+
+        current_app.logger.info("Issue maybe here")
+        current_app.logger.info("Issue maybe not here?")
+        """
+
+        # User input
+        question = "What were the EEG correlates in the patients seizures? What were the patients physical symptoms during a seizure? Did the patient have Type 1, Type 2, or Type 3 seizures?"
+        k = 12  # Reduced for more focused results
+
+        # Get and display results
+        current_app.logger.info("HERE")
+        top_paragraphs = find_top_k_similar(data, question, k)
+        
+        current_app.logger.info("NO??")
+
+        llm_prompt_visit_summary = llm_prompt_visit_summary + "\n\n".join(item['paragraph'] for item in top_paragraphs)
+
+        payload = {
+            "model": MODEL_NAME,
+            "prompt": llm_prompt_visit_summary,
+            "stream": False,
+        }
+        current_app.logger.info("Sending summary request 2 to model")
+        response += send_request_to_model(payload)
+        current_app.logger.info(f"Response: {response}")
+        text = extract_after_day_one(data)
+        clinical_code = extract_after_diagnosis_code(text)
+
+        return response + "\n\n" + clinical_code
     except Exception as e:
         current_app.logger.error(f"Error in handle_summary_request: {str(e)}")
         return f"Error generating summary: {str(e)}"
@@ -271,7 +302,7 @@ def send_request_to_model(payload: Dict[str, Any]) -> str:
             headers={"Content-Type": "application/json"},
         )
 
-        with urllib.request.urlopen(req, timeout=None) as response:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
             result = json.loads(response.read().decode("utf-8"))
             return result["response"]
 

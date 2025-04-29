@@ -4,6 +4,31 @@ from flask import current_app
 from typing import List, Dict, Union, Any
 from datetime import datetime, timedelta
 
+def extract_after_diagnosis_code(content):
+    # Pattern to match "Clinical Code(s):" or "Clinical Diagnosis Code:" and capture everything after it
+    pattern = r'Clinical\s+(?:Code\(s\)|Diagnosis\s+Code):\s*\n?(.*)'
+
+    match = re.search(pattern, content, re.DOTALL)
+
+    if match:
+        clinical_code_string = "**Clinical Code**\n" + match.group(1).strip()
+        return clinical_code_string  # Return everything after the label
+    else:
+        return ""
+
+def extract_after_day_one(content):
+    # Pattern to match "Clinical Code(s):" or "Clinical Diagnosis Code:" and capture everything after it
+    # Extract text after "Day 1" (case-insensitive)
+    match = re.search(r'(?i)day 1[:,\-\s]*(.*)', content, re.DOTALL)
+
+    if match:
+        extracted_text = match.group(1).strip()
+
+    else:
+        extracted_text = content
+
+    return extracted_text
+
 def normalize_time_string(t):
     try:
         # Try known formats
